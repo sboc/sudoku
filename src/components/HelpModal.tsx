@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { TECHNIQUE_WEIGHT, DIFFICULTY_BANDS } from '../core/grader';
 import type { Technique } from '../core/humanSolver';
 import { TECHNIQUE_LABEL } from '../core/techniqueHelp';
@@ -26,12 +27,21 @@ interface Props {
 }
 
 export function HelpModal({ onClose }: Props) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   return (
     <div className="help-overlay" onClick={onClose}>
-      <div className="help-modal" onClick={e => e.stopPropagation()}>
-        <button className="help-close" onClick={onClose} aria-label="Close">✕</button>
+      <div className="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" onClick={e => e.stopPropagation()}>
+        <button ref={closeRef} className="help-close" onClick={onClose} aria-label="Close">✕</button>
 
-        <h2>How puzzles work</h2>
+        <h2 id="help-modal-title">How puzzles work</h2>
 
         <section>
           <h3>Generation</h3>
