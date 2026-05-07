@@ -84,7 +84,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   } = useHint({ nextHint, userGrid, autoSolveRef, setElapsed, showTimerFlash, placeDigitDirect, applyEliminations });
 
   const { autoSolve, toggleAutoSolve } = useAutoSolve({
-    userGridRef, notesRef, solvedRef, autoSolveRef,
+    userGridRef, notesRef, solvedRef, failedRef, autoSolveRef,
     setElapsed, showTimerFlash,
     setActiveHint, setHintPhase, setHintRevealed,
     applyHintAction, fillAllNotes,
@@ -127,6 +127,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (solvedRef.current || failedRef.current) return;
       const sel = selectedRef.current;
       if (e.key === 'Escape') { if (sel !== null) selectCell(sel); }
       else if (e.key === 'n' || e.key === 'N') toggleNotesMode();

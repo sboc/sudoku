@@ -125,7 +125,7 @@ export function useSudoku(initial: GeneratedPuzzle, saved?: SavedSudokuState) {
 
   const placeDigitDirect = useCallback((cell: number, digit: number) => {
     setState(s => {
-      if (s.puzzle[cell] !== 0) return s;
+      if (s.puzzle[cell] !== 0 || s.solved || s.failed) return s;
       const userGrid = [...s.userGrid];
       userGrid[cell] = digit;
       let notes = [...s.notes];

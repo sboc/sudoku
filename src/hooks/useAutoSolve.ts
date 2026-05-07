@@ -9,6 +9,7 @@ interface UseAutoSolveParams {
   userGridRef: MutableRefObject<number[]>;
   notesRef: MutableRefObject<Set<number>[]>;
   solvedRef: MutableRefObject<boolean>;
+  failedRef: MutableRefObject<boolean>;
   autoSolveRef: MutableRefObject<boolean>;
   setElapsed: Dispatch<SetStateAction<number>>;
   showTimerFlash: (msg: string) => void;
@@ -23,6 +24,7 @@ export function useAutoSolve({
   userGridRef,
   notesRef,
   solvedRef,
+  failedRef,
   autoSolveRef,
   setElapsed,
   showTimerFlash,
@@ -39,9 +41,10 @@ export function useAutoSolve({
 
   function runAutoSolve() {
     if (!autoSolveRef.current) return;
-    if (solvedRef.current) {
+    if (solvedRef.current || failedRef.current) {
       autoSolveRef.current = false;
       setAutoSolve(false);
+      setActiveHint(null);
       return;
     }
     const hint = findNextHint(userGridRef.current, notesRef.current);
@@ -58,12 +61,12 @@ export function useAutoSolve({
     setHintPhase('evidence');
     setHintRevealed(true);
     autoSolveTimerRef.current = setTimeout(() => {
-      if (!autoSolveRef.current) return;
+      if (!autoSolveRef.current || failedRef.current) return;
       setElapsed(s => s + HINT_REVEAL_COST * w);
       showTimerFlash(penaltyLabel(HINT_REVEAL_COST * w));
       setHintPhase('action');
       autoSolveTimerRef.current = setTimeout(() => {
-        if (!autoSolveRef.current) return;
+        if (!autoSolveRef.current || failedRef.current) return;
         setElapsed(s => s + HINT_APPLY_COST * w);
         showTimerFlash(penaltyLabel(HINT_APPLY_COST * w));
         applyHintAction(hint);
