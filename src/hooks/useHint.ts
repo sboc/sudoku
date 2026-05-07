@@ -32,6 +32,7 @@ export function useHint({
     if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
     setActiveHint(null);
     setHintRevealed(false);
+    setHintPhase('evidence');
   }, []);
 
   useEffect(() => {

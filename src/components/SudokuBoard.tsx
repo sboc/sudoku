@@ -51,6 +51,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   const [copied, setCopied] = useState(false);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   const [showTechniqueHelp, setShowTechniqueHelp] = useState(false);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Declare refs before hooks that receive them; synced via useLayoutEffect below
   const selectedRef = useRef(selected);
@@ -102,7 +103,10 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   });
 
   useEffect(() => {
-    return () => { if (!exitedRef.current) persistGame(saveDataRef.current); };
+    return () => {
+      if (!exitedRef.current) persistGame(saveDataRef.current);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    };
   }, []);
 
   // Skip saving a pristine game that wasn't loaded from a save
@@ -164,7 +168,8 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   function copyLink() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
   }
 
