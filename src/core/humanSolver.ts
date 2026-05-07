@@ -887,8 +887,10 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
           eliminations: allEliminations,
         };
       }
-      default:
-        return null;
+      default: {
+        const _exhaustive: never = step.technique;
+        return _exhaustive;
+      }
     }
   }
 
