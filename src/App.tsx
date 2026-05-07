@@ -80,7 +80,8 @@ export default function App() {
   }
 
   function handleBack() {
-    history.back();
+    history.replaceState(null, '', window.location.pathname);
+    setActivePuzzle(null);
   }
 
   if (activePuzzle) {
