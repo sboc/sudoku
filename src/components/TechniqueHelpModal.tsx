@@ -1,8 +1,9 @@
 import { TECHNIQUE_EXPLANATIONS, TECHNIQUE_LABEL } from '../core/techniqueHelp';
+import type { Technique } from '../core/humanSolver';
 import './HelpModal.css';
 
 interface Props {
-  technique: string;
+  technique: Technique;
   onClose: () => void;
 }
 

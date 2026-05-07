@@ -205,7 +205,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
               key={i}
               className={getCellClass(i)}
               onClick={() => selectCell(i)}
-              aria-label={`Cell ${i} value ${val}`}
+              aria-label={`Row ${Math.floor(i / 9) + 1} Column ${(i % 9) + 1}${val !== 0 ? ` value ${val}` : ''}`}
             >
               {val !== 0 ? val : notes[i].size > 0 ? (
                 <span className="notes-grid">
