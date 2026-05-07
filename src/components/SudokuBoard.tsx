@@ -122,6 +122,10 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     persistGame(saveDataRef.current);
   }, [state.userGrid, state.notes, state.penaltyCount, state.failed, state.solved, state.notesMode, state.puzzle, savedGame]);
 
+  useEffect(() => {
+    if (solved || failed) setConfirmingEnd(false);
+  }, [solved, failed]);
+
   function handleFillAllNotes() {
     fillAllNotes();
     setElapsed(s => s + 30);
