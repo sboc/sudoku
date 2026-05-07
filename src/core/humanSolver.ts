@@ -540,23 +540,25 @@ function wWing(grid: number[], cands: Candidates): SolveStep | null {
       if (pPeers.has(q)) continue; // must not see each other directly
 
       for (const unit of ALL_UNITS) {
-        const aCells = unit.filter(c => grid[c] === 0 && cands[c].has(a));
-        if (aCells.length !== 2) continue;
-        const [x, y] = aCells;
-        const xPeers = PEER_SETS[x];
-        const yPeers = PEER_SETS[y];
-        const xSeesP = xPeers.has(p);
-        const ySeesQ = yPeers.has(q);
-        const xSeesQ = xPeers.has(q);
-        const ySeesP = yPeers.has(p);
-        if (!((xSeesP && ySeesQ) || (xSeesQ && ySeesP))) continue;
+        for (const [bridge, elim] of [[a, b], [b, a]] as [number, number][]) {
+          const bridgeCells = unit.filter(c => grid[c] === 0 && cands[c].has(bridge));
+          if (bridgeCells.length !== 2) continue;
+          const [x, y] = bridgeCells;
+          const xPeers = PEER_SETS[x];
+          const yPeers = PEER_SETS[y];
+          const xSeesP = xPeers.has(p);
+          const ySeesQ = yPeers.has(q);
+          const xSeesQ = xPeers.has(q);
+          const ySeesP = yPeers.has(p);
+          if (!((xSeesP && ySeesQ) || (xSeesQ && ySeesP))) continue;
 
-        let changed = false;
-        for (const c of peers(q)) {
-          if (!pPeers.has(c)) continue;
-          if (cands[c].has(b)) { cands[c].delete(b); changed = true; }
+          let changed = false;
+          for (const c of peers(q)) {
+            if (!pPeers.has(c)) continue;
+            if (cands[c].has(elim)) { cands[c].delete(elim); changed = true; }
+          }
+          if (changed) return { technique: 'w_wing', cells: [p, q, x, y], digit: elim };
         }
-        if (changed) return { technique: 'w_wing', cells: [p, q, x, y], digit: b };
       }
     }
   }
