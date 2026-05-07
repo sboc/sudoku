@@ -5,6 +5,7 @@
 body {
   margin: 0;
   background: #1a1a2e;
+  overflow-x: hidden;
 }
 
 #root {
@@ -15,4 +16,10 @@ body {
   padding: 2rem 1rem;
   color: #eee;
   font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 0.75rem 0.5rem;
+  }
 }

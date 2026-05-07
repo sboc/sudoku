@@ -34,6 +34,7 @@ header {
   height: 28px;
   padding: 0;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -160,6 +161,7 @@ h1 {
   font-size: clamp(0.9rem, 3vw, 1.3rem);
   font-weight: 600;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -261,6 +263,7 @@ h1 {
   font-weight: 700;
   padding: 0.6rem;
   cursor: pointer;
+  touch-action: manipulation;
   transition: background 0.15s, border-color 0.15s;
 }
 
@@ -339,6 +342,7 @@ h1 {
   height: 18px;
   padding: 0;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -460,4 +464,38 @@ h1 {
   100% { opacity: 0; transform: translateY(-8px); }
 }
 
+@media (max-width: 480px) {
+  .sudoku-container {
+    gap: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .share-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .hint-explain-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .numpad-row .num-btn {
+    height: 3rem;
+  }
+
+  .num-btn {
+    min-height: 2.75rem;
+  }
+
+  .hint-apply-btn,
+  .hint-dismiss-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
 

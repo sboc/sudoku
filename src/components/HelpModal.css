@@ -26,14 +26,20 @@
 
 .help-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.75rem;
+  right: 0.75rem;
   background: none;
   border: none;
   color: #8899bb;
   font-size: 1rem;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  touch-action: manipulation;
+  padding: 0.5rem 0.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   transition: color 0.15s;
 }
@@ -153,4 +159,24 @@
   font-size: 0.88rem;
   line-height: 1.55;
   color: #c9d1e0;
+}
+
+@media (max-width: 480px) {
+  .help-modal {
+    padding: 1rem;
+    max-height: 92svh;
+  }
+
+  .help-modal h2 {
+    padding-right: 3rem;
+  }
+
+  .tech-table {
+    font-size: 0.78rem;
+  }
+
+  .tech-table th,
+  .tech-table td {
+    padding: 0.35rem 0.3rem;
+  }
 }
