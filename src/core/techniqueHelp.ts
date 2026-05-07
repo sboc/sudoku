@@ -1,9 +1,11 @@
+import type { Technique } from './humanSolver';
+
 export interface TechniqueExplanation {
   summary: string;
   steps: string[];
 }
 
-export const TECHNIQUE_LABEL: Record<string, string> = {
+export const TECHNIQUE_LABEL: Record<Technique, string> = {
   naked_single: 'Naked Single',
   hidden_single: 'Hidden Single',
   naked_pair: 'Naked Pair',
@@ -21,7 +23,7 @@ export const TECHNIQUE_LABEL: Record<string, string> = {
   w_wing: 'W-Wing',
 };
 
-export const TECHNIQUE_EXPLANATIONS: Record<string, TechniqueExplanation> = {
+export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
   naked_single: {
     summary: 'A cell has only one digit that can legally go there. Every other digit is already present in the same row, column, or box.',
     steps: [
