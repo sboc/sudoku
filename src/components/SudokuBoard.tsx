@@ -210,8 +210,8 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   function copyLink() {
     const url = window.location.href;
     if (navigator.share) {
-      const text = solved ? `I solved this sudoku in ${formatSolveTime(elapsed)}!` : undefined;
-      navigator.share({ url, text }).catch((err: Error) => {
+      const text = solved ? `Solved in ${formatSolveTime(elapsed)}!` : undefined;
+      navigator.share({ url, title: 'Sudoku', text }).catch((err: Error) => {
         if (err.name !== 'AbortError') showTimerFlash('Share failed');
       });
       return;
