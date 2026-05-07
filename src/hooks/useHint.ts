@@ -61,11 +61,12 @@ export function useHint({
   }
 
   function handleShowWhere() {
-    if (!activeHint) return;
+    if (!activeHint || hintRevealed) return;
     const w = TECHNIQUE_WEIGHT[activeHint.technique];
     setElapsed(s => s + HINT_REVEAL_COST * w);
     showTimerFlash(penaltyLabel(HINT_REVEAL_COST * w));
     setHintRevealed(true);
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
     hintTimerRef.current = setTimeout(() => setHintPhase('action'), 700);
   }
 
