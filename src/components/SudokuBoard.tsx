@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSudoku } from '../hooks/useSudoku';
 import type { GeneratedPuzzle } from '../hooks/usePuzzlePool';
 import { loadSave, persistGame, localRemove } from '../core/persistence';
@@ -51,6 +51,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   const [copied, setCopied] = useState(false);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   const [showTechniqueHelp, setShowTechniqueHelp] = useState(false);
+  const closeTechniqueHelp = useCallback(() => setShowTechniqueHelp(false), []);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Declare refs before hooks that receive them; synced via useLayoutEffect below
@@ -319,7 +320,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       {showTechniqueHelp && activeHint && (
         <TechniqueHelpModal
           technique={activeHint.technique}
-          onClose={() => setShowTechniqueHelp(false)}
+          onClose={closeTechniqueHelp}
         />
       )}
 

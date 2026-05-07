@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { PlayableDifficulty } from '../hooks/usePuzzlePool';
 import type { UnfinishedGame } from '../App';
 import { HelpModal } from './HelpModal';
@@ -17,6 +17,7 @@ interface Props {
 
 export function StartPage({ counts, onSelect, unfinished, onContinue }: Props) {
   const [showHelp, setShowHelp] = useState(false);
+  const closeHelp = useCallback(() => setShowHelp(false), []);
 
   return (
     <div className="start-container">
@@ -66,7 +67,7 @@ export function StartPage({ counts, onSelect, unfinished, onContinue }: Props) {
           );
         })}
       </div>
-      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showHelp && <HelpModal onClose={closeHelp} />}
     </div>
   );
 }
