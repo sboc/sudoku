@@ -36,7 +36,6 @@ describe('dlxSolve', () => {
   });
 
   it('returns empty for unsolvable grid', () => {
-    const bad = [...EASY_PUZZLE];
     // Place conflicting digit: set cell 0 to 3 (row already has 5,3,0... 5 is at index 0)
     const conflict = Array(81).fill(0);
     conflict[0] = 1;
