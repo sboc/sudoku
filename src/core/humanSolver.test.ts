@@ -446,3 +446,201 @@ describe('advanced technique code paths', () => {
     expect(seenTechniques.size).toBeGreaterThan(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Advanced hint formatting coverage (findNextHint switch cases lines 678-891)
+// ---------------------------------------------------------------------------
+
+// Puzzles verified to trigger specific techniques through findNextHint step-through.
+// Each puzzle string is 81 digits (0 = empty).
+const GR1_PUZZLE = p('000000000000003085001020400000507000004000100090000000500000073002010000000040009');
+const NT1_PUZZLE = p('000030086000000000010200000000107600000040000007208000000004010000000000640050000');
+const HQ_PUZZLE = p('003000000000560040009000001020000070080000030070000040500000700060071000000000500');
+const XWING_PUZZLE = p('002050000010006300400000002000200004063040098700001000300000001009600030000010900');
+const WW4_PUZZLE = p('010000003608000207003900500000604010030050020040302000001007600305000109200000030');
+const YW1_PUZZLE = p('050000080000086000000201070009020601280000054703060900090605000000170000030000010');
+const XYZ3_PUZZLE = p('000900300005821000190600000016000290000070000043000670000008069000213800004009000');
+const WW_A_PUZZLE = p('480300000000000071020000000705000060000200800000000000001076000300000400000050000');
+const WW_B_PUZZLE = p('000014000030000200070000000000900030601000000000000080200000104000050600000708000');
+
+// Sentinel (non-digit) added to initialized notes so that findNextHint treats a
+// cell with all candidates eliminated differently from a cell with no notes at all.
+// Without it, an empty notes set causes findNextHint to re-derive all candidates
+// from the grid, causing infinite elimination loops.
+const NOTES_SENTINEL = 0;
+
+function initAdvancedCellNotes(notes: Set<number>[], grid: number[], cell: number) {
+  if (grid[cell] !== 0) { notes[cell].clear(); return; }
+  if (notes[cell].size > 0) return;
+  const r = Math.floor(cell / 9), c = cell % 9;
+  const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+  notes[cell].add(NOTES_SENTINEL);
+  for (let d = 1; d <= 9; d++) notes[cell].add(d);
+  for (let j = 0; j < 9; j++) {
+    if (grid[r * 9 + j]) notes[cell].delete(grid[r * 9 + j]);
+    if (grid[j * 9 + c]) notes[cell].delete(grid[j * 9 + c]);
+  }
+  for (let dr = 0; dr < 3; dr++)
+    for (let dc = 0; dc < 3; dc++)
+      if (grid[(br + dr) * 9 + (bc + dc)]) notes[cell].delete(grid[(br + dr) * 9 + (bc + dc)]);
+}
+
+function advancedPeersOf(cell: number): number[] {
+  const r = Math.floor(cell / 9), c = cell % 9;
+  const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+  const s = new Set<number>();
+  for (let i = 0; i < 9; i++) { s.add(r * 9 + i); s.add(i * 9 + c); }
+  for (let dr = 0; dr < 3; dr++)
+    for (let dc = 0; dc < 3; dc++) s.add((br + dr) * 9 + (bc + dc));
+  s.delete(cell);
+  return [...s];
+}
+
+function applyAdvancedHint(
+  grid: number[],
+  notes: Set<number>[],
+  hint: NonNullable<ReturnType<typeof findNextHint>>,
+) {
+  if (hint.isPlacement && hint.digit !== undefined) {
+    const cell = hint.actionCells[0];
+    grid[cell] = hint.digit;
+    notes[cell].clear();
+    for (const peer of advancedPeersOf(cell)) {
+      initAdvancedCellNotes(notes, grid, peer);
+      notes[peer].delete(hint.digit);
+    }
+  } else {
+    for (const { cell, digit } of hint.eliminations) {
+      initAdvancedCellNotes(notes, grid, cell);
+      notes[cell].delete(digit);
+    }
+  }
+}
+
+function captureHintOfType(puzzle: number[], targetTechnique: string, maxSteps = 1000): ReturnType<typeof findNextHint> {
+  const grid = [...puzzle];
+  const notes = Array.from({ length: 81 }, () => new Set<number>());
+  for (let i = 0; i < 81; i++) initAdvancedCellNotes(notes, grid, i);
+  for (let step = 0; step < maxSteps; step++) {
+    const hint = findNextHint(grid, notes);
+    if (!hint) return null;
+    if (hint.technique === targetTechnique) return hint;
+    applyAdvancedHint(grid, notes, hint);
+  }
+  return null;
+}
+
+describe('findNextHint — naked subset hint formatting', () => {
+  it('naked_pair: 2 evidence cells, eliminations present, digit set', () => {
+    const hint = captureHintOfType(GR1_PUZZLE, 'naked_pair');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(2);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.description).toMatch(/candidates/i);
+  });
+
+  it('naked_triple: 3 evidence cells, digit set, elimination hint', () => {
+    const hint = captureHintOfType(NT1_PUZZLE, 'naked_triple');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(3);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/triple/i);
+  });
+
+  it('naked_quad: 4 evidence cells, digit set, elimination hint', () => {
+    const hint = captureHintOfType(NT1_PUZZLE, 'naked_quad');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/quad/i);
+  });
+});
+
+describe('findNextHint — hidden subset hint formatting', () => {
+  it('hidden_pair: 2 cells, action cells equal evidence cells', () => {
+    const hint = captureHintOfType(GR1_PUZZLE, 'hidden_pair');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(2);
+    expect(hint!.actionCells).toEqual(hint!.evidenceCells);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+  });
+
+  it('hidden_triple: 3 cells, action cells equal evidence cells', () => {
+    const hint = captureHintOfType(WW_A_PUZZLE, 'hidden_triple');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(3);
+    expect(hint!.actionCells).toEqual(hint!.evidenceCells);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/triple/i);
+  });
+
+  it('hidden_quad: 4 cells, action cells equal evidence cells', () => {
+    const hint = captureHintOfType(HQ_PUZZLE, 'hidden_quad');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.actionCells).toEqual(hint!.evidenceCells);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/quad/i);
+  });
+});
+
+describe('findNextHint — fish technique hint formatting', () => {
+  it('x_wing: 4 corner evidence cells, digit set, description mentions X-Wing', () => {
+    const hint = captureHintOfType(XWING_PUZZLE, 'x_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/x-wing/i);
+  });
+
+  it('swordfish: cells present, digit set, description mentions Swordfish', () => {
+    const hint = captureHintOfType(WW4_PUZZLE, 'swordfish');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/swordfish/i);
+  });
+});
+
+describe('findNextHint — wing technique hint formatting', () => {
+  it('y_wing: 3 evidence cells (pivot + pincers), description mentions Y-Wing', () => {
+    const hint = captureHintOfType(YW1_PUZZLE, 'y_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(3);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/y-wing/i);
+  });
+
+  it('xyz_wing: 3 evidence cells, digit set, description mentions XYZ-Wing', () => {
+    const hint = captureHintOfType(XYZ3_PUZZLE, 'xyz_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(3);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/xyz-wing/i);
+  });
+
+  it('w_wing: 4 evidence cells (p, q, x, y), digit set, description mentions W-Wing', () => {
+    const hint = captureHintOfType(WW_A_PUZZLE, 'w_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/w-wing/i);
+  });
+});

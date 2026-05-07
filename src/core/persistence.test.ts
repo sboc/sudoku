@@ -50,7 +50,28 @@ describe('localStorage wrappers', () => {
   it('localKeys returns empty array when storage is empty', () => {
     expect(localKeys()).toHaveLength(0);
   });
+
+  it('localKeys returns empty array when localStorage throws', () => {
+    vi.stubGlobal('localStorage', { get length() { throw new Error('storage unavailable'); } });
+    expect(localKeys()).toEqual([]);
+    vi.stubGlobal('localStorage', localStorageMock);
+  });
 });
+
+function validSaveData() {
+  return {
+    sudoku: {
+      userGrid: Array(81).fill(0),
+      notes: Array(81).fill([]),
+      notesMode: false,
+      penaltyCount: 0,
+      failed: false,
+      solved: false,
+    },
+    elapsed: 42,
+    difficulty: 'easy',
+  };
+}
 
 describe('loadSave', () => {
   it('returns null for missing key', () => {
@@ -60,6 +81,76 @@ describe('loadSave', () => {
   it('returns null for invalid JSON', () => {
     localSet('bad', 'not-json{');
     expect(loadSave('bad')).toBeNull();
+  });
+
+  it('returns null for non-object JSON', () => {
+    localSet('k', JSON.stringify(42));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when sudoku field is missing', () => {
+    localSet('k', JSON.stringify({ elapsed: 0, difficulty: 'easy' }));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when userGrid is wrong length', () => {
+    const d = validSaveData(); d.sudoku.userGrid = [0, 1];
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when userGrid contains invalid digit', () => {
+    const d = validSaveData(); d.sudoku.userGrid = Array(81).fill(10);
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when notes is wrong length', () => {
+    const d = validSaveData(); (d.sudoku as Record<string, unknown>).notes = [[]];
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when notes contains non-array', () => {
+    const d = validSaveData(); (d.sudoku as Record<string, unknown>).notes = Array(81).fill(1);
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when notes contain out-of-range digits', () => {
+    const d = validSaveData(); d.sudoku.notes = Array(81).fill([10]);
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when notesMode is not boolean', () => {
+    const d = validSaveData(); (d.sudoku as Record<string, unknown>).notesMode = 'yes';
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when failed is not boolean', () => {
+    const d = validSaveData(); (d.sudoku as Record<string, unknown>).failed = 1;
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when penaltyCount is negative', () => {
+    const d = validSaveData(); d.sudoku.penaltyCount = -1;
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when elapsed is negative', () => {
+    const d = validSaveData(); d.elapsed = -5;
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
+  });
+
+  it('returns null when difficulty is not a string', () => {
+    const d = validSaveData(); (d as Record<string, unknown>).difficulty = 99;
+    localSet('k', JSON.stringify(d));
+    expect(loadSave('k')).toBeNull();
   });
 
   it('returns parsed object for valid JSON', () => {
