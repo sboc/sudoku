@@ -38,8 +38,10 @@ export function loadSave(key: string): PersistedGame | null {
     const p = JSON.parse(raw);
     if (!p || typeof p !== 'object') return null;
     if (!p.sudoku || !Array.isArray(p.sudoku.userGrid) || p.sudoku.userGrid.length !== 81) return null;
+    if (!p.sudoku.userGrid.every((v: unknown) => Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 9)) return null;
     if (!Array.isArray(p.sudoku.notes) || p.sudoku.notes.length !== 81) return null;
     if (!p.sudoku.notes.every(Array.isArray)) return null;
+    if (!p.sudoku.notes.every((arr: unknown[]) => arr.every(n => Number.isInteger(n) && (n as number) >= 1 && (n as number) <= 9))) return null;
     return p as PersistedGame;
   } catch { return null; }
 }

@@ -170,7 +170,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       setCopied(true);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    }).catch(() => showTimerFlash('Copy failed'));
   }
 
   return (
