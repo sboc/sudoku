@@ -259,7 +259,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
             <div className="numpad-main">
               <div className={`digit-grid${activeHint ? ' digit-grid--hidden' : ''}`}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
-                  <button key={d} onClick={() => enterDigit(d)} className="num-btn">{d}</button>
+                  <button key={d} onClick={() => enterDigit(d)} className="num-btn" tabIndex={activeHint ? -1 : undefined}>{d}</button>
                 ))}
               </div>
               {activeHint && (
