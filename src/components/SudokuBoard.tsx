@@ -310,13 +310,13 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
                       <p className="hint-description">{activeHint.description}</p>
                       <div className="hint-footer">
                         <button className="hint-apply-btn" onClick={handleApplyHint}>Apply</button>
-                        <button className="hint-dismiss-btn" onClick={dismissHint}>✕</button>
+                        <button className="hint-dismiss-btn" onClick={dismissHint} aria-label="Dismiss hint">✕</button>
                       </div>
                     </>
                   ) : (
                     <div className="hint-footer">
                       <button className="hint-apply-btn" onClick={handleShowWhere}>Show where</button>
-                      <button className="hint-dismiss-btn" onClick={dismissHint}>✕</button>
+                      <button className="hint-dismiss-btn" onClick={dismissHint} aria-label="Dismiss hint">✕</button>
                     </div>
                   )}
                 </div>
