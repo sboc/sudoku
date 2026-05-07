@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Background -->
+  <rect width="48" height="48" rx="7" fill="#0f1a2e"/>
+
+  <!-- Grid area: x=3 y=3 size=42, 3 boxes × 3 boxes -->
+  <!-- Each box = 14px, minor cell = 14/3 ≈ 4.667px -->
+
+  <!-- Minor cell lines (subtle) -->
+  <g stroke="#1e2d5a" stroke-width="0.5">
+    <!-- horizontal minor -->
+    <line x1="3" y1="7.67" x2="45" y2="7.67"/>
+    <line x1="3" y1="12.33" x2="45" y2="12.33"/>
+    <line x1="3" y1="21.67" x2="45" y2="21.67"/>
+    <line x1="3" y1="26.33" x2="45" y2="26.33"/>
+    <line x1="3" y1="35.67" x2="45" y2="35.67"/>
+    <line x1="3" y1="40.33" x2="45" y2="40.33"/>
+    <!-- vertical minor -->
+    <line x1="7.67" y1="3" x2="7.67" y2="45"/>
+    <line x1="12.33" y1="3" x2="12.33" y2="45"/>
+    <line x1="21.67" y1="3" x2="21.67" y2="45"/>
+    <line x1="26.33" y1="3" x2="26.33" y2="45"/>
+    <line x1="35.67" y1="3" x2="35.67" y2="45"/>
+    <line x1="40.33" y1="3" x2="40.33" y2="45"/>
+  </g>
+
+  <!-- Major box dividers -->
+  <g stroke="#4a6fa5" stroke-width="1.5">
+    <line x1="3" y1="17" x2="45" y2="17"/>
+    <line x1="3" y1="31" x2="45" y2="31"/>
+    <line x1="17" y1="3" x2="17" y2="45"/>
+    <line x1="31" y1="3" x2="31" y2="45"/>
+  </g>
+
+  <!-- Outer border -->
+  <rect x="3" y="3" width="42" height="42" rx="2" fill="none" stroke="#3b5bdb" stroke-width="1.5"/>
+
+  <!-- Numbers — a handful of placed digits, font-size tuned for readability -->
+  <!-- Given (bright) -->
+  <g font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central">
+    <!-- row 0 -->
+    <text x="10" y="5.8"  font-size="5" fill="#e0e6f0">3</text>
+    <text x="24" y="5.8"  font-size="5" fill="#e0e6f0">7</text>
+    <text x="42.67" y="5.8" font-size="5" fill="#e0e6f0">1</text>
+    <!-- row 1 -->
+    <text x="15" y="10.5" font-size="5" fill="#e0e6f0">6</text>
+    <!-- row 2 -->
+    <text x="5.3"  y="15.1" font-size="5" fill="#e0e6f0">9</text>
+    <text x="38.3" y="15.1" font-size="5" fill="#e0e6f0">4</text>
+    <!-- row 3 -->
+    <text x="20"   y="19.8" font-size="5" fill="#e0e6f0">2</text>
+    <text x="38.3" y="19.8" font-size="5" fill="#e0e6f0">8</text>
+    <!-- row 4 (center) -->
+    <text x="5.3"  y="24.5" font-size="5" fill="#e0e6f0">5</text>
+    <text x="24"   y="24.5" font-size="5.5" fill="#3b82f6">1</text>
+    <text x="42.67" y="24.5" font-size="5" fill="#e0e6f0">3</text>
+    <!-- row 5 -->
+    <text x="10"   y="29.2" font-size="5" fill="#e0e6f0">7</text>
+    <text x="28.7" y="29.2" font-size="5" fill="#e0e6f0">4</text>
+    <!-- row 6 -->
+    <text x="5.3"  y="33.9" font-size="5" fill="#e0e6f0">4</text>
+    <text x="38.3" y="33.9" font-size="5" fill="#e0e6f0">6</text>
+    <!-- row 7 -->
+    <text x="33.3" y="38.5" font-size="5" fill="#e0e6f0">9</text>
+    <!-- row 8 -->
+    <text x="5.3"  y="43.2" font-size="5" fill="#e0e6f0">8</text>
+    <text x="24"   y="43.2" font-size="5" fill="#e0e6f0">2</text>
+    <text x="42.67" y="43.2" font-size="5" fill="#e0e6f0">5</text>
+  </g>
+</svg>
