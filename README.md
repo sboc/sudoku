@@ -10,7 +10,7 @@ A React + TypeScript Sudoku game with a human-style solver, graded difficulty, a
 - Hint system: 15 solving techniques from Naked Single through W-Wing, with three-phase step-by-step reveal
 - Notes mode, auto-fill all notes, animated auto-solve
 - Penalty system: wrong guesses add time; 10 wrong attempts ends the game
-- Game state persisted in `localStorage`; resume unfinished games on return; share via URL hash (`#game/<81-digit-string>`)
+- Game state persisted in `localStorage`; resume unfinished games on return; share via URL hash (`#game/<81-digit-string>`) with solve time in share text (Web Share API on mobile, clipboard fallback)
 - Background puzzle pre-generation pool keeps puzzles ready instantly
 
 ## Tech stack
@@ -126,6 +126,7 @@ Static lookup tables: `TECHNIQUE_LABEL` (short display name) and `TECHNIQUE_HELP
 - `HINT_REVEAL_COST = 60` - seconds added for revealing which cells are involved
 - `HINT_APPLY_COST = 120` - seconds added for auto-applying the hint
 - `penaltyLabel(s)` - formats a penalty duration as `+Xs`, `+Xm`, or `+XmYs`
+- `formatSolveTime(s)` - formats elapsed seconds as human-readable prose (`1 hr, 3 mins and 2 secs`), used in share text
 - `formatTime(s)` - formats elapsed time as `MM:SS` or `H:MM:SS`
 
 ### `src/hooks/` - React state and side-effects
@@ -220,7 +221,7 @@ Each `core/` module has a co-located `*.test.ts` file:
 | `grader.test.ts` | Score calculation, difficulty band assignment |
 | `humanSolver.test.ts` | All 15 technique detection cases (~700 lines) |
 | `persistence.test.ts` | Serialisation round-trips, schema validation |
-| `utils.test.ts` | Time/penalty formatters |
+| `utils.test.ts` | Time/penalty formatters, `formatSolveTime` |
 
 Run with:
 ```sh
