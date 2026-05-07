@@ -7,7 +7,7 @@ import { findNextHint } from '../core/humanSolver';
 import { TechniqueHelpModal } from './TechniqueHelpModal';
 import { DIFFICULTY_COLOR } from '../core/grader';
 import { TECHNIQUE_LABEL } from '../core/techniqueHelp';
-import { formatTime } from '../core/utils';
+import { formatTime, formatSolveTime } from '../core/utils';
 import { useTimer } from '../hooks/useTimer';
 import { useCelebration } from '../hooks/useCelebration';
 import { useHint } from '../hooks/useHint';
@@ -208,7 +208,15 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   }
 
   function copyLink() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+    const url = window.location.href;
+    if (navigator.share) {
+      const text = solved ? `I solved this sudoku in ${formatSolveTime(elapsed)}!` : undefined;
+      navigator.share({ url, text }).catch((err: Error) => {
+        if (err.name !== 'AbortError') showTimerFlash('Share failed');
+      });
+      return;
+    }
+    navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);

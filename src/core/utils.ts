@@ -10,6 +10,18 @@ export function penaltyLabel(s: number): string {
   return `+${m}m${r}s`;
 }
 
+export function formatSolveTime(s: number): string {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h} ${h === 1 ? 'hr' : 'hrs'}`);
+  if (m > 0) parts.push(`${m} ${m === 1 ? 'min' : 'mins'}`);
+  if (sec > 0 || parts.length === 0) parts.push(`${sec} ${sec === 1 ? 'sec' : 'secs'}`);
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1];
+}
+
 export function formatTime(s: number): string {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
