@@ -129,10 +129,11 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     const handler = (e: KeyboardEvent) => {
       if (solvedRef.current || failedRef.current) return;
       const sel = selectedRef.current;
+      const locked = !!activeHint || autoSolveRef.current;
       if (e.key === 'Escape') { if (sel !== null) selectCell(sel); }
-      else if (e.key === 'n' || e.key === 'N') toggleNotesMode();
-      else if (e.key >= '1' && e.key <= '9') enterDigit(Number(e.key));
-      else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') clearCell();
+      else if (e.key === 'n' || e.key === 'N') { if (!locked) toggleNotesMode(); }
+      else if (e.key >= '1' && e.key <= '9') { if (!locked) enterDigit(Number(e.key)); }
+      else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') { if (!locked) clearCell(); }
       else if (e.key === 'ArrowRight') selectCell(sel !== null ? (sel % 9 < 8 ? sel + 1 : sel) : 0);
       else if (e.key === 'ArrowLeft') selectCell(sel !== null ? (sel % 9 > 0 ? sel - 1 : sel) : 0);
       else if (e.key === 'ArrowDown') selectCell(sel !== null ? (sel + 9 <= 80 ? sel + 9 : sel) : 0);
@@ -140,7 +141,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [enterDigit, clearCell, selectCell, toggleNotesMode]);
+  }, [enterDigit, clearCell, selectCell, toggleNotesMode, activeHint]);
 
   const selectedRow = selected !== null ? Math.floor(selected / 9) : -1;
   const selectedCol = selected !== null ? selected % 9 : -1;

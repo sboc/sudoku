@@ -21,18 +21,37 @@ export function useTimer(
     timerFlashTimerRef.current = setTimeout(() => setTimerFlash(null), 1500);
   }, []);
 
+  const hiddenPausedRef = useRef(false);
+
   useEffect(() => {
     timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+
+    function handleVisibility() {
+      if (document.visibilityState === 'hidden') {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          hiddenPausedRef.current = true;
+        }
+      } else if (hiddenPausedRef.current) {
+        hiddenPausedRef.current = false;
+        timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (timerFlashTimerRef.current) clearTimeout(timerFlashTimerRef.current);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
   useEffect(() => {
-    if ((solved || failed) && timerRef.current) {
-      clearInterval(timerRef.current);
+    if (solved || failed) {
+      if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
+      hiddenPausedRef.current = false;
     }
   }, [solved, failed]);
 
