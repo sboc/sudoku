@@ -17,9 +17,9 @@ export default defineConfig({
       exclude: ['src/core/techniqueHelp.ts'],
       reporter: ['text', 'html', 'lcov'],
       thresholds: {
-        lines: 68,
-        functions: 85,
-        branches: 46,
+        lines: 99,
+        functions: 100,
+        branches: 99,
       },
     },
   },
