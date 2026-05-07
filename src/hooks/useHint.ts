@@ -37,7 +37,7 @@ export function useHint({
 
   useEffect(() => {
     if (!autoSolveRef.current) dismissHint();
-  }, [userGrid, dismissHint]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userGrid, dismissHint, autoSolveRef]);
 
   useEffect(() => () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); }, []);
 

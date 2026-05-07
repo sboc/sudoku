@@ -109,7 +109,6 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     return () => {
       if (!exitedRef.current) persistGame(saveDataRef.current);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
-      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
     };
   }, []);
 
@@ -129,16 +128,19 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
 
   const prevPenaltyCountRef = useRef(penaltyCount);
   const [flashingCell, setFlashingCell] = useState<number | null>(null);
-  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (penaltyCount > prevPenaltyCountRef.current) {
-      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashingCell(selectedRef.current);
-      flashTimerRef.current = setTimeout(() => setFlashingCell(null), 600);
     }
     prevPenaltyCountRef.current = penaltyCount;
   }, [penaltyCount]);
+
+  useEffect(() => {
+    if (flashingCell === null) return;
+    const id = setTimeout(() => setFlashingCell(null), 600);
+    return () => clearTimeout(id);
+  }, [flashingCell]);
 
   const puzzleBlockedDigits = useMemo(() => {
     if (selected === null || userGrid[selected] !== 0) return new Set<number>();

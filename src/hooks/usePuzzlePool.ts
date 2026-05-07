@@ -48,20 +48,19 @@ function persistPool(d: PlayableDifficulty, puzzles: GeneratedPuzzle[]) {
 }
 
 export function usePuzzlePool() {
-  // poolRef and counts are initialised together so there is no flash of "Preparing..."
-  // for master/legend puzzles that were persisted from a previous session.
-  const poolRef = useRef<Pool>(null!);
-  // eslint-disable-next-line react-hooks/refs
-  const [counts, setCounts] = useState<Record<PlayableDifficulty, number>>(() => {
+  // Load persisted master/legend puzzles once so there is no flash of "Preparing..."
+  // when the component mounts with already-generated puzzles from a prior session.
+  const [initialPool] = useState<Pool>(() => {
     const pool: Pool = { easy: [], medium: [], hard: [], expert: [], master: [], legend: [] };
     pool.master = loadPersistedPool('master');
     pool.legend = loadPersistedPool('legend');
-    poolRef.current = pool;
-    return {
-      easy: 0, medium: 0, hard: 0, expert: 0,
-      master: pool.master.length,
-      legend: pool.legend.length,
-    };
+    return pool;
+  });
+  const poolRef = useRef(initialPool);
+  const [counts, setCounts] = useState<Record<PlayableDifficulty, number>>({
+    easy: 0, medium: 0, hard: 0, expert: 0,
+    master: initialPool.master.length,
+    legend: initialPool.legend.length,
   });
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
