@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { localGet, localSet, localRemove, localKeys, loadSave, persistGame } from './persistence';
 
-function makeLocalStorageMock() {
+const makeLocalStorageMock = () => {
   let store: Record<string, string> = {};
   return {
     getItem: (k: string) => store[k] ?? null,
@@ -11,7 +11,7 @@ function makeLocalStorageMock() {
     key: (i: number) => Object.keys(store)[i] ?? null,
     clear: () => { store = {}; },
   };
-}
+};
 
 const localStorageMock = makeLocalStorageMock();
 vi.stubGlobal('localStorage', localStorageMock);
@@ -70,7 +70,7 @@ describe('localStorage wrappers', () => {
   });
 });
 
-function validSaveData() {
+const validSaveData = () => {
   return {
     sudoku: {
       userGrid: Array(81).fill(0),
@@ -83,7 +83,7 @@ function validSaveData() {
     elapsed: 42,
     difficulty: 'easy',
   };
-}
+};
 
 describe('loadSave', () => {
   it('returns null for missing key', () => {

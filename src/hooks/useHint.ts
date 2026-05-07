@@ -14,7 +14,7 @@ interface UseHintParams {
   applyEliminations: (elims: { cell: number; digit: number }[]) => void;
 }
 
-export function useHint({
+export const useHint = ({
   nextHint,
   userGrid,
   autoSolveRef,
@@ -22,7 +22,7 @@ export function useHint({
   showTimerFlash,
   placeDigitDirect,
   applyEliminations,
-}: UseHintParams) {
+}: UseHintParams) => {
   const [activeHint, setActiveHint] = useState<Hint | null>(null);
   const [hintPhase, setHintPhase] = useState<'evidence' | 'action'>('evidence');
   const [hintRevealed, setHintRevealed] = useState(false);
@@ -49,7 +49,7 @@ export function useHint({
     }
   }, [placeDigitDirect, applyEliminations]);
 
-  function handleHelp() {
+  const handleHelp = () => {
     if (activeHint) { dismissHint(); return; }
     if (!nextHint) return;
     const w = TECHNIQUE_WEIGHT[nextHint.technique];
@@ -58,9 +58,9 @@ export function useHint({
     setActiveHint(nextHint);
     setHintPhase('evidence');
     setHintRevealed(false);
-  }
+  };
 
-  function handleShowWhere() {
+  const handleShowWhere = () => {
     if (!activeHint || hintRevealed) return;
     const w = TECHNIQUE_WEIGHT[activeHint.technique];
     setElapsed(s => s + HINT_REVEAL_COST * w);
@@ -68,16 +68,16 @@ export function useHint({
     setHintRevealed(true);
     if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
     hintTimerRef.current = setTimeout(() => setHintPhase('action'), 700);
-  }
+  };
 
-  function handleApplyHint() {
+  const handleApplyHint = () => {
     if (!activeHint) return;
     const w = TECHNIQUE_WEIGHT[activeHint.technique];
     setElapsed(s => s + HINT_APPLY_COST * w);
     showTimerFlash(penaltyLabel(HINT_APPLY_COST * w));
     applyHintAction(activeHint);
     dismissHint();
-  }
+  };
 
   const hintEvidenceSet = useMemo(
     () => (activeHint && hintRevealed ? new Set(activeHint.evidenceCells) : null),
@@ -97,4 +97,4 @@ export function useHint({
     hintEvidenceSet, hintActionSet,
     applyHintAction,
   };
-}
+};

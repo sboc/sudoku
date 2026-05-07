@@ -26,7 +26,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function HelpModal({ onClose }: Props) {
+export const HelpModal = ({ onClose }: Props) => {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -99,4 +99,4 @@ export function HelpModal({ onClose }: Props) {
       </div>
     </div>
   );
-}
+};

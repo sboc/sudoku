@@ -1,4 +1,4 @@
-export function ShareIcon() {
+export const ShareIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -6,9 +6,9 @@ export function ShareIcon() {
       <path d="M4 8v5h8V8"/>
     </svg>
   );
-}
+};
 
-export function PowerIcon() {
+export const PowerIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
@@ -16,36 +16,36 @@ export function PowerIcon() {
       <path d="M5.5 5A5 5 0 1 0 10.5 5"/>
     </svg>
   );
-}
+};
 
-export function CheckIcon() {
+export const CheckIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 8l4 4 6-7"/>
     </svg>
   );
-}
+};
 
-export function CrossIcon() {
+export const CrossIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
       <path d="M4 4l8 8M12 4l-8 8"/>
     </svg>
   );
-}
+};
 
-export function PencilIcon() {
+export const PencilIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/>
     </svg>
   );
-}
+};
 
-export function FillAllIcon() {
+export const FillAllIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
@@ -55,9 +55,9 @@ export function FillAllIcon() {
       <line x1="5" y1="11" x2="9"  y2="11"/>
     </svg>
   );
-}
+};
 
-export function HelpIcon() {
+export const HelpIcon = () => {
   return (
     <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -66,4 +66,4 @@ export function HelpIcon() {
       <circle cx="8" cy="12" r="0.7" fill="currentColor" stroke="none"/>
     </svg>
   );
-}
+};

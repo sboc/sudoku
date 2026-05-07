@@ -8,7 +8,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function TechniqueHelpModal({ technique, onClose }: Props) {
+export const TechniqueHelpModal = ({ technique, onClose }: Props) => {
   const explanation = TECHNIQUE_EXPLANATIONS[technique];
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -44,4 +44,4 @@ export function TechniqueHelpModal({ technique, onClose }: Props) {
       </div>
     </div>
   );
-}
+};

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-export function useTimer(
+export const useTimer = (
   initialElapsed: number,
   initialPenaltyCount: number,
   penaltyCount: number,
   solved: boolean,
   failed: boolean,
-) {
+) => {
   const [elapsed, setElapsed] = useState(initialElapsed);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [timerFlash, setTimerFlash] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export function useTimer(
       if (!gameEndedRef.current) setElapsed(s => s + 1);
     }, 1000);
 
-    function handleVisibility() {
+    const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         if (timerRef.current) {
           clearInterval(timerRef.current);
@@ -42,7 +42,7 @@ export function useTimer(
           if (!gameEndedRef.current) setElapsed(s => s + 1);
         }, 1000);
       }
-    }
+    };
 
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
@@ -71,4 +71,4 @@ export function useTimer(
   }, [penaltyCount, showTimerFlash]);
 
   return { elapsed, setElapsed, timerFlash, timerFlashKey, showTimerFlash };
-}
+};

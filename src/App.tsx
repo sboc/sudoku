@@ -13,11 +13,11 @@ export interface UnfinishedGame {
   difficulty: string;
 }
 
-function encodePuzzle(puzzle: number[]): string {
+const encodePuzzle = (puzzle: number[]): string => {
   return puzzle.join('');
-}
+};
 
-function puzzleFromString(puzzleString: string): GeneratedPuzzle | null {
+const puzzleFromString = (puzzleString: string): GeneratedPuzzle | null => {
   const puzzle = puzzleString.split('').map(Number);
   if (puzzle.length !== 81 || puzzle.some(isNaN)) return null;
   const solution = solvePuzzle(puzzle);
@@ -25,15 +25,15 @@ function puzzleFromString(puzzleString: string): GeneratedPuzzle | null {
   const humanResult = humanSolve(puzzle);
   const grade = gradePuzzle(humanResult.techniques, humanResult.solved);
   return { puzzle, solution, grade };
-}
+};
 
-function loadFromHash(hash: string): GeneratedPuzzle | null {
+const loadFromHash = (hash: string): GeneratedPuzzle | null => {
   const match = hash.match(/^#game\/([0-9]{81})$/);
   if (!match) return null;
   return puzzleFromString(match[1]);
-}
+};
 
-function findUnfinishedGame(): UnfinishedGame | null {
+const findUnfinishedGame = (): UnfinishedGame | null => {
   for (const key of localKeys()) {
     if (!key.startsWith('sudoku:') || key.length !== 88) continue;
     const save = loadSave(key);
@@ -42,9 +42,9 @@ function findUnfinishedGame(): UnfinishedGame | null {
     }
   }
   return null;
-}
+};
 
-export default function App() {
+const App = () => {
   const { counts, takePuzzle } = usePuzzlePool();
   const [activePuzzle, setActivePuzzle] = useState<GeneratedPuzzle | null>(() =>
     loadFromHash(window.location.hash)
@@ -60,36 +60,38 @@ export default function App() {
   }, [activePuzzle]);
 
   useEffect(() => {
-    function handlePopState() {
+    const handlePopState = () => {
       setActivePuzzle(loadFromHash(window.location.hash));
-    }
+    };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  function handleSelect(difficulty: PlayableDifficulty) {
+  const handleSelect = (difficulty: PlayableDifficulty) => {
     const puzzle = takePuzzle(difficulty);
     if (!puzzle) return;
     setActivePuzzle(puzzle);
     history.pushState(null, '', `#game/${encodePuzzle(puzzle.puzzle)}`);
-  }
+  };
 
-  function handleContinue() {
+  const handleContinue = () => {
     if (!unfinished) return;
     const puzzle = puzzleFromString(unfinished.puzzleString);
     if (!puzzle) return;
     setActivePuzzle(puzzle);
     history.pushState(null, '', `#game/${unfinished.puzzleString}`);
-  }
+  };
 
-  function handleBack() {
+  const handleBack = () => {
     history.replaceState(null, '', window.location.pathname);
     setActivePuzzle(null);
-  }
+  };
 
   if (activePuzzle) {
     return <SudokuBoard initialPuzzle={activePuzzle} onBack={handleBack} />;
   }
 
   return <StartPage counts={counts} onSelect={handleSelect} unfinished={unfinished} onContinue={handleContinue} />;
-}
+};
+
+export default App;

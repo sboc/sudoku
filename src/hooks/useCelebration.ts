@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { MutableRefObject } from 'react';
 
-export function useCelebration(
+export const useCelebration = (
   solved: boolean,
   failed: boolean,
   solvedRef: MutableRefObject<boolean>,
   failedRef: MutableRefObject<boolean>,
-) {
+) => {
   const [celebrating, setCelebrating] = useState(false);
   const [celebrationKey, setCelebrationKey] = useState(0);
   const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,4 +34,4 @@ export function useCelebration(
   }, [startCelebration, solvedRef, failedRef]);
 
   return { celebrating, celebrationKey };
-}
+};

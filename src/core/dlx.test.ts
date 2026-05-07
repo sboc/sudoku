@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { dlxSolve, hasUniqueSolution } from './dlx';
 
 // Puzzle string → number array helper
-function p(s: string): number[] {
+const p = (s: string): number[] => {
   return s.split('').map(Number);
-}
+};
 
 // Minimal valid puzzle (many givens, one solution)
 const EASY_PUZZLE = p(

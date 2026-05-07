@@ -15,7 +15,7 @@ interface Props {
   onContinue?: () => void;
 }
 
-export function StartPage({ counts, onSelect, unfinished, onContinue }: Props) {
+export const StartPage = ({ counts, onSelect, unfinished, onContinue }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const closeHelp = useCallback(() => setShowHelp(false), []);
 
@@ -70,4 +70,4 @@ export function StartPage({ counts, onSelect, unfinished, onContinue }: Props) {
       {showHelp && <HelpModal onClose={closeHelp} />}
     </div>
   );
-}
+};

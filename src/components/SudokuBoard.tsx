@@ -14,7 +14,7 @@ import { useHint } from '../hooks/useHint';
 import { useAutoSolve } from '../hooks/useAutoSolve';
 import './SudokuBoard.css';
 
-function CelebrationNumber({ value, index }: { value: number; index: number }) {
+const CelebrationNumber = ({ value, index }: { value: number; index: number }) => {
   const [vars] = useState<React.CSSProperties>(() => {
     const row = Math.floor(index / 9);
     const col = index % 9;
@@ -33,14 +33,14 @@ function CelebrationNumber({ value, index }: { value: number; index: number }) {
     } as React.CSSProperties;
   });
   return <span className="cel-num" style={vars}>{value}</span>;
-}
+};
 
 interface Props {
   initialPuzzle: GeneratedPuzzle;
   onBack: () => void;
 }
 
-export function SudokuBoard({ initialPuzzle, onBack }: Props) {
+export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
   const storageKey = `sudoku:${initialPuzzle.puzzle.join('')}`;
   const savedGame = useMemo(() => loadSave(storageKey), [storageKey]);
 
@@ -158,11 +158,11 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     return blocked;
   }, [selected, userGrid]);
 
-  function handleFillAllNotes() {
+  const handleFillAllNotes = () => {
     fillAllNotes();
     setElapsed(s => s + 30);
     showTimerFlash('+30s');
-  }
+  };
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -188,7 +188,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     ? Math.floor(selectedRow / 3) * 3 + Math.floor(selectedCol / 3)
     : -1;
 
-  function getCellClass(i: number): string {
+  const getCellClass = (i: number): string => {
     const row = Math.floor(i / 9);
     const col = i % 9;
     const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
@@ -205,9 +205,9 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       hintActionSet?.has(i) ? (activeHint!.isPlacement ? 'hint-target' : 'hint-eliminated') : null,
       flashingCell === i ? 'flash-error' : null,
     ] as (string | null)[]).filter(Boolean).join(' ');
-  }
+  };
 
-  function copyLink() {
+  const copyLink = () => {
     const url = window.location.href;
     if (navigator.share) {
       const text = solved ? `Solved in ${formatSolveTime(elapsed)}!` : undefined;
@@ -221,7 +221,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     }).catch(() => showTimerFlash('Copy failed'));
-  }
+  };
 
   return (
     <div className="sudoku-container">
@@ -371,4 +371,4 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
 
     </div>
   );
-}
+};

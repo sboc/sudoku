@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { humanSolve, findNextHint } from './humanSolver';
 
-function p(s: string): number[] {
+const p = (s: string): number[] => {
   return s.split('').map(Number);
-}
+};
 
 // Solvable with only naked/hidden singles
 const EASY_PUZZLE = p(
@@ -24,14 +24,14 @@ const HARD_PUZZLE = p(
 );
 
 // Near-complete: only one empty cell
-function nearlyComplete(): number[] {
+const nearlyComplete = (): number[] => {
   const g = [...EASY_SOLUTION];
   g[80] = 0;
   return g;
-}
+};
 
 // Apply humanSolve partially by simulating step-by-step via findNextHint
-function collectHints(puzzle: number[], maxSteps = 200): Array<{ technique: string }> {
+const collectHints = (puzzle: number[], maxSteps = 200): Array<{ technique: string }> => {
   const grid = [...puzzle];
   const notes = Array.from({ length: 81 }, () => new Set<number>());
   const hints: Array<{ technique: string }> = [];
@@ -74,7 +74,7 @@ function collectHints(puzzle: number[], maxSteps = 200): Array<{ technique: stri
     }
   }
   return hints;
-}
+};
 
 describe('humanSolve — basic', () => {
   it('solves an easy puzzle', () => {
@@ -294,7 +294,7 @@ const PAIRS_PUZZLE = p(
 
 describe('intermediate technique code paths via findNextHint', () => {
   // Step through hints collecting all technique types seen
-  function stepThroughHints(puzzle: number[], maxSteps = 300): Set<string> {
+  const stepThroughHints = (puzzle: number[], maxSteps = 300): Set<string> => {
     const grid = [...puzzle];
     // Start with empty notes — findNextHint uses grid-derived candidates when no notes present
     const notes = Array.from({ length: 81 }, () => new Set<number>());
@@ -328,7 +328,7 @@ describe('intermediate technique code paths via findNextHint', () => {
       }
     }
     return seen;
-  }
+  };
 
   it('exercises pointing_pair technique path', () => {
     const techniques = stepThroughHints(POINTING_PAIR_PUZZLE);
@@ -471,7 +471,7 @@ const WW_B_PUZZLE = p('000014000030000200070000000000900030601000000000000080200
 // from the grid, causing infinite elimination loops.
 const NOTES_SENTINEL = 0;
 
-function initAdvancedCellNotes(notes: Set<number>[], grid: number[], cell: number) {
+const initAdvancedCellNotes = (notes: Set<number>[], grid: number[], cell: number) => {
   if (grid[cell] !== 0) { notes[cell].clear(); return; }
   if (notes[cell].size > 0) return;
   const r = Math.floor(cell / 9), c = cell % 9;
@@ -485,9 +485,9 @@ function initAdvancedCellNotes(notes: Set<number>[], grid: number[], cell: numbe
   for (let dr = 0; dr < 3; dr++)
     for (let dc = 0; dc < 3; dc++)
       if (grid[(br + dr) * 9 + (bc + dc)]) notes[cell].delete(grid[(br + dr) * 9 + (bc + dc)]);
-}
+};
 
-function advancedPeersOf(cell: number): number[] {
+const advancedPeersOf = (cell: number): number[] => {
   const r = Math.floor(cell / 9), c = cell % 9;
   const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
   const s = new Set<number>();
@@ -496,13 +496,13 @@ function advancedPeersOf(cell: number): number[] {
     for (let dc = 0; dc < 3; dc++) s.add((br + dr) * 9 + (bc + dc));
   s.delete(cell);
   return [...s];
-}
+};
 
-function applyAdvancedHint(
+const applyAdvancedHint = (
   grid: number[],
   notes: Set<number>[],
   hint: NonNullable<ReturnType<typeof findNextHint>>,
-) {
+) => {
   if (hint.isPlacement && hint.digit !== undefined) {
     const cell = hint.actionCells[0];
     grid[cell] = hint.digit;
@@ -517,9 +517,9 @@ function applyAdvancedHint(
       notes[cell].delete(digit);
     }
   }
-}
+};
 
-function captureHintOfType(puzzle: number[], targetTechnique: string, maxSteps = 1000): ReturnType<typeof findNextHint> {
+const captureHintOfType = (puzzle: number[], targetTechnique: string, maxSteps = 1000): ReturnType<typeof findNextHint> => {
   const grid = [...puzzle];
   const notes = Array.from({ length: 81 }, () => new Set<number>());
   for (let i = 0; i < 81; i++) initAdvancedCellNotes(notes, grid, i);
@@ -530,7 +530,7 @@ function captureHintOfType(puzzle: number[], targetTechnique: string, maxSteps =
     applyAdvancedHint(grid, notes, hint);
   }
   return null;
-}
+};
 
 describe('findNextHint — naked subset hint formatting', () => {
   it('naked_pair: 2 evidence cells, eliminations present, digit set', () => {

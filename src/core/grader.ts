@@ -45,7 +45,7 @@ export interface Grade {
   techniques: Technique[];
 }
 
-export function gradePuzzle(techniques: Set<Technique>, solved: boolean): Grade {
+export const gradePuzzle = (techniques: Set<Technique>, solved: boolean): Grade => {
   if (!solved) {
     return { difficulty: 'unsolvable', score: 999, techniques: [...techniques] };
   }
@@ -62,4 +62,4 @@ export function gradePuzzle(techniques: Set<Technique>, solved: boolean): Grade 
   else difficulty = 'legend';
 
   return { difficulty, score, techniques: techniqueList };
-}
+};

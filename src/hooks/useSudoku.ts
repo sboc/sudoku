@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import type { GeneratedPuzzle } from './usePuzzlePool';
 import type { SavedSudokuState } from '../core/persistence';
 
-function eliminateFromPeerNotes(notes: Set<number>[], cell: number, digit: number): Set<number>[] {
+const eliminateFromPeerNotes = (notes: Set<number>[], cell: number, digit: number): Set<number>[] => {
   const row = Math.floor(cell / 9);
   const col = cell % 9;
   const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
@@ -23,7 +23,7 @@ function eliminateFromPeerNotes(notes: Set<number>[], cell: number, digit: numbe
     }
   }
   return result;
-}
+};
 
 interface SudokuState {
   puzzle: number[];
@@ -37,7 +37,7 @@ interface SudokuState {
   solved: boolean;
 }
 
-export function useSudoku(initial: GeneratedPuzzle, saved?: SavedSudokuState) {
+export const useSudoku = (initial: GeneratedPuzzle, saved?: SavedSudokuState) => {
   const [state, setState] = useState<SudokuState>(() => ({
     puzzle: initial.puzzle,
     solution: initial.solution,
@@ -150,4 +150,4 @@ export function useSudoku(initial: GeneratedPuzzle, saved?: SavedSudokuState) {
   }, []);
 
   return { state, selectCell, enterDigit, clearCell, toggleNotesMode, fillAllNotes, placeDigitDirect, applyEliminations };
-}
+};

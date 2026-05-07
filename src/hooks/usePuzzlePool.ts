@@ -19,11 +19,11 @@ const TARGET: Record<PlayableDifficulty, number> = {
 
 type Pool = Record<PlayableDifficulty, GeneratedPuzzle[]>;
 
-function poolStorageKey(d: PlayableDifficulty) {
+const poolStorageKey = (d: PlayableDifficulty) => {
   return `sudoku:pool:${d}`;
-}
+};
 
-function isValidPuzzle(p: unknown): p is GeneratedPuzzle {
+const isValidPuzzle = (p: unknown): p is GeneratedPuzzle => {
   if (!p || typeof p !== 'object') return false;
   const { puzzle, solution, grade } = p as Record<string, unknown>;
   return (
@@ -31,23 +31,23 @@ function isValidPuzzle(p: unknown): p is GeneratedPuzzle {
     Array.isArray(solution) && solution.length === 81 &&
     !!grade && typeof (grade as Record<string, unknown>).difficulty === 'string'
   );
-}
+};
 
-function loadPersistedPool(d: PlayableDifficulty): GeneratedPuzzle[] {
+const loadPersistedPool = (d: PlayableDifficulty): GeneratedPuzzle[] => {
   const raw = localGet(poolStorageKey(d));
   try {
     if (!raw) return [];
     const arr = JSON.parse(raw);
     return Array.isArray(arr) ? arr.filter(isValidPuzzle) : [];
   } catch { return []; }
-}
+};
 
-function persistPool(d: PlayableDifficulty, puzzles: GeneratedPuzzle[]) {
+const persistPool = (d: PlayableDifficulty, puzzles: GeneratedPuzzle[]) => {
   if (puzzles.length === 0) localRemove(poolStorageKey(d));
   else localSet(poolStorageKey(d), JSON.stringify(puzzles));
-}
+};
 
-export function usePuzzlePool() {
+export const usePuzzlePool = () => {
   // Load persisted master/legend puzzles once so there is no flash of "Preparing..."
   // when the component mounts with already-generated puzzles from a prior session.
   const [initialPool] = useState<Pool>(() => {
@@ -71,7 +71,7 @@ export function usePuzzlePool() {
   useEffect(() => {
     mountedRef.current = true;
 
-    function generateNext() {
+    const generateNext = () => {
       if (!mountedRef.current) { runningRef.current = false; return; }
 
       const needsMore = DIFFICULTIES.some(d => poolRef.current[d].length < TARGET[d]);
@@ -93,7 +93,7 @@ export function usePuzzlePool() {
       } catch { /* skip malformed puzzle, continue generating */ }
 
       timerRef.current = setTimeout(generateNext, 0);
-    }
+    };
 
     restartRef.current = generateNext;
     runningRef.current = true;
@@ -106,7 +106,7 @@ export function usePuzzlePool() {
     };
   }, []);
 
-  function takePuzzle(difficulty: PlayableDifficulty): GeneratedPuzzle | undefined {
+  const takePuzzle = (difficulty: PlayableDifficulty): GeneratedPuzzle | undefined => {
     const pool = poolRef.current[difficulty];
     if (pool.length === 0) return undefined;
     const item = pool.shift()!;
@@ -119,7 +119,7 @@ export function usePuzzlePool() {
     }
 
     return item;
-  }
+  };
 
   return { counts, takePuzzle };
-}
+};

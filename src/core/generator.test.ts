@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generatePuzzle, solvePuzzle } from './generator';
 
-function isValidComplete(grid: number[]): boolean {
+const isValidComplete = (grid: number[]): boolean => {
   if (grid.length !== 81) return false;
   for (let i = 0; i < 9; i++) {
     const row = Array.from({ length: 9 }, (_, j) => grid[i * 9 + j]).sort();
@@ -17,11 +17,11 @@ function isValidComplete(grid: number[]): boolean {
     if (JSON.stringify(box) !== JSON.stringify(expected)) return false;
   }
   return true;
-}
+};
 
-function p(s: string): number[] {
+const p = (s: string): number[] => {
   return s.split('').map(Number);
-}
+};
 
 const EASY_PUZZLE = p(
   '530070000600195000098000060800060003400803001700020006060000280000419005000080079',

@@ -7,23 +7,23 @@ export interface SavedSudokuState {
   solved: boolean;
 }
 
-export function localGet(key: string): string | null {
+export const localGet = (key: string): string | null => {
   try { return localStorage.getItem(key); } catch { return null; }
-}
+};
 
-export function localSet(key: string, value: string): void {
+export const localSet = (key: string, value: string): void => {
   try { localStorage.setItem(key, value); } catch { /* unavailable */ }
-}
+};
 
-export function localRemove(key: string): void {
+export const localRemove = (key: string): void => {
   try { localStorage.removeItem(key); } catch { /* unavailable */ }
-}
+};
 
-export function localKeys(): string[] {
+export const localKeys = (): string[] => {
   try {
     return Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i) ?? '').filter(Boolean);
   } catch { return []; }
-}
+};
 
 export interface PersistedGame {
   sudoku: SavedSudokuState;
@@ -31,7 +31,7 @@ export interface PersistedGame {
   difficulty: string;
 }
 
-export function loadSave(key: string): PersistedGame | null {
+export const loadSave = (key: string): PersistedGame | null => {
   const raw = localGet(key);
   if (!raw) return null;
   try {
@@ -50,9 +50,9 @@ export function loadSave(key: string): PersistedGame | null {
     if (typeof p.difficulty !== 'string') return null;
     return p as PersistedGame;
   } catch { return null; }
-}
+};
 
-export function persistGame({ state, elapsed, storageKey, difficulty }: {
+export const persistGame = ({ state, elapsed, storageKey, difficulty }: {
   state: { userGrid: number[]; notes: Set<number>[]; notesMode: boolean; penaltyCount: number; failed: boolean; solved: boolean };
   elapsed: number;
   storageKey: string;
@@ -71,4 +71,4 @@ export function persistGame({ state, elapsed, storageKey, difficulty }: {
     difficulty,
   };
   localSet(storageKey, JSON.stringify(data));
-}
+};

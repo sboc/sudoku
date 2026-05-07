@@ -1,20 +1,20 @@
 import { dlxSolve, hasUniqueSolution } from './dlx';
 
-function shuffle<T>(arr: T[]): T[] {
+const shuffle = <T>(arr: T[]): T[] => {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
-}
+};
 
-function generateFullGrid(): number[] {
+const generateFullGrid = (): number[] => {
   const grid = new Array(81).fill(0);
   fillGrid(grid);
   return grid;
-}
+};
 
-function fillGrid(grid: number[]): boolean {
+const fillGrid = (grid: number[]): boolean => {
   const empty = grid.indexOf(0);
   if (empty === -1) return true;
 
@@ -27,9 +27,9 @@ function fillGrid(grid: number[]): boolean {
     }
   }
   return false;
-}
+};
 
-function isValid(grid: number[], cell: number, d: number): boolean {
+const isValid = (grid: number[], cell: number, d: number): boolean => {
   const r = Math.floor(cell / 9);
   const c = cell % 9;
   const box = Math.floor(r / 3) * 3 + Math.floor(c / 3);
@@ -42,9 +42,9 @@ function isValid(grid: number[], cell: number, d: number): boolean {
     if (grid[br * 9 + bc] === d) return false;
   }
   return true;
-}
+};
 
-export function generatePuzzle(): { puzzle: number[]; solution: number[] } {
+export const generatePuzzle = (): { puzzle: number[]; solution: number[] } => {
   const solution = generateFullGrid();
   const puzzle = [...solution];
 
@@ -59,9 +59,9 @@ export function generatePuzzle(): { puzzle: number[]; solution: number[] } {
   }
 
   return { puzzle, solution };
-}
+};
 
-export function solvePuzzle(grid: number[]): number[] | null {
+export const solvePuzzle = (grid: number[]): number[] | null => {
   const solutions = dlxSolve(grid, 1);
   return solutions.length > 0 ? solutions[0] : null;
-}
+};

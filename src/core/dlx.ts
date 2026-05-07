@@ -149,7 +149,7 @@ class DLX {
 }
 
 // Constraints: cell, row-digit, col-digit, box-digit
-function buildSudokuDLX(grid: number[]): DLX {
+const buildSudokuDLX = (grid: number[]): DLX => {
   // 4 * 81 = 324 columns
   const dlx = new DLX(324);
 
@@ -173,9 +173,9 @@ function buildSudokuDLX(grid: number[]): DLX {
     }
   }
   return dlx;
-}
+};
 
-export function dlxSolve(grid: number[], max = 2): number[][] {
+export const dlxSolve = (grid: number[], max = 2): number[][] => {
   const dlx = buildSudokuDLX(grid);
   const solutions = dlx.solve(max);
   return solutions.map(sol => {
@@ -187,8 +187,8 @@ export function dlxSolve(grid: number[], max = 2): number[][] {
     }
     return result;
   });
-}
+};
 
-export function hasUniqueSolution(grid: number[]): boolean {
+export const hasUniqueSolution = (grid: number[]): boolean => {
   return dlxSolve(grid, 2).length === 1;
-}
+};

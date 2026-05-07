@@ -20,7 +20,7 @@ interface UseAutoSolveParams {
   fillAllNotes: () => void;
 }
 
-export function useAutoSolve({
+export const useAutoSolve = ({
   userGridRef,
   notesRef,
   solvedRef,
@@ -33,13 +33,13 @@ export function useAutoSolve({
   setHintRevealed,
   applyHintAction,
   fillAllNotes,
-}: UseAutoSolveParams) {
+}: UseAutoSolveParams) => {
   const [autoSolve, setAutoSolve] = useState(false);
   const autoSolveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => { if (autoSolveTimerRef.current) clearTimeout(autoSolveTimerRef.current); }, []);
 
-  function runAutoSolve() {
+  const runAutoSolve = () => {
     if (!autoSolveRef.current) return;
     if (solvedRef.current || failedRef.current) {
       autoSolveRef.current = false;
@@ -74,9 +74,9 @@ export function useAutoSolve({
         autoSolveTimerRef.current = setTimeout(runAutoSolve, 300);
       }, 500);
     }, 500);
-  }
+  };
 
-  function toggleAutoSolve() {
+  const toggleAutoSolve = () => {
     if (autoSolveRef.current) {
       autoSolveRef.current = false;
       setAutoSolve(false);
@@ -91,7 +91,7 @@ export function useAutoSolve({
       // Give fillAllNotes a tick to propagate before the first hint search
       autoSolveTimerRef.current = setTimeout(runAutoSolve, 100);
     }
-  }
+  };
 
   return { autoSolve, toggleAutoSolve };
-}
+};

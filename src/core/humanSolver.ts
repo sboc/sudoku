@@ -32,7 +32,7 @@ interface HumanSolveResult {
 
 type Candidates = Set<number>[];
 
-function initCandidates(grid: number[]): Candidates {
+const initCandidates = (grid: number[]): Candidates => {
   const cands: Candidates = Array.from({ length: 81 }, () => new Set<number>());
   for (let cell = 0; cell < 81; cell++) {
     if (grid[cell] !== 0) continue;
@@ -46,7 +46,7 @@ function initCandidates(grid: number[]): Candidates {
     }
   }
   return cands;
-}
+};
 
 const PEERS: number[][] = Array.from({ length: 81 }, (_, cell) => {
   const r = Math.floor(cell / 9);
@@ -66,13 +66,13 @@ const PEERS: number[][] = Array.from({ length: 81 }, (_, cell) => {
 const peers = (cell: number) => PEERS[cell];
 const PEER_SETS: ReadonlySet<number>[] = PEERS.map(p => new Set(p));
 
-function rowCells(r: number): number[] {
+const rowCells = (r: number): number[] => {
   return Array.from({ length: 9 }, (_, i) => r * 9 + i);
-}
-function colCells(c: number): number[] {
+};
+const colCells = (c: number): number[] => {
   return Array.from({ length: 9 }, (_, i) => i * 9 + c);
-}
-function boxCells(box: number): number[] {
+};
+const boxCells = (box: number): number[] => {
   const br = Math.floor(box / 3) * 3;
   const bc = (box % 3) * 3;
   const cells: number[] = [];
@@ -80,26 +80,26 @@ function boxCells(box: number): number[] {
     for (let c = 0; c < 3; c++)
       cells.push((br + r) * 9 + (bc + c));
   return cells;
-}
+};
 
 const ALL_ROWS: number[][] = Array.from({ length: 9 }, (_, i) => rowCells(i));
 const ALL_COLS: number[][] = Array.from({ length: 9 }, (_, i) => colCells(i));
 const ALL_BOXES: number[][] = Array.from({ length: 9 }, (_, i) => boxCells(i));
 const ALL_UNITS: number[][] = ALL_ROWS.flatMap((r, i) => [r, ALL_COLS[i], ALL_BOXES[i]]);
 
-function eliminate(cands: Candidates, cell: number, d: number) {
+const eliminate = (cands: Candidates, cell: number, d: number) => {
   for (const p of peers(cell)) {
     cands[p].delete(d);
   }
   cands[cell].clear();
-}
+};
 
-function placeDigit(grid: number[], cands: Candidates, cell: number, d: number) {
+const placeDigit = (grid: number[], cands: Candidates, cell: number, d: number) => {
   grid[cell] = d;
   eliminate(cands, cell, d);
-}
+};
 
-function nakedSingle(grid: number[], cands: Candidates): SolveStep | null {
+const nakedSingle = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let cell = 0; cell < 81; cell++) {
     if (grid[cell] !== 0) continue;
     if (cands[cell].size === 1) {
@@ -109,9 +109,9 @@ function nakedSingle(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function hiddenSingle(grid: number[], cands: Candidates): SolveStep | null {
+const hiddenSingle = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     for (let d = 1; d <= 9; d++) {
       const possible = unit.filter(c => grid[c] === 0 && cands[c].has(d));
@@ -122,9 +122,9 @@ function hiddenSingle(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function nakedPair(grid: number[], cands: Candidates): SolveStep | null {
+const nakedPair = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const empties = unit.filter(c => grid[c] === 0);
     for (let i = 0; i < empties.length; i++) {
@@ -153,9 +153,9 @@ function nakedPair(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function nakedTriple(grid: number[], cands: Candidates): SolveStep | null {
+const nakedTriple = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const unitEmpties = unit.filter(c => grid[c] === 0);
     const empties = unitEmpties.filter(c => cands[c].size >= 2 && cands[c].size <= 3);
@@ -185,9 +185,9 @@ function nakedTriple(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function hiddenPair(grid: number[], cands: Candidates): SolveStep | null {
+const hiddenPair = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const empties = unit.filter(c => grid[c] === 0);
     for (let d1 = 1; d1 <= 8; d1++) {
@@ -212,9 +212,9 @@ function hiddenPair(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function hiddenTriple(grid: number[], cands: Candidates): SolveStep | null {
+const hiddenTriple = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const empties = unit.filter(c => grid[c] === 0);
     for (let d1 = 1; d1 <= 7; d1++) {
@@ -244,9 +244,9 @@ function hiddenTriple(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function nakedQuad(grid: number[], cands: Candidates): SolveStep | null {
+const nakedQuad = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const unitEmpties = unit.filter(c => grid[c] === 0);
     const empties = unitEmpties.filter(c => cands[c].size >= 2 && cands[c].size <= 4);
@@ -274,9 +274,9 @@ function nakedQuad(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function hiddenQuad(grid: number[], cands: Candidates): SolveStep | null {
+const hiddenQuad = (grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const empties = unit.filter(c => grid[c] === 0);
     for (let d1 = 1; d1 <= 6; d1++) {
@@ -299,9 +299,9 @@ function hiddenQuad(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function pointingPair(grid: number[], cands: Candidates): SolveStep | null {
+const pointingPair = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let box = 0; box < 9; box++) {
     const bc = ALL_BOXES[box];
     for (let d = 1; d <= 9; d++) {
@@ -327,9 +327,9 @@ function pointingPair(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function boxLineReduction(grid: number[], cands: Candidates): SolveStep | null {
+const boxLineReduction = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let i = 0; i < 9; i++) {
     for (const unit of [ALL_ROWS[i], ALL_COLS[i]]) {
       for (let d = 1; d <= 9; d++) {
@@ -349,9 +349,9 @@ function boxLineReduction(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function xWing(grid: number[], cands: Candidates): SolveStep | null {
+const xWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let d = 1; d <= 9; d++) {
     // row-based
     const rowData: { row: number; cols: number[] }[] = [];
@@ -399,9 +399,9 @@ function xWing(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function swordfish(grid: number[], cands: Candidates): SolveStep | null {
+const swordfish = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let d = 1; d <= 9; d++) {
     // row-based
     const rowData: { row: number; cols: number[] }[] = [];
@@ -457,9 +457,9 @@ function swordfish(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
-function yWing(grid: number[], cands: Candidates): SolveStep | null {
+const yWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let pivot = 0; pivot < 81; pivot++) {
     if (grid[pivot] !== 0 || cands[pivot].size !== 2) continue;
     const [a, b] = cands[pivot];
@@ -488,12 +488,12 @@ function yWing(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
 // XYZ-Wing: pivot with 3 candidates, two bivalue pincers seeing pivot that are each a subset of
 // pivot's candidates. Together they cover all 3 pivot digits; their shared candidate is eliminated
 // from any cell that sees all three (pivot + both pincers).
-function xyzWing(grid: number[], cands: Candidates): SolveStep | null {
+const xyzWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let pivot = 0; pivot < 81; pivot++) {
     if (grid[pivot] !== 0 || cands[pivot].size !== 3) continue;
     const pivotCands = cands[pivot];
@@ -520,11 +520,11 @@ function xyzWing(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
 // W-Wing: two bivalue cells with the same two candidates {A,B} connected by a strong link on A.
 // If P=A then the bridge forces Q=B, so any cell seeing both P and Q can't be B.
-function wWing(grid: number[], cands: Candidates): SolveStep | null {
+const wWing = (grid: number[], cands: Candidates): SolveStep | null => {
   const bivalue: number[] = [];
   for (let c = 0; c < 81; c++) {
     if (grid[c] === 0 && cands[c].size === 2) bivalue.push(c);
@@ -563,7 +563,7 @@ function wWing(grid: number[], cands: Candidates): SolveStep | null {
     }
   }
   return null;
-}
+};
 
 const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
   nakedSingle,
@@ -593,15 +593,15 @@ export interface Hint {
   eliminations: { cell: number; digit: number }[];
 }
 
-function cloneCands(cands: Candidates): Candidates {
+const cloneCands = (cands: Candidates): Candidates => {
   return cands.map(s => new Set(s));
-}
+};
 
-function cellRef(cell: number): string {
+const cellRef = (cell: number): string => {
   return `R${Math.floor(cell / 9) + 1}C${(cell % 9) + 1}`;
-}
+};
 
-export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint | null {
+export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint | null => {
   const baseGrid = [...userGrid];
   const fromGrid = initCandidates(baseGrid);
   const hasAnyNotes = userNotes.some(s => s.size > 0);
@@ -896,9 +896,9 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
   }
 
   return null;
-}
+};
 
-export function humanSolve(inputGrid: number[]): HumanSolveResult {
+export const humanSolve = (inputGrid: number[]): HumanSolveResult => {
   const grid = [...inputGrid];
   const cands = initCandidates(grid);
   const steps: SolveStep[] = [];
@@ -920,4 +920,4 @@ export function humanSolve(inputGrid: number[]): HumanSolveResult {
 
   const solved = grid.every(v => v !== 0);
   return { solved, steps, techniques, finalGrid: grid };
-}
+};
