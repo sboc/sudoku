@@ -206,24 +206,33 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       </header>
 
       <div className="board-wrapper">
-        <div className={`board${celebrating ? ' board--celebrating' : ''}`} role="grid">
-          {userGrid.map((val, i) => (
-            <button
-              key={i}
-              className={getCellClass(i)}
-              onClick={() => selectCell(i)}
-              aria-label={`Row ${Math.floor(i / 9) + 1} Column ${(i % 9) + 1}${val !== 0 ? ` value ${val}` : notes[i].size > 0 ? ` notes ${[...notes[i]].sort((a, b) => a - b).join(' ')}` : ''}`}
-            >
-              {val !== 0 ? val : notes[i].size > 0 ? (
-                <span className="notes-grid">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                    <span key={n} className="note-digit">
-                      {notes[i].has(n) ? n : ''}
-                    </span>
-                  ))}
-                </span>
-              ) : null}
-            </button>
+        <div className={`board${celebrating ? ' board--celebrating' : ''}`} role="grid" aria-label="Sudoku grid">
+          {Array.from({ length: 9 }, (_, row) => (
+            <div key={row} role="row" style={{ display: 'contents' }}>
+              {Array.from({ length: 9 }, (_, col) => {
+                const i = row * 9 + col;
+                const val = userGrid[i];
+                return (
+                  <button
+                    key={i}
+                    role="gridcell"
+                    className={getCellClass(i)}
+                    onClick={() => selectCell(i)}
+                    aria-label={`Row ${row + 1} Column ${col + 1}${val !== 0 ? ` value ${val}` : notes[i].size > 0 ? ` notes ${[...notes[i]].sort((a, b) => a - b).join(' ')}` : ''}`}
+                  >
+                    {val !== 0 ? val : notes[i].size > 0 ? (
+                      <span className="notes-grid">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                          <span key={n} className="note-digit">
+                            {notes[i].has(n) ? n : ''}
+                          </span>
+                        ))}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </div>
         {celebrating && (
