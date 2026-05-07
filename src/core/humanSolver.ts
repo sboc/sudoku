@@ -848,7 +848,7 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
       }
       case 'y_wing': {
         const [pivot, p1, p2] = step.cells!;
-        const eliminatedDigit = allEliminations[0]?.digit;
+        const eliminatedDigit = allEliminations[0]?.digit ?? '?';
         return {
           technique: step.technique,
           description: `Y-Wing: pivot ${cellRef(pivot)} with pincers ${cellRef(p1)} and ${cellRef(p2)}. Eliminate ${eliminatedDigit} from their common peers.`,
