@@ -122,9 +122,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     persistGame(saveDataRef.current);
   }, [state.userGrid, state.notes, state.penaltyCount, state.failed, state.solved, state.notesMode, state.puzzle, savedGame]);
 
-  useEffect(() => {
-    if (solved || failed) setConfirmingEnd(false);
-  }, [solved, failed]);
+  const effectiveConfirmingEnd = confirmingEnd && !solved && !failed;
 
   function handleFillAllNotes() {
     fillAllNotes();
@@ -196,7 +194,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
         <button className="share-btn" onClick={copyLink} aria-label="Share">
           {copied ? <CheckIcon /> : <ShareIcon />}
         </button>
-        {confirmingEnd ? (
+        {effectiveConfirmingEnd ? (
           <>
             <button className="share-btn end-confirm" onClick={() => { exitedRef.current = true; localRemove(storageKey); onBack(); }} aria-label="Confirm end">
               <CheckIcon />
