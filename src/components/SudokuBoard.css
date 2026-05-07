@@ -179,6 +179,10 @@ h1 {
   font-weight: 800;
 }
 
+.cell.user-placed {
+  color: #6c9ff8;
+}
+
 .cell.selected {
   background: #3b5bdb !important;
   color: #fff;
@@ -274,6 +278,16 @@ h1 {
 .num-btn:hover {
   background: #1e2d5a;
   border-color: #3b5bdb;
+}
+
+.num-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.num-btn:disabled:hover {
+  background: #16213e;
+  border-color: #333;
 }
 
 .numpad-row {

@@ -124,6 +124,24 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
 
   const effectiveConfirmingEnd = confirmingEnd && !solved && !failed;
 
+  const selectedFilled = selected !== null && userGrid[selected] !== 0;
+
+  const puzzleBlockedDigits = useMemo(() => {
+    if (selected === null || userGrid[selected] !== 0) return new Set<number>();
+    const row = Math.floor(selected / 9);
+    const col = selected % 9;
+    const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+    const blocked = new Set<number>();
+    for (let k = 0; k < 9; k++) {
+      if (puzzle[row * 9 + k]) blocked.add(puzzle[row * 9 + k]);
+      if (puzzle[k * 9 + col]) blocked.add(puzzle[k * 9 + col]);
+      const br = Math.floor(box / 3) * 3 + Math.floor(k / 3);
+      const bc = (box % 3) * 3 + (k % 3);
+      if (puzzle[br * 9 + bc]) blocked.add(puzzle[br * 9 + bc]);
+    }
+    return blocked;
+  }, [selected, puzzle, userGrid]);
+
   function handleFillAllNotes() {
     fillAllNotes();
     setElapsed(s => s + 30);
@@ -163,7 +181,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       i === selected ? 'selected'
         : (row === selectedRow || col === selectedCol || box === selectedBox) ? 'highlighted' : null,
       selected !== null && userGrid[i] !== 0 && userGrid[i] === userGrid[selected] && i !== selected ? 'same-digit' : null,
-      puzzle[i] !== 0 ? 'given' : null,
+      puzzle[i] !== 0 ? 'given' : userGrid[i] !== 0 ? 'user-placed' : null,
       userGrid[i] === 0 && notes[i].size > 0 ? 'has-notes' : null,
       col % 3 === 2 && col !== 8 ? 'border-right' : null,
       row % 3 === 2 && row !== 8 ? 'border-bottom' : null,
@@ -204,7 +222,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
             </button>
           </>
         ) : (
-          <button className="share-btn" onClick={() => setConfirmingEnd(true)} aria-label="End game">
+          <button className="share-btn" onClick={() => solved || failed ? onBack() : setConfirmingEnd(true)} aria-label="End game">
             <PowerIcon />
           </button>
         )}
@@ -261,7 +279,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
             <div className="numpad-main">
               <div className={`digit-grid${activeHint ? ' digit-grid--hidden' : ''}`}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
-                  <button key={d} onClick={() => enterDigit(d)} className="num-btn" tabIndex={activeHint ? -1 : undefined}>{d}</button>
+                  <button key={d} onClick={() => enterDigit(d)} className="num-btn" disabled={selectedFilled || puzzleBlockedDigits.has(d)} tabIndex={activeHint ? -1 : undefined}>{d}</button>
                 ))}
               </div>
               {activeHint && (

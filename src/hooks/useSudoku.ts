@@ -114,7 +114,7 @@ export function useSudoku(initial: GeneratedPuzzle, saved?: SavedSudokuState) {
 
   const clearCell = useCallback(() => {
     setState(s => {
-      if (s.selected === null || s.puzzle[s.selected] !== 0 || s.failed || s.solved) return s;
+      if (s.selected === null || s.userGrid[s.selected] !== 0 || s.failed || s.solved) return s;
       const userGrid = [...s.userGrid];
       userGrid[s.selected] = 0;
       const notes = [...s.notes];
