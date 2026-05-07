@@ -57,7 +57,7 @@ export const persistGame = ({ state, elapsed, storageKey, difficulty }: {
   elapsed: number;
   storageKey: string;
   difficulty: string;
-}) {
+}) => {
   const data: PersistedGame = {
     sudoku: {
       userGrid: state.userGrid,
