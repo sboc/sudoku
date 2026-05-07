@@ -22,9 +22,12 @@ export function useTimer(
   }, []);
 
   const hiddenPausedRef = useRef(false);
+  const gameEndedRef = useRef(false);
 
   useEffect(() => {
-    timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+    timerRef.current = setInterval(() => {
+      if (!gameEndedRef.current) setElapsed(s => s + 1);
+    }, 1000);
 
     function handleVisibility() {
       if (document.visibilityState === 'hidden') {
@@ -35,7 +38,9 @@ export function useTimer(
         }
       } else if (hiddenPausedRef.current) {
         hiddenPausedRef.current = false;
-        timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+        timerRef.current = setInterval(() => {
+          if (!gameEndedRef.current) setElapsed(s => s + 1);
+        }, 1000);
       }
     }
 
@@ -49,6 +54,7 @@ export function useTimer(
 
   useEffect(() => {
     if (solved || failed) {
+      gameEndedRef.current = true;
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
       hiddenPausedRef.current = false;
