@@ -31,7 +31,7 @@ export function HelpModal({ onClose }: Props) {
 
   useEffect(() => {
     closeRef.current?.focus();
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
