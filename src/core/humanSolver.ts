@@ -888,6 +888,7 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
         };
       }
       default: {
+        /* c8 ignore next 2 */
         const _exhaustive: never = step.technique;
         return _exhaustive;
       }

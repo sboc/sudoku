@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { penaltyLabel, formatTime } from './utils';
+import { penaltyLabel, formatTime, formatSolveTime } from './utils';
 
 describe('penaltyLabel', () => {
   it('returns seconds only when < 60s', () => {
@@ -18,6 +18,35 @@ describe('penaltyLabel', () => {
     expect(penaltyLabel(90)).toBe('+1m30s');
     expect(penaltyLabel(125)).toBe('+2m5s');
     expect(penaltyLabel(3661)).toBe('+61m1s');
+  });
+});
+
+describe('formatSolveTime', () => {
+  it('returns seconds-only for values under one minute', () => {
+    expect(formatSolveTime(0)).toBe('0 secs');
+    expect(formatSolveTime(1)).toBe('1 sec');
+    expect(formatSolveTime(2)).toBe('2 secs');
+  });
+
+  it('returns minutes-only when no seconds remain', () => {
+    expect(formatSolveTime(60)).toBe('1 min');
+    expect(formatSolveTime(120)).toBe('2 mins');
+  });
+
+  it('returns hours-only when no minutes or seconds remain', () => {
+    expect(formatSolveTime(3600)).toBe('1 hr');
+    expect(formatSolveTime(7200)).toBe('2 hrs');
+  });
+
+  it('joins two parts with "and"', () => {
+    expect(formatSolveTime(90)).toBe('1 min and 30 secs');
+    expect(formatSolveTime(3660)).toBe('1 hr and 1 min');
+    expect(formatSolveTime(3601)).toBe('1 hr and 1 sec');
+  });
+
+  it('joins three parts with comma and "and"', () => {
+    expect(formatSolveTime(3661)).toBe('1 hr, 1 min and 1 sec');
+    expect(formatSolveTime(7382)).toBe('2 hrs, 3 mins and 2 secs');
   });
 });
 
