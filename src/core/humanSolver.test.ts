@@ -651,6 +651,33 @@ describe('findNextHint — fish technique hint formatting', () => {
     expect(hint!.eliminations.length).toBeGreaterThan(0);
     expect(hint!.description).toMatch(/swordfish/i);
   });
+
+  it('swordfish (row-based elimination): synthetic state exercises the row-based branch', () => {
+    // All-zero grid + crafted notes: digit 1 in rows 0, 3, 6 constrained to cols
+    // {1,7}, {4,7}, {1,4} respectively — combined col-set = {1,4,7} (size 3).
+    // Each row's target cols deliberately span different boxes so box-line reduction
+    // cannot fire before swordfish. No simpler technique fires first.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    const targetCols: Record<number, number[]> = { 0: [1, 7], 3: [4, 7], 6: [1, 4] };
+    for (const [rowStr, cols] of Object.entries(targetCols)) {
+      const row = Number(rowStr);
+      for (let col = 0; col < 9; col++) {
+        const cell = row * 9 + col;
+        if (cols.includes(col)) {
+          for (let d = 1; d <= 9; d++) notes[cell].add(d);
+        } else {
+          for (let d = 2; d <= 9; d++) notes[cell].add(d);
+        }
+      }
+    }
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('swordfish');
+    expect(hint!.digit).toBe(1);
+    expect(hint!.evidenceCells).toHaveLength(9);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+  });
 });
 
 describe('findNextHint — wing technique hint formatting', () => {
@@ -681,5 +708,16 @@ describe('findNextHint — wing technique hint formatting', () => {
     expect(hint!.digit).toBeDefined();
     expect(hint!.eliminations.length).toBeGreaterThan(0);
     expect(hint!.description).toMatch(/w-wing/i);
+  });
+
+  it('w_wing (wa !== digit branch): second puzzle exercises the other candidate-order arm', () => {
+    // WW_B_PUZZLE's w_wing fires with baseCands[p] = [5, 9] and digit = 9,
+    // so wa (5) !== digit (9) — takes the wa branch in the description formatter.
+    const hint = captureHintOfType(WW_B_PUZZLE, 'w_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('w_wing');
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
   });
 });

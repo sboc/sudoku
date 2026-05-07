@@ -835,7 +835,7 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
       }
       case 'swordfish': {
         const digit = step.digit!;
-        const cornerCells = step.cells ?? [];
+        const cornerCells = step.cells!;
         return {
           technique: step.technique,
           description: `Swordfish on ${digit}: three rows (or columns) each have ${digit} in only 2-3 cells, all spanning the same three columns (or rows). Eliminate ${digit} from the rest of those lines.`,
@@ -848,10 +848,10 @@ export function findNextHint(userGrid: number[], userNotes: Set<number>[]): Hint
       }
       case 'y_wing': {
         const [pivot, p1, p2] = step.cells!;
-        const eliminatedDigit = allEliminations[0]?.digit;
+        const eliminatedDigit = allEliminations[0].digit;
         return {
           technique: step.technique,
-          description: `Y-Wing: pivot ${cellRef(pivot)} with pincers ${cellRef(p1)} and ${cellRef(p2)}. Eliminate ${eliminatedDigit ?? '?'} from their common peers.`,
+          description: `Y-Wing: pivot ${cellRef(pivot)} with pincers ${cellRef(p1)} and ${cellRef(p2)}. Eliminate ${eliminatedDigit} from their common peers.`,
           evidenceCells: [pivot, p1, p2],
           actionCells: eliminatedCells,
           isPlacement: false,
