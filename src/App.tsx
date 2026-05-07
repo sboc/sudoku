@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { usePuzzlePool, type GeneratedPuzzle, type PlayableDifficulty } from './hooks/usePuzzlePool';
 import { StartPage } from './components/StartPage';
 import { SudokuBoard } from './components/SudokuBoard';
@@ -50,11 +50,14 @@ export default function App() {
     loadFromHash(window.location.hash)
   );
 
-  // Re-scan for unfinished games whenever the active puzzle changes (e.g. returning to start page)
-  const unfinished = useMemo<UnfinishedGame | null>(
-    () => (activePuzzle ? null : findUnfinishedGame()),
-    [activePuzzle]
+  const [unfinished, setUnfinished] = useState<UnfinishedGame | null>(
+    () => findUnfinishedGame()
   );
+
+  // Re-scan after activePuzzle clears — runs after unmount cleanup (persistGame), so save is in localStorage
+  useEffect(() => {
+    if (!activePuzzle) setUnfinished(findUnfinishedGame());
+  }, [activePuzzle]);
 
   useEffect(() => {
     function handlePopState() {
