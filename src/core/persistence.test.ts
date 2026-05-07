@@ -56,6 +56,18 @@ describe('localStorage wrappers', () => {
     expect(localKeys()).toEqual([]);
     vi.stubGlobal('localStorage', localStorageMock);
   });
+
+  it('localKeys filters out null key values from localStorage.key()', () => {
+    vi.stubGlobal('localStorage', {
+      length: 2,
+      key: (i: number) => (i === 0 ? 'real-key' : null),
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    });
+    expect(localKeys()).toEqual(['real-key']);
+    vi.stubGlobal('localStorage', localStorageMock);
+  });
 });
 
 function validSaveData() {

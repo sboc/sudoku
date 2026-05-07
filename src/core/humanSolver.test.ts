@@ -457,6 +457,8 @@ const GR1_PUZZLE = p('0000000000000030850010204000005070000040001000900000005000
 const NT1_PUZZLE = p('000030086000000000010200000000107600000040000007208000000004010000000000640050000');
 const HQ_PUZZLE = p('003000000000560040009000001020000070080000030070000040500000700060071000000000500');
 const XWING_PUZZLE = p('002050000010006300400000002000200004063040098700001000300000001009600030000010900');
+// Column-based x_wing (from SudokuWiki): digit 2 in same 2 rows across 2 columns, no matching row-based pattern
+const XWING_COL_PUZZLE = p('000000004760010050090002081070050010000709000080030060240100070010090045900000000');
 const WW4_PUZZLE = p('010000003608000207003900500000604010030050020040302000001007600305000109200000030');
 const YW1_PUZZLE = p('050000080000086000000201070009020601280000054703060900090605000000170000030000010');
 const XYZ3_PUZZLE = p('000900300005821000190600000016000290000070000043000670000008069000213800004009000');
@@ -594,7 +596,7 @@ describe('findNextHint — hidden subset hint formatting', () => {
 });
 
 describe('findNextHint — fish technique hint formatting', () => {
-  it('x_wing: 4 corner evidence cells, digit set, description mentions X-Wing', () => {
+  it('x_wing (row-based): 4 corner evidence cells, digit set, description mentions X-Wing', () => {
     const hint = captureHintOfType(XWING_PUZZLE, 'x_wing');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
@@ -602,6 +604,43 @@ describe('findNextHint — fish technique hint formatting', () => {
     expect(hint!.digit).toBeDefined();
     expect(hint!.eliminations.length).toBeGreaterThan(0);
     expect(hint!.description).toMatch(/x-wing/i);
+  });
+
+  it('x_wing (col-based): exercises column corner-cell path in hint formatting', () => {
+    const hint = captureHintOfType(XWING_COL_PUZZLE, 'x_wing');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+  });
+
+  it('x_wing (row-based corner assignment): synthetic state exercises the row-based branch', () => {
+    // All-zero grid + crafted notes: digit 1 constrained to exactly cols 2 and 6
+    // in rows 1 and 5 (via notes), while all other cells carry either full candidates
+    // (empty notes → grid-valid) or notes without digit 1. No simpler technique fires
+    // first (every unit has digit 1 in 2+ cells), so x_wing is the first hit and
+    // re-finds its corners via the row-based path (lines 795-796).
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    for (const row of [1, 5]) {
+      for (let col = 0; col < 9; col++) {
+        const cell = row * 9 + col;
+        if (col === 2 || col === 6) {
+          for (let d = 1; d <= 9; d++) notes[cell].add(d);
+        } else {
+          for (let d = 2; d <= 9; d++) notes[cell].add(d);
+        }
+      }
+    }
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('x_wing');
+    expect(hint!.digit).toBe(1);
+    // row-based corners: r1c2=11, r1c6=15, r5c2=47, r5c6=51
+    expect(hint!.evidenceCells).toEqual(expect.arrayContaining([11, 15, 47, 51]));
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
   });
 
   it('swordfish: cells present, digit set, description mentions Swordfish', () => {
