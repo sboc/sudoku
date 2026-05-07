@@ -91,6 +91,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   });
 
   // Keep refs current after every render (in effect, not during render)
+  const activeHintRef = useRef(activeHint);
   const saveDataRef = useRef({ state, elapsed, storageKey, difficulty: grade.difficulty });
   const exitedRef = useRef(false);
   useLayoutEffect(() => {
@@ -99,6 +100,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     notesRef.current = notes;
     solvedRef.current = solved;
     failedRef.current = failed;
+    activeHintRef.current = activeHint;
     saveDataRef.current = { state, elapsed, storageKey, difficulty: grade.difficulty };
   });
 
@@ -129,7 +131,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     const handler = (e: KeyboardEvent) => {
       if (solvedRef.current || failedRef.current) return;
       const sel = selectedRef.current;
-      const locked = !!activeHint || autoSolveRef.current;
+      const locked = !!activeHintRef.current || autoSolveRef.current;
       if (e.key === 'Escape') { if (sel !== null) selectCell(sel); }
       else if (e.key === 'n' || e.key === 'N') { if (!locked) toggleNotesMode(); }
       else if (e.key >= '1' && e.key <= '9') { if (!locked) enterDigit(Number(e.key)); }
@@ -141,7 +143,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [enterDigit, clearCell, selectCell, toggleNotesMode, activeHint]);
+  }, [enterDigit, clearCell, selectCell, toggleNotesMode]);
 
   const selectedRow = selected !== null ? Math.floor(selected / 9) : -1;
   const selectedCol = selected !== null ? selected % 9 : -1;
