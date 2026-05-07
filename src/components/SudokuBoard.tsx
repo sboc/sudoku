@@ -109,6 +109,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
     return () => {
       if (!exitedRef.current) persistGame(saveDataRef.current);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
     };
   }, []);
 
@@ -125,6 +126,19 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
   const effectiveConfirmingEnd = confirmingEnd && !solved && !failed;
 
   const selectedFilled = selected !== null && userGrid[selected] !== 0;
+
+  const prevPenaltyCountRef = useRef(penaltyCount);
+  const [flashingCell, setFlashingCell] = useState<number | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (penaltyCount > prevPenaltyCountRef.current) {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      setFlashingCell(selectedRef.current);
+      flashTimerRef.current = setTimeout(() => setFlashingCell(null), 600);
+    }
+    prevPenaltyCountRef.current = penaltyCount;
+  }, [penaltyCount]);
 
   const puzzleBlockedDigits = useMemo(() => {
     if (selected === null || userGrid[selected] !== 0) return new Set<number>();
@@ -187,6 +201,7 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
       row % 3 === 2 && row !== 8 ? 'border-bottom' : null,
       hintEvidenceSet?.has(i) ? 'hint-evidence' : null,
       hintActionSet?.has(i) ? (activeHint!.isPlacement ? 'hint-target' : 'hint-eliminated') : null,
+      flashingCell === i ? 'flash-error' : null,
     ] as (string | null)[]).filter(Boolean).join(' ');
   }
 

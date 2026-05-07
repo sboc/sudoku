@@ -325,6 +325,15 @@ h1 {
   color: #6af;
 }
 
+@keyframes flash-error {
+  0%, 30% { box-shadow: inset 0 0 0 3px #e53935; }
+  100% { box-shadow: none; }
+}
+
+.cell.flash-error {
+  animation: flash-error 0.55s ease-out forwards;
+}
+
 /* Hint cell animations */
 @keyframes hint-evidence-glow {
   0%, 100% { background: rgba(33, 150, 243, 0.15); }
