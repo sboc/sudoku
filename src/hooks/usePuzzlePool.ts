@@ -77,18 +77,20 @@ export function usePuzzlePool() {
       const needsMore = DIFFICULTIES.some(d => poolRef.current[d].length < TARGET[d]);
       if (!needsMore) { runningRef.current = false; return; }
 
-      const { puzzle, solution } = generatePuzzle();
-      const humanResult = humanSolve(puzzle);
-      const grade = gradePuzzle(humanResult.techniques, humanResult.solved);
-      const d = grade.difficulty;
+      try {
+        const { puzzle, solution } = generatePuzzle();
+        const humanResult = humanSolve(puzzle);
+        const grade = gradePuzzle(humanResult.techniques, humanResult.solved);
+        const d = grade.difficulty;
 
-      if (d !== 'unsolvable') {
-        if (poolRef.current[d].length < TARGET[d]) {
-          poolRef.current[d].push({ puzzle, solution, grade });
-          if (d === 'master' || d === 'legend') persistPool(d, poolRef.current[d]);
-          setCounts(prev => ({ ...prev, [d]: prev[d] + 1 }));
+        if (d !== 'unsolvable') {
+          if (poolRef.current[d].length < TARGET[d]) {
+            poolRef.current[d].push({ puzzle, solution, grade });
+            if (d === 'master' || d === 'legend') persistPool(d, poolRef.current[d]);
+            setCounts(prev => ({ ...prev, [d]: prev[d] + 1 }));
+          }
         }
-      }
+      } catch { /* skip malformed puzzle, continue generating */ }
 
       timerRef.current = setTimeout(generateNext, 0);
     }

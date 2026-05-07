@@ -296,9 +296,9 @@ export function SudokuBoard({ initialPuzzle, onBack }: Props) {
 
       <div className="numpad">
         {solved ? (
-          <div className="solved-banner">Puzzle Solved!</div>
+          <div className="solved-banner" role="status">Puzzle Solved!</div>
         ) : failed ? (
-          <div className="failed-banner">Game Over: {penaltyCount} wrong attempt{penaltyCount !== 1 ? 's' : ''}</div>
+          <div className="failed-banner" role="status">Game Over: {penaltyCount} wrong attempt{penaltyCount !== 1 ? 's' : ''}</div>
         ) : (
           <>
             <div className="numpad-main">
