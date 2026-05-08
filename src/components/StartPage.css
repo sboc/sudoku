@@ -32,9 +32,11 @@
   gap: 1rem;
 }
 
-.continue-btn:hover {
-  background: #1e2d5a;
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .continue-btn:hover {
+    background: #1e2d5a;
+    transform: translateY(-2px);
+  }
 }
 
 .continue-btn:active {
@@ -92,9 +94,11 @@
   flex-shrink: 0;
 }
 
-.help-btn:hover {
-  border-color: #3b5bdb;
-  color: #eee;
+@media (hover: hover) {
+  .help-btn:hover {
+    border-color: #3b5bdb;
+    color: #eee;
+  }
 }
 
 .subtitle {
@@ -127,9 +131,11 @@
   transition: background 0.15s, transform 0.1s;
 }
 
-.difficulty-btn:not(:disabled):hover {
-  background: #1e2d5a;
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .difficulty-btn:not(:disabled):hover {
+    background: #1e2d5a;
+    transform: translateY(-2px);
+  }
 }
 
 .difficulty-btn:not(:disabled):active {

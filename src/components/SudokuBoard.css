@@ -42,11 +42,17 @@ header {
   flex-shrink: 0;
 }
 
-.share-btn:hover,
 .share-btn:focus-visible {
   border-color: #3b5bdb;
   color: #eee;
   outline: none;
+}
+
+@media (hover: hover) {
+  .share-btn:hover {
+    border-color: #3b5bdb;
+    color: #eee;
+  }
 }
 
 .share-btn.end-confirm {
@@ -54,10 +60,12 @@ header {
   color: #f44336;
 }
 
-.share-btn.end-confirm:hover {
-  border-color: #f44336;
-  background: rgba(244, 67, 54, 0.12);
-  color: #f44336;
+@media (hover: hover) {
+  .share-btn.end-confirm:hover {
+    border-color: #f44336;
+    background: rgba(244, 67, 54, 0.12);
+    color: #f44336;
+  }
 }
 
 h1 {
@@ -284,9 +292,11 @@ h1 {
   transition: background 0.15s, border-color 0.15s;
 }
 
-.num-btn:hover {
-  background: #1e2d5a;
-  border-color: #3b5bdb;
+@media (hover: hover) {
+  .num-btn:hover {
+    background: #1e2d5a;
+    border-color: #3b5bdb;
+  }
 }
 
 .num-btn:focus-visible {
@@ -389,10 +399,15 @@ h1 {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.hint-explain-btn:hover,
 .hint-explain-btn:focus-visible {
   background: rgba(59, 91, 219, 0.2);
   outline: none;
+}
+
+@media (hover: hover) {
+  .hint-explain-btn:hover {
+    background: rgba(59, 91, 219, 0.2);
+  }
 }
 
 .hint-header {
@@ -433,8 +448,8 @@ h1 {
   cursor: pointer;
   transition: background 0.15s;
 }
-.hint-apply-btn:hover,
 .hint-apply-btn:focus-visible { background: #4c6ef5; outline: none; }
+@media (hover: hover) { .hint-apply-btn:hover { background: #4c6ef5; } }
 
 .hint-dismiss-btn {
   background: none;
@@ -447,8 +462,8 @@ h1 {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.hint-dismiss-btn:hover,
 .hint-dismiss-btn:focus-visible { border-color: #555; color: #eee; outline: none; }
+@media (hover: hover) { .hint-dismiss-btn:hover { border-color: #555; color: #eee; } }
 
 /* Help button active state */
 .num-btn.help-active {
