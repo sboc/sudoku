@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'Sudoku',
         short_name: 'Sudoku',
         description: 'Sudoku puzzle game',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#1a1a2e',
+        background_color: '#1a1a2e',
         display: 'standalone',
         start_url: '/',
         icons: [
