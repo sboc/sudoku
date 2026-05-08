@@ -146,6 +146,9 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
     return () => clearTimeout(id);
   }, [flashingCell]);
 
+  const hintDisabled = !nextHint && !activeHint && !autoSolve;
+  const autoDisabled = !nextHint && !autoSolve;
+
   const puzzleBlockedDigits = useMemo(() => {
     if (selected === null || userGrid[selected] !== 0) return new Set<number>();
     const row = Math.floor(selected / 9);
@@ -161,6 +164,11 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
     }
     return blocked;
   }, [selected, userGrid]);
+
+  useEffect(() => {
+    const el = document.activeElement as HTMLButtonElement | HTMLInputElement | null;
+    if (el?.disabled) el.blur();
+  }, [hintDisabled, autoDisabled, selectedFilled, puzzleBlockedDigits]);
 
   const handleFillAllNotes = () => {
     fillAllNotes();
@@ -347,17 +355,17 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
               <button
                 className={`num-btn icon-btn${activeHint && !autoSolve ? ' help-active' : ''}`}
                 onClick={handleHelp}
-                disabled={!nextHint && !activeHint && !autoSolve}
+                disabled={hintDisabled}
               >
                 <HelpIcon /> Hint
               </button>
-              <label className={`num-btn autosolve-label${autoSolve ? ' active' : ''}${!nextHint && !autoSolve ? ' autosolve-disabled' : ''}`}>
+              <label className={`num-btn autosolve-label${autoSolve ? ' active' : ''}${autoDisabled ? ' autosolve-disabled' : ''}`}>
                 <input
                   type="checkbox"
                   className="autosolve-checkbox"
                   checked={autoSolve}
                   onChange={toggleAutoSolve}
-                  disabled={!nextHint && !autoSolve}
+                  disabled={autoDisabled}
                 />
                 Auto
               </label>
