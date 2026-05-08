@@ -284,11 +284,13 @@ h1 {
   transition: background 0.15s, border-color 0.15s;
 }
 
-.num-btn:hover,
-.num-btn:focus-visible {
+.num-btn:hover {
   background: #1e2d5a;
   border-color: #3b5bdb;
-  outline: none;
+}
+
+.num-btn:focus-visible {
+  background: #1e2d5a;
 }
 
 .num-btn:disabled {
