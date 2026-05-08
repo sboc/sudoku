@@ -275,6 +275,7 @@ h1 {
   border: 2px solid #333;
   border-radius: 8px;
   color: #eee;
+  outline: none;
   font-size: 1.2rem;
   font-weight: 700;
   padding: 0.6rem;
