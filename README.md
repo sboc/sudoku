@@ -12,6 +12,7 @@ A React + TypeScript Sudoku game with a human-style solver, graded difficulty, a
 - Penalty system: wrong guesses add time; 10 wrong attempts ends the game
 - Game state persisted in `localStorage`; resume unfinished games on return; share via URL hash (`#game/<81-digit-string>`) with solve time in share text (Web Share API on mobile, clipboard fallback)
 - Background puzzle pre-generation pool keeps puzzles ready instantly
+- Installable as a PWA on iOS and Android; works fully offline
 
 ## Tech stack
 
@@ -19,6 +20,7 @@ A React + TypeScript Sudoku game with a human-style solver, graded difficulty, a
 |---|---|
 | UI | React 19 + TypeScript |
 | Build | Vite + Rolldown/Babel (React Compiler) |
+| PWA | vite-plugin-pwa + Workbox (service worker, offline cache) |
 | Test | Vitest + happy-dom |
 | Lint | ESLint + typescript-eslint + react-hooks plugin |
 | Coverage | @vitest/coverage-v8 |
@@ -242,9 +244,15 @@ npm run dev      # Vite dev server with HMR
 ## Build
 
 ```sh
-npm run build    # tsc + Vite bundle → dist/
+npm run build    # tsc + Vite bundle → dist/ (includes SW + manifest)
 npm run preview  # serve dist/ locally
 ```
+
+## iOS install
+
+1. Deploy `dist/` to any HTTPS host
+2. Open in Safari on iPhone → share sheet → **Add to Home Screen**
+3. Launches standalone (no browser chrome), works offline
 
 ## Lint
 
