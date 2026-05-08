@@ -601,7 +601,12 @@ const cellRef = (cell: number): string => {
   return `R${Math.floor(cell / 9) + 1}C${(cell % 9) + 1}`;
 };
 
-export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint | null => {
+const isHintValid = (hint: Hint, solution: number[]): boolean => {
+  if (hint.isPlacement) return hint.digit === solution[hint.actionCells[0]];
+  return !hint.eliminations.some(({ cell, digit }) => digit === solution[cell]);
+};
+
+export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solution?: number[]): Hint | null => {
   const baseGrid = [...userGrid];
   const fromGrid = initCandidates(baseGrid);
   const hasAnyNotes = userNotes.some(s => s.size > 0);
@@ -617,11 +622,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
     return s;
   });
 
-  // All techniques leave cands/grid unmodified when they return null, so one clone suffices.
-  const testGrid = [...baseGrid];
-  const testCands = cloneCands(baseCands);
-
   for (const fn of TECHNIQUES) {
+    // Fresh clone each iteration: when solution validation skips a matched technique,
+    // the technique has already mutated testGrid/testCands via placeDigit/eliminate.
+    const testGrid = [...baseGrid];
+    const testCands = cloneCands(baseCands);
+
     const step = fn(testGrid, testCands);
     if (!step) continue;
 
@@ -638,12 +644,13 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
     }
     const eliminatedCells = [...eliminatedCellSet];
 
+    let hint: Hint;
     switch (step.technique) {
       case 'naked_single': {
         const cell = step.cell!;
         const digit = step.digit!;
         const evidenceCells = peers(cell).filter(c => baseGrid[c] !== 0);
-        return {
+        hint = {
           technique: step.technique,
           description: `${cellRef(cell)} has only one possible digit: ${digit}.`,
           evidenceCells,
@@ -652,6 +659,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: [],
         };
+        break;
       }
       case 'hidden_single': {
         const cell = step.cell!;
@@ -664,7 +672,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
             break;
           }
         }
-        return {
+        hint = {
           technique: step.technique,
           description: `${digit} can only go in ${cellRef(cell)} in its unit.`,
           evidenceCells,
@@ -673,11 +681,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: [],
         };
+        break;
       }
       case 'naked_pair': {
         const [c1, c2] = step.cells!;
         const pairDigits = [...baseCands[c1]];
-        return {
+        hint = {
           technique: step.technique,
           description: `${cellRef(c1)} and ${cellRef(c2)} share candidates ${pairDigits.join(',')}. Eliminate them from peers.`,
           evidenceCells: [c1, c2],
@@ -686,6 +695,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit: pairDigits[0],
           eliminations: allEliminations,
         };
+        break;
       }
       case 'naked_triple': {
         const cells = step.cells!;
@@ -693,7 +703,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
         for (const d of baseCands[cells[1]]) combined.add(d);
         for (const d of baseCands[cells[2]]) combined.add(d);
         const tripleDigits = [...combined];
-        return {
+        hint = {
           technique: step.technique,
           description: `Cells ${cells.map(cellRef).join(', ')} form a naked triple with digits ${tripleDigits.join(',')}. Eliminate them from peers.`,
           evidenceCells: cells,
@@ -702,10 +712,11 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit: tripleDigits[0],
           eliminations: allEliminations,
         };
+        break;
       }
       case 'hidden_pair': {
         const cells = step.cells!;
-        return {
+        hint = {
           technique: step.technique,
           description: `${cellRef(cells[0])} and ${cellRef(cells[1])} are the only cells for those digits in their unit. Eliminate other candidates from them.`,
           evidenceCells: cells,
@@ -713,10 +724,11 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           isPlacement: false,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'hidden_triple': {
         const cells = step.cells!;
-        return {
+        hint = {
           technique: step.technique,
           description: `${cells.map(cellRef).join(', ')} form a hidden triple. Eliminate other candidates from them.`,
           evidenceCells: cells,
@@ -724,6 +736,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           isPlacement: false,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'naked_quad': {
         const cells = step.cells!;
@@ -732,7 +745,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
         for (const d of baseCands[cells[2]]) combined.add(d);
         for (const d of baseCands[cells[3]]) combined.add(d);
         const quadDigits = [...combined];
-        return {
+        hint = {
           technique: step.technique,
           description: `Cells ${cells.map(cellRef).join(', ')} form a naked quad with digits ${quadDigits.join(',')}. Eliminate them from peers.`,
           evidenceCells: cells,
@@ -741,10 +754,11 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit: quadDigits[0],
           eliminations: allEliminations,
         };
+        break;
       }
       case 'hidden_quad': {
         const cells = step.cells!;
-        return {
+        hint = {
           technique: step.technique,
           description: `${cells.map(cellRef).join(', ')} form a hidden quad. Eliminate other candidates from them.`,
           evidenceCells: cells,
@@ -752,11 +766,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           isPlacement: false,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'pointing_pair': {
         const cells = step.cells!;
         const digit = step.digit!;
-        return {
+        hint = {
           technique: step.technique,
           description: `${digit} in its box is confined to ${cells.map(cellRef).join(', ')}. Eliminate ${digit} from the rest of that line.`,
           evidenceCells: cells,
@@ -765,11 +780,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'box_line_reduction': {
         const cells = step.cells!;
         const digit = step.digit!;
-        return {
+        hint = {
           technique: step.technique,
           description: `${digit} in its line is confined to ${cells.map(cellRef).join(', ')}. Eliminate ${digit} from the rest of that box.`,
           evidenceCells: cells,
@@ -778,6 +794,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'x_wing': {
         const digit = step.digit!;
@@ -823,7 +840,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
             }
           }
         }
-        return {
+        hint = {
           technique: step.technique,
           description: `X-Wing on ${digit}: the four corners fix ${digit} in two lines. Eliminate ${digit} from other cells in those lines.`,
           evidenceCells: cornerCells,
@@ -832,11 +849,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'swordfish': {
         const digit = step.digit!;
         const cornerCells = step.cells!;
-        return {
+        hint = {
           technique: step.technique,
           description: `Swordfish on ${digit}: three rows (or columns) each have ${digit} in only 2-3 cells, all spanning the same three columns (or rows). Eliminate ${digit} from the rest of those lines.`,
           evidenceCells: cornerCells,
@@ -845,11 +863,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'y_wing': {
         const [pivot, p1, p2] = step.cells!;
         const eliminatedDigit = allEliminations[0].digit;
-        return {
+        hint = {
           technique: step.technique,
           description: `Y-Wing: pivot ${cellRef(pivot)} with pincers ${cellRef(p1)} and ${cellRef(p2)}. Eliminate ${eliminatedDigit} from their common peers.`,
           evidenceCells: [pivot, p1, p2],
@@ -858,11 +877,12 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit: eliminatedDigit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'xyz_wing': {
         const [pivot, p1, p2] = step.cells!;
         const digit = step.digit!;
-        return {
+        hint = {
           technique: step.technique,
           description: `XYZ-Wing: pivot ${cellRef(pivot)} has three candidates including ${digit}; pincers ${cellRef(p1)} and ${cellRef(p2)} each hold ${digit} and one pivot candidate. Eliminate ${digit} from cells seeing all three.`,
           evidenceCells: [pivot, p1, p2],
@@ -871,13 +891,14 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
       case 'w_wing': {
         const [p, q, x, y] = step.cells!;
         const digit = step.digit!;
         const [wa, wb] = baseCands[p];
         const a = wa !== digit ? wa : wb;
-        return {
+        hint = {
           technique: step.technique,
           description: `W-Wing: ${cellRef(p)} and ${cellRef(q)} both have candidates {${a},${digit}}. A strong link on ${a} via ${cellRef(x)} and ${cellRef(y)} means ${digit} can be eliminated from cells that see both.`,
           evidenceCells: [p, q, x, y],
@@ -886,13 +907,17 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[]): Hint
           digit,
           eliminations: allEliminations,
         };
+        break;
       }
+      /* c8 ignore next */
       default: {
-        /* c8 ignore next 2 */
         const _exhaustive: never = step.technique;
         return _exhaustive;
       }
     }
+
+    if (solution && !isHintValid(hint, solution)) continue;
+    return hint;
   }
 
   return null;

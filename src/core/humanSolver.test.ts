@@ -200,6 +200,105 @@ describe('findNextHint — basic', () => {
     const hint = findNextHint(grid, notes);
     expect(hint).not.toBeNull();
   });
+
+  it('placement hint passes solution validation when solution is correct', () => {
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    const hint = findNextHint(EASY_PUZZLE, notes, EASY_SOLUTION);
+    expect(hint).not.toBeNull();
+    if (hint?.isPlacement) {
+      expect(hint.digit).toBe(EASY_SOLUTION[hint.actionCells[0]]);
+    }
+  });
+
+  it('returns null when placement hint is blocked by wrong solution', () => {
+    // Nearly complete grid with one empty cell; corrupt the solution for that cell
+    // so that the naked_single hint (only valid hint) fails validation → null
+    const grid = nearlyComplete();
+    const emptyCell = grid.indexOf(0);
+    const wrongSolution = [...EASY_SOLUTION];
+    const correctDigit = wrongSolution[emptyCell];
+    wrongSolution[emptyCell] = correctDigit === 9 ? 1 : correctDigit + 1;
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    expect(findNextHint(grid, notes, wrongSolution)).toBeNull();
+  });
+
+  it('skips rejected hint and continues to next valid technique', () => {
+    // Get the first hint without validation to find out which cell fires first
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    const firstHint = findNextHint(EASY_PUZZLE, notes);
+    expect(firstHint).not.toBeNull();
+    expect(firstHint!.isPlacement).toBe(true); // EASY_PUZZLE uses only singles
+
+    const blockedCell = firstHint!.actionCells[0];
+    const blockedDigit = firstHint!.digit!;
+
+    // Corrupt that cell's entry in the solution so the first hint fails validation
+    const corruptedSolution = [...EASY_SOLUTION];
+    corruptedSolution[blockedCell] = blockedDigit === 9 ? 1 : blockedDigit + 1;
+
+    // EASY_PUZZLE has many singles — another valid hint must be reachable
+    const nextHint = findNextHint(EASY_PUZZLE, notes, corruptedSolution);
+    expect(nextHint).not.toBeNull();
+    // The returned hint must be valid against the (corrupted) solution
+    if (nextHint!.isPlacement) {
+      expect(nextHint!.digit).toBe(corruptedSolution[nextHint!.actionCells[0]]);
+    }
+  });
+
+  it('validates and returns elimination hint when solution is safe', () => {
+    // Walk GR1_PUZZLE (known to require naked_pair) past all singles so the first
+    // available hint is an elimination technique. Then call with a zero-filled solution:
+    // digits are 1–9 so solution[cell]=0 never matches, meaning the elimination is safe
+    // and isHintValid (line 606) returns true.
+    const grid = [...GR1_PUZZLE];
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    for (let i = 0; i < 81; i++) initAdvancedCellNotes(notes, grid, i);
+
+    for (let step = 0; step < 500; step++) {
+      const h = findNextHint(grid, notes);
+      if (!h) return; // puzzle finished early — skip
+      if (!h.isPlacement) break; // at elimination territory — stop applying
+      applyAdvancedHint(grid, notes, h);
+    }
+
+    // State has no naked/hidden singles left; first hint is an elimination technique.
+    // zeros solution: no cell's answer is 0, so no elimination is "wrong" → hint valid.
+    const result = findNextHint(grid, notes, Array(81).fill(0));
+    expect(result).not.toBeNull();
+    expect(result!.isPlacement).toBe(false);
+    expect(result!.eliminations.length).toBeGreaterThan(0);
+  });
+
+  it('rejects elimination hint that would remove a solution digit', () => {
+    // Same setup: walk to elimination-only territory.
+    const grid = [...GR1_PUZZLE];
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    for (let i = 0; i < 81; i++) initAdvancedCellNotes(notes, grid, i);
+
+    for (let step = 0; step < 500; step++) {
+      const h = findNextHint(grid, notes);
+      if (!h) return;
+      if (!h.isPlacement) break;
+      applyAdvancedHint(grid, notes, h);
+    }
+
+    const elimHint = findNextHint(grid, notes);
+    if (!elimHint || elimHint.isPlacement) return;
+
+    // Poison the solution so that the first elimination targets the "solution digit"
+    const { cell: targetCell, digit: targetDigit } = elimHint.eliminations[0];
+    const poisonedSolution = Array(81).fill(0);
+    poisonedSolution[targetCell] = targetDigit;
+
+    // isHintValid (line 606) returns false → hint is skipped
+    const result = findNextHint(grid, notes, poisonedSolution);
+    // The returned hint (if any) must not contain the poisoned elimination
+    if (result && !result.isPlacement) {
+      expect(
+        result.eliminations.some(e => e.cell === targetCell && e.digit === targetDigit),
+      ).toBe(false);
+    }
+  });
 });
 
 describe('findNextHint — technique coverage via step-through', () => {

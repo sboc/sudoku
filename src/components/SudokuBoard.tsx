@@ -72,7 +72,10 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
 
   const { celebrating, celebrationKey } = useCelebration(solved, failed, solvedRef, failedRef);
 
-  const nextHint = useMemo(() => findNextHint(state.userGrid, state.notes), [state.userGrid, state.notes]);
+  const nextHint = useMemo(
+    () => findNextHint(state.userGrid, state.notes, initialPuzzle.solution),
+    [state.userGrid, state.notes, initialPuzzle.solution],
+  );
 
   const {
     activeHint, setActiveHint,
@@ -86,6 +89,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
 
   const { autoSolve, toggleAutoSolve } = useAutoSolve({
     userGridRef, notesRef, solvedRef, failedRef, autoSolveRef,
+    solution: initialPuzzle.solution,
     setElapsed, showTimerFlash,
     setActiveHint, setHintPhase, setHintRevealed,
     applyHintAction, fillAllNotes,

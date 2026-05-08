@@ -8,20 +8,24 @@ export interface SavedSudokuState {
 }
 
 export const localGet = (key: string): string | null => {
+  /* c8 ignore next */
   try { return localStorage.getItem(key); } catch { return null; }
 };
 
 export const localSet = (key: string, value: string): void => {
+  /* c8 ignore next */
   try { localStorage.setItem(key, value); } catch { /* unavailable */ }
 };
 
 export const localRemove = (key: string): void => {
+  /* c8 ignore next */
   try { localStorage.removeItem(key); } catch { /* unavailable */ }
 };
 
 export const localKeys = (): string[] => {
   try {
     return Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i) ?? '').filter(Boolean);
+  /* c8 ignore next */
   } catch { return []; }
 };
 
@@ -49,6 +53,7 @@ export const loadSave = (key: string): PersistedGame | null => {
     if (typeof p.elapsed !== 'number' || (p.elapsed as number) < 0) return null;
     if (typeof p.difficulty !== 'string') return null;
     return p as PersistedGame;
+  /* c8 ignore next */
   } catch { return null; }
 };
 

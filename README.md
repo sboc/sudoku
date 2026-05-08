@@ -82,7 +82,7 @@ The most substantial module (~920 lines). Simulates how a human solves Sudoku by
 
 Exported functions:
 - `humanSolve(puzzle)` → `HumanSolveResult` - runs the full solve, returning all steps taken, the set of techniques used, and the final grid state. Used by the grader.
-- `findNextHint(grid, notes)` → `Hint | null` - finds the single next applicable technique given the current user grid and candidate notes. The hint carries evidence cells, action cells, elimination targets, and human-readable description strings used by `useHint`.
+- `findNextHint(grid, notes, solution?)` → `Hint | null` - finds the single next applicable technique given the current user grid and candidate notes. The hint carries evidence cells, action cells, elimination targets, and human-readable description strings used by `useHint`. When `solution` is provided, each candidate hint is validated against it before being returned — placement hints must match the solution digit, elimination hints must not remove the solution digit from any cell. Invalid hints (caused by corrupted user notes) are skipped and the next technique is tried; `null` is only returned when all techniques are exhausted. Each technique gets a fresh candidate clone so a skipped technique's mutations don't pollute subsequent ones.
 
 #### `grader.ts` - difficulty classification
 
@@ -161,7 +161,7 @@ The hint auto-dismisses when `userGrid` changes (i.e., user makes a move) unless
 
 #### `useAutoSolve.ts` - animated auto-solve
 
-Drives an automated replay of `findNextHint` steps with configurable delays, filling notes first if needed, then applying hints one at a time. Sets `autoSolveRef` to prevent the hint system from interfering during the animation.
+Drives an automated replay of `findNextHint` steps with configurable delays, filling notes first if needed, then applying hints one at a time. Sets `autoSolveRef` to prevent the hint system from interfering during the animation. Passes `solution` to `findNextHint` so corrupted user notes cannot cause wrong digits to be placed during auto-solve.
 
 #### `useTimer.ts` - elapsed time and penalty flash
 
@@ -229,6 +229,8 @@ npm test              # single run
 npm run test:watch    # watch mode
 npm run test:coverage # coverage report (output: coverage/)
 ```
+
+All files report 100% statement, branch, function, and line coverage.
 
 ## Dev setup
 

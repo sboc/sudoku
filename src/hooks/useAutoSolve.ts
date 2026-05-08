@@ -11,6 +11,7 @@ interface UseAutoSolveParams {
   solvedRef: MutableRefObject<boolean>;
   failedRef: MutableRefObject<boolean>;
   autoSolveRef: MutableRefObject<boolean>;
+  solution: number[];
   setElapsed: Dispatch<SetStateAction<number>>;
   showTimerFlash: (msg: string) => void;
   setActiveHint: (hint: Hint | null) => void;
@@ -26,6 +27,7 @@ export const useAutoSolve = ({
   solvedRef,
   failedRef,
   autoSolveRef,
+  solution,
   setElapsed,
   showTimerFlash,
   setActiveHint,
@@ -47,7 +49,7 @@ export const useAutoSolve = ({
       setActiveHint(null);
       return;
     }
-    const hint = findNextHint(userGridRef.current, notesRef.current);
+    const hint = findNextHint(userGridRef.current, notesRef.current, solution);
     if (!hint) {
       autoSolveRef.current = false;
       setAutoSolve(false);
