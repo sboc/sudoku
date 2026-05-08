@@ -344,7 +344,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
             </div>
             <div className="numpad-row">
               <button
-                onClick={toggleNotesMode}
+                onClick={(e) => { toggleNotesMode(); (e.currentTarget as HTMLButtonElement).blur(); }}
                 className={`num-btn notes-toggle${notesMode ? ' active' : ''}`}
               >
                 <PencilIcon /> Notes
@@ -364,7 +364,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
                   type="checkbox"
                   className="autosolve-checkbox"
                   checked={autoSolve}
-                  onChange={toggleAutoSolve}
+                  onChange={(e) => { toggleAutoSolve(); e.currentTarget.blur(); }}
                   disabled={autoDisabled}
                 />
                 Auto
