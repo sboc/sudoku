@@ -3,9 +3,10 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { Hint } from '../core/humanSolver';
 import { findNextHint } from '../core/humanSolver';
 import { TECHNIQUE_WEIGHT } from '../core/grader';
-import { penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
+import { penaltyLabel, HINT_REVEAL_COST } from '../core/utils';
 
 const AUTOSOLVE_STEP_COST = 15;
+const AUTOSOLVE_APPLY_COST = 120;
 
 interface UseAutoSolveParams {
   userGridRef: MutableRefObject<number[]>;
@@ -71,8 +72,8 @@ export const useAutoSolve = ({
       setHintPhase('action');
       autoSolveTimerRef.current = setTimeout(() => {
         if (!autoSolveRef.current || failedRef.current) return;
-        setElapsed(s => s + HINT_APPLY_COST * w);
-        showTimerFlash(penaltyLabel(HINT_APPLY_COST * w));
+        setElapsed(s => s + AUTOSOLVE_APPLY_COST * w);
+        showTimerFlash(penaltyLabel(AUTOSOLVE_APPLY_COST * w));
         applyHintAction(hint);
         setActiveHint(null);
         autoSolveTimerRef.current = setTimeout(runAutoSolve, 300);
