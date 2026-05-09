@@ -67,3 +67,11 @@ export const HelpIcon = () => {
     </svg>
   );
 };
+
+export const GearIcon = () => (
+  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none"
+    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="8" cy="8" r="2.5"/>
+    <path d="M8 1.5v1.3M8 13.2v1.3M1.5 8h1.3M13.2 8h1.3M3.6 3.6l.9.9M11.5 11.5l.9.9M3.6 12.4l.9-.9M11.5 4.5l.9-.9"/>
+  </svg>
+);

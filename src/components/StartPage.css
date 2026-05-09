@@ -18,10 +18,10 @@
 
 .continue-btn {
   width: 100%;
-  background: #16213e;
-  border: 2px solid #3b5bdb;
+  background: var(--c-bg-cell);
+  border: 2px solid var(--c-accent);
   border-radius: 12px;
-  color: #eee;
+  color: var(--c-text-1);
   cursor: pointer;
   touch-action: manipulation;
   display: flex;
@@ -34,7 +34,7 @@
 
 @media (hover: hover) {
   .continue-btn:hover {
-    background: #1e2d5a;
+    background: var(--c-bg-cell-hi);
     transform: translateY(-2px);
   }
 }
@@ -66,7 +66,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: #8899bb;
+  color: var(--c-text-2);
   letter-spacing: 0.05em;
 }
 
@@ -76,15 +76,14 @@
   gap: 0.5rem;
 }
 
-.help-btn {
+.help-btn,
+.settings-btn {
   background: none;
-  border: 1.5px solid #333;
+  border: 1.5px solid var(--c-border-ui);
   border-radius: 50%;
-  color: #8899bb;
-  font-size: 0.75rem;
-  font-weight: 700;
-  width: 22px;
-  height: 22px;
+  color: var(--c-text-2);
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   touch-action: manipulation;
   display: flex;
@@ -94,15 +93,26 @@
   flex-shrink: 0;
 }
 
+.help-btn {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 @media (hover: hover) {
-  .help-btn:hover {
-    border-color: #3b5bdb;
-    color: #eee;
+  .help-btn:hover,
+  .settings-btn:hover {
+    border-color: var(--c-accent);
+    color: var(--c-text-1);
   }
 }
 
+@media (max-width: 480px) {
+  .help-btn,
+  .settings-btn { width: 36px; height: 36px; }
+}
+
 .subtitle {
-  color: #8899bb;
+  color: var(--c-text-2);
   font-size: 1rem;
   margin: 0;
   letter-spacing: 0.05em;
@@ -117,10 +127,10 @@
 }
 
 .difficulty-btn {
-  background: #16213e;
+  background: var(--c-bg-cell);
   border: 2px solid var(--accent);
   border-radius: 12px;
-  color: #eee;
+  color: var(--c-text-1);
   cursor: pointer;
   touch-action: manipulation;
   display: flex;
@@ -133,7 +143,7 @@
 
 @media (hover: hover) {
   .difficulty-btn:not(:disabled):hover {
-    background: #1e2d5a;
+    background: var(--c-bg-cell-hi);
     transform: translateY(-2px);
   }
 }
@@ -143,7 +153,7 @@
 }
 
 .difficulty-btn:disabled {
-  border-color: #333;
+  border-color: var(--c-border-ui);
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -165,11 +175,11 @@
 }
 
 .diff-status.ready {
-  color: #6af;
+  color: var(--c-accent-soft);
 }
 
 .diff-status.loading {
-  color: #666;
+  color: var(--c-text-3);
 }
 
 .dot-pulse {
@@ -188,11 +198,6 @@
 }
 
 @media (max-width: 480px) {
-  .help-btn {
-    width: 32px;
-    height: 32px;
-  }
-
   .difficulty-btn {
     padding: 1.25rem 0.75rem;
   }

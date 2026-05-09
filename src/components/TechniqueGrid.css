@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
-  border: 2px solid #4a5a80;
+  border: 2px solid var(--c-border-box);
   width: 100%;
   max-width: 252px;
   aspect-ratio: 1;
@@ -11,8 +11,8 @@
 }
 
 .tg-cell {
-  border-right: 1px solid #243050;
-  border-bottom: 1px solid #243050;
+  border-right: 1px solid var(--c-border-ui);
+  border-bottom: 1px solid var(--c-border-ui);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,19 +20,19 @@
 }
 
 .tg-box-right {
-  border-right: 2px solid #4a5a80;
+  border-right: 2px solid var(--c-border-box);
 }
 
 .tg-box-bottom {
-  border-bottom: 2px solid #4a5a80;
+  border-bottom: 2px solid var(--c-border-box);
 }
 
 .tg-inactive {
-  background: #0c1428;
+  background: var(--c-gap);
 }
 
 .tg-context {
-  background: #1a2a4a;
+  background: var(--c-bg-cell);
 }
 
 .tg-evidence {
@@ -50,7 +50,7 @@
 .tg-value {
   font-size: clamp(0.5rem, 2vw, 0.72rem);
   font-weight: 700;
-  color: #c9d1e0;
+  color: var(--c-text-1);
   line-height: 1;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .tg-cand-shown {
-  color: #8899bb;
+  color: var(--c-text-2);
 }
 
 .tg-evidence .tg-cand-shown {
@@ -111,7 +111,7 @@
   align-items: center;
   gap: 0.35rem;
   font-size: 0.72rem;
-  color: #8899bb;
+  color: var(--c-text-2);
 }
 
 .tg-legend-swatch {
@@ -139,7 +139,7 @@
 .tg-caption {
   font-size: 0.78rem;
   line-height: 1.5;
-  color: #8899bb;
+  color: var(--c-text-2);
   text-align: center;
   margin-top: 0.5rem;
   font-style: italic;

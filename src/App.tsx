@@ -6,6 +6,7 @@ import { loadSave, localKeys } from './core/persistence';
 import { solvePuzzle } from './core/generator';
 import { humanSolve } from './core/humanSolver';
 import { gradePuzzle } from './core/grader';
+import { useTheme } from './hooks/useTheme';
 
 export interface UnfinishedGame {
   puzzleString: string;
@@ -45,6 +46,7 @@ const findUnfinishedGame = (): UnfinishedGame | null => {
 };
 
 const App = () => {
+  const [theme, setTheme] = useTheme();
   const { counts, takePuzzle } = usePuzzlePool();
   const [activePuzzle, setActivePuzzle] = useState<GeneratedPuzzle | null>(() =>
     loadFromHash(window.location.hash)
@@ -92,7 +94,7 @@ const App = () => {
     return <SudokuBoard initialPuzzle={activePuzzle} onBack={handleBack} />;
   }
 
-  return <StartPage counts={counts} onSelect={handleSelect} unfinished={unfinished} onContinue={handleContinue} />;
+  return <StartPage counts={counts} onSelect={handleSelect} unfinished={unfinished} onContinue={handleContinue} theme={theme} onChangeTheme={setTheme} />;
 };
 
 export default App;

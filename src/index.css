@@ -1,29 +1,89 @@
-*, *::before, *::after {
-  box-sizing: border-box;
+:root,
+html[data-theme="ocean"] {
+  --c-bg-page: #07101e;
+  --c-bg-surface: #0c1a30;
+  --c-bg-cell: #0e1d36;
+  --c-bg-cell-hi: #162a4a;
+  --c-bg-cell-digit: #1d3660;
+  --c-bg-select: #1d4ed8;
+  --c-gap: #050d1a;
+  --c-border-box: #2a4878;
+  --c-border-ui: #142240;
+  --c-text-1: #dce8f8;
+  --c-text-2: #5a7aaa;
+  --c-text-3: #28385a;
+  --c-accent: #3b7ff6;
+  --c-accent-soft: #5aa0ff;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
+html[data-theme="midnight"] {
+  --c-bg-page: #000000;
+  --c-bg-surface: #0c0c12;
+  --c-bg-cell: #10101a;
+  --c-bg-cell-hi: #181824;
+  --c-bg-cell-digit: #222235;
+  --c-bg-select: #4338ca;
+  --c-gap: #050508;
+  --c-border-box: #303050;
+  --c-border-ui: #181825;
+  --c-text-1: #f0f0f8;
+  --c-text-2: #6565a0;
+  --c-text-3: #303060;
+  --c-accent: #6366f1;
+  --c-accent-soft: #818cf8;
 }
 
+html[data-theme="dusk"] {
+  --c-bg-page: #0d0818;
+  --c-bg-surface: #130d28;
+  --c-bg-cell: #1a1035;
+  --c-bg-cell-hi: #241550;
+  --c-bg-cell-digit: #2e1868;
+  --c-bg-select: #7c3aed;
+  --c-gap: #080414;
+  --c-border-box: #3e2272;
+  --c-border-ui: #1e0e48;
+  --c-text-1: #ede9fe;
+  --c-text-2: #7860c0;
+  --c-text-3: #3a2870;
+  --c-accent: #8b5cf6;
+  --c-accent-soft: #a78bfa;
+}
+
+html[data-theme="forest"] {
+  --c-bg-page: #051209;
+  --c-bg-surface: #091e10;
+  --c-bg-cell: #0c2216;
+  --c-bg-cell-hi: #102e1c;
+  --c-bg-cell-digit: #163a24;
+  --c-bg-select: #047a58;
+  --c-gap: #030908;
+  --c-border-box: #1a4830;
+  --c-border-ui: #0d2a18;
+  --c-text-1: #d0fae4;
+  --c-text-2: #4a9870;
+  --c-text-3: #1e5035;
+  --c-accent: #10b981;
+  --c-accent-soft: #34d399;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+button { -webkit-tap-highlight-color: transparent; }
 body {
   margin: 0;
-  background: #1a1a2e;
+  background: var(--c-bg-page);
   overflow-x: hidden;
+  transition: background 0.2s;
 }
-
 #root {
   min-height: 100svh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 2rem 1rem;
-  color: #eee;
+  color: var(--c-text-1);
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
-
 @media (max-width: 480px) {
-  #root {
-    padding: 0.75rem 0.5rem;
-  }
+  #root { padding: 0.75rem 0.5rem; }
 }

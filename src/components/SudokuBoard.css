@@ -20,16 +20,16 @@ header {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
-  color: #8899bb;
+  color: var(--c-text-2);
   position: relative;
   white-space: nowrap;
 }
 
 .share-btn {
   background: none;
-  border: 1.5px solid #243050;
+  border: 1.5px solid var(--c-border-ui);
   border-radius: 6px;
-  color: #8899bb;
+  color: var(--c-text-2);
   width: 28px;
   height: 28px;
   padding: 0;
@@ -43,15 +43,15 @@ header {
 }
 
 .share-btn:focus-visible {
-  border-color: #3b5bdb;
-  color: #eee;
+  border-color: var(--c-accent);
+  color: var(--c-text-1);
   outline: none;
 }
 
 @media (hover: hover) {
   .share-btn:hover {
-    border-color: #3b5bdb;
-    color: #eee;
+    border-color: var(--c-accent);
+    color: var(--c-text-1);
   }
 }
 
@@ -111,8 +111,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 2px;
-  background: #0e1a35;
-  border: 3px solid #4a5a80;
+  background: var(--c-gap);
+  border: 3px solid var(--c-border-box);
   border-radius: 6px;
   padding: 3px;
   width: 100%;
@@ -165,15 +165,15 @@ h1 {
 }
 
 .cell:focus-visible {
-  outline: 2px solid #3b5bdb;
+  outline: 2px solid var(--c-accent);
   outline-offset: -2px;
   z-index: 1;
 }
 
 .cell {
-  background: #1a2a4a;
+  background: var(--c-bg-cell);
   border: none;
-  color: #c9d1e0;
+  color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
   cursor: pointer;
@@ -191,33 +191,33 @@ h1 {
 }
 
 .cell.given {
-  color: #e0e6f0;
+  color: var(--c-text-1);
   font-weight: 800;
 }
 
 .cell.user-placed {
-  color: #6c9ff8;
+  color: var(--c-accent-soft);
 }
 
 .cell.selected {
-  background: #3b5bdb !important;
+  background: var(--c-bg-select) !important;
   color: #fff;
 }
 
 .cell.highlighted {
-  background: #1e2d5a;
+  background: var(--c-bg-cell-hi);
 }
 
 .cell.same-digit {
-  background: #253570;
+  background: var(--c-bg-cell-digit);
 }
 
 .cell.border-right {
-  border-right: 2px solid #4a5a80;
+  border-right: 2px solid var(--c-border-box);
 }
 
 .cell.border-bottom {
-  border-bottom: 2px solid #4a5a80;
+  border-bottom: 2px solid var(--c-border-box);
 }
 
 .cell.has-notes {
@@ -239,7 +239,7 @@ h1 {
   justify-content: center;
   font-size: clamp(0.38rem, 1.6vw, 0.65rem);
   font-weight: 500;
-  color: #6af;
+  color: var(--c-accent-soft);
   line-height: 1;
 }
 
@@ -268,8 +268,8 @@ h1 {
 .hint-panel {
   position: absolute;
   inset: 0;
-  background: #1a2a4a;
-  border: 1px solid #2a3a60;
+  background: var(--c-bg-surface);
+  border: 1px solid var(--c-border-box);
   border-radius: 10px;
   padding: 0.75rem 1rem;
   display: flex;
@@ -279,10 +279,10 @@ h1 {
 }
 
 .num-btn {
-  background: #1a2a4a;
-  border: 2px solid #243050;
+  background: var(--c-bg-cell);
+  border: 2px solid var(--c-border-ui);
   border-radius: 8px;
-  color: #eee;
+  color: var(--c-text-1);
   outline: none;
   font-size: 1.2rem;
   font-weight: 700;
@@ -294,13 +294,13 @@ h1 {
 
 @media (hover: hover) {
   .num-btn:hover {
-    background: #1e2d5a;
-    border-color: #3b5bdb;
+    background: var(--c-bg-cell-hi);
+    border-color: var(--c-accent);
   }
 }
 
 .num-btn:focus-visible {
-  background: #1e2d5a;
+  background: var(--c-bg-cell-hi);
 }
 
 .num-btn:disabled {
@@ -309,8 +309,8 @@ h1 {
 }
 
 .num-btn:disabled:hover {
-  background: #1a2a4a;
-  border-color: #243050;
+  background: var(--c-bg-cell);
+  border-color: var(--c-border-ui);
 }
 
 .numpad-row {
@@ -343,9 +343,9 @@ h1 {
 
 .num-btn.notes-toggle.active,
 .num-btn.autosolve-label.active {
-  background: #1e2d5a;
-  border-color: #3b5bdb;
-  color: #6af;
+  background: var(--c-bg-cell-hi);
+  border-color: var(--c-accent);
+  color: var(--c-accent-soft);
 }
 
 @keyframes flash-error {
@@ -383,9 +383,9 @@ h1 {
 
 .hint-explain-btn {
   background: none;
-  border: 1px solid #3b5bdb;
+  border: 1px solid var(--c-accent);
   border-radius: 50%;
-  color: #6af;
+  color: var(--c-accent-soft);
   font-size: 0.72rem;
   font-weight: 700;
   width: 18px;
@@ -421,19 +421,19 @@ h1 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #6af;
+  color: var(--c-accent-soft);
 }
 
 .hint-description {
   font-size: 0.85rem;
-  color: #c9d1e0;
+  color: var(--c-text-1);
   line-height: 1.5;
   margin: 0;
 }
 
 .hint-cost-label {
   font-size: 0.85rem;
-  color: #c9d1e0;
+  color: var(--c-text-1);
   margin: 0;
   text-align: center;
 }
@@ -445,7 +445,7 @@ h1 {
 }
 
 .hint-apply-btn {
-  background: #3b5bdb;
+  background: var(--c-accent);
   border: none;
   border-radius: 6px;
   color: #fff;
@@ -455,28 +455,28 @@ h1 {
   cursor: pointer;
   transition: background 0.15s;
 }
-.hint-apply-btn:focus-visible { background: #4c6ef5; outline: none; }
-@media (hover: hover) { .hint-apply-btn:hover { background: #4c6ef5; } }
+.hint-apply-btn:focus-visible { background: var(--c-accent-soft); outline: none; }
+@media (hover: hover) { .hint-apply-btn:hover { background: var(--c-accent-soft); } }
 
 .hint-dismiss-btn {
   background: none;
-  border: 1px solid #243050;
+  border: 1px solid var(--c-border-ui);
   border-radius: 6px;
-  color: #8899bb;
+  color: var(--c-text-2);
   font-size: 0.78rem;
   font-weight: 600;
   padding: 0.3rem 0.8rem;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.hint-dismiss-btn:focus-visible { border-color: #4a5a80; color: #eee; outline: none; }
-@media (hover: hover) { .hint-dismiss-btn:hover { border-color: #4a5a80; color: #eee; } }
+.hint-dismiss-btn:focus-visible { border-color: var(--c-border-box); color: var(--c-text-1); outline: none; }
+@media (hover: hover) { .hint-dismiss-btn:hover { border-color: var(--c-border-box); color: var(--c-text-1); } }
 
 /* Help button active state */
 .num-btn.help-active {
-  background: #1e2d5a;
-  border-color: #3b5bdb;
-  color: #6af;
+  background: var(--c-bg-cell-hi);
+  border-color: var(--c-accent);
+  color: var(--c-accent-soft);
 }
 
 /* Auto-solve checkbox label */
@@ -491,7 +491,7 @@ h1 {
 .autosolve-checkbox {
   width: 13px;
   height: 13px;
-  accent-color: #3b5bdb;
+  accent-color: var(--c-accent);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -577,4 +577,3 @@ h1 {
     font-size: clamp(0.55rem, 2.4vw, 0.8rem);
   }
 }
-
