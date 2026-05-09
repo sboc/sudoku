@@ -172,8 +172,8 @@ h1 {
 
 .cell {
   background: var(--c-bg-cell);
-  border-right: 1px solid var(--c-border-ui);
-  border-bottom: 1px solid var(--c-border-ui);
+  border-right: 1px solid var(--c-border-box);
+  border-bottom: 1px solid var(--c-border-box);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
