@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useSudoku } from '../hooks/useSudoku';
 import type { GeneratedPuzzle } from '../hooks/usePuzzlePool';
 import { loadSave, persistGame, localRemove } from '../core/persistence';
-import { PencilIcon, FillAllIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon, AutoIcon } from './Icons';
+import { PencilIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon, AutoIcon } from './Icons';
 import { findNextHint } from '../core/humanSolver';
 import { TechniqueHelpModal } from './TechniqueHelpModal';
 import { DIFFICULTY_COLOR, TECHNIQUE_WEIGHT } from '../core/grader';
@@ -352,8 +352,8 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
               >
                 <PencilIcon /> Notes
               </button>
-              <button onClick={handleFillAllNotes} className="num-btn icon-btn">
-                <FillAllIcon /> All Notes
+              <button onClick={handleFillAllNotes} className="num-btn">
+                All Notes
               </button>
               <button
                 className={`num-btn icon-btn${activeHint && !autoSolve ? ' help-active' : ''}`}

@@ -244,6 +244,10 @@ h1 {
   line-height: 1;
 }
 
+.cell.selected .note-digit {
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .numpad {
   display: flex;
   flex-direction: column;
