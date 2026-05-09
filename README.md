@@ -7,7 +7,7 @@ A React + TypeScript Sudoku game with a human-style solver, graded difficulty, a
 - Six difficulty levels: Easy, Medium, Hard, Expert, Master, Legend
 - Puzzles guaranteed to have a unique solution (exact-cover check via Dancing Links)
 - Difficulty graded by running a human-style solver and summing technique weights
-- Hint system: 15 solving techniques from Naked Single through W-Wing, with three-phase step-by-step reveal
+- Hint system: 15 solving techniques from Naked Single through W-Wing; peeking a hint is free and shows the reveal cost upfront, revealing highlights the board and charges time, applying executes the move for a flat +30s
 - Notes mode, auto-fill all notes, animated auto-solve
 - Penalty system: wrong guesses add time; 10 wrong attempts ends the game
 - Game state persisted in `localStorage`; resume unfinished games on return; share via URL hash (`#game/<81-digit-string>`) with solve time in share text (Web Share API on mobile, clipboard fallback)
@@ -124,9 +124,8 @@ Static lookup tables: `TECHNIQUE_LABEL` (short display name) and `TECHNIQUE_HELP
 
 #### `utils.ts` - shared constants and formatters
 
-- `HINT_PEEK_COST = 15` - seconds added for viewing a hint description
-- `HINT_REVEAL_COST = 60` - seconds added for revealing which cells are involved
-- `HINT_APPLY_COST = 120` - seconds added for auto-applying the hint
+- `HINT_REVEAL_COST = 60` - seconds (× technique weight) added for revealing which cells are involved
+- `HINT_APPLY_COST = 30` - flat seconds added for applying a hint action (no weight multiplier)
 - `penaltyLabel(s)` - formats a penalty duration as `+Xs`, `+Xm`, or `+XmYs`
 - `formatSolveTime(s)` - formats elapsed seconds as human-readable prose (`1 hr, 3 mins and 2 secs`), used in share text
 - `formatTime(s)` - formats elapsed time as `MM:SS` or `H:MM:SS`
@@ -155,9 +154,9 @@ On mount, loads any persisted pools from `localStorage`. Runs a background `setI
 #### `useHint.ts` - hint reveal flow
 
 Manages a three-phase hint reveal:
-1. **Peek** (`hintPhase = 'evidence'`, `hintRevealed = false`) - shows technique name and description, charges `HINT_PEEK_COST`
-2. **Reveal** (`hintPhase = 'evidence'`, `hintRevealed = true`) - highlights evidence cells on the board, charges `HINT_REVEAL_COST`
-3. **Apply** (`hintPhase = 'action'`) - executes the hint action (place digit or eliminate candidates), charges `HINT_APPLY_COST`
+1. **Peek** (`hintRevealed = false`) - free; shows the cost of revealing so the user can decide
+2. **Reveal** (`hintRevealed = true`) - shows technique name, description, and highlights evidence cells on the board; charges `HINT_REVEAL_COST × weight`
+3. **Apply** - executes the hint action (place digit or eliminate candidates); charges a flat `HINT_APPLY_COST`
 
 The hint auto-dismisses when `userGrid` changes (i.e., user makes a move) unless auto-solve is running.
 
