@@ -113,7 +113,7 @@ h1 {
   grid-template-rows: repeat(9, 1fr);
   gap: 0;
   background: transparent;
-  border: 2px solid var(--c-border-box);
+  border: 2px solid var(--c-accent);
   padding: 0;
   width: 100%;
   aspect-ratio: 1;
@@ -216,9 +216,9 @@ h1 {
 /* :nth-child(n+73) never matches (cells live in 9-child row wrappers), use DOM path instead */
 .board > div:last-child > .cell { border-bottom: none; }
 
-/* Box dividers — 2px, same color, width signals the boundary */
-.cell.border-right { border-right: 2px solid var(--c-border-box); }
-.cell.border-bottom { border-bottom: 2px solid var(--c-border-box); }
+/* Box dividers — accent color, clearly visible against cell background */
+.cell.border-right { border-right: 2px solid var(--c-accent); }
+.cell.border-bottom { border-bottom: 2px solid var(--c-accent); }
 
 .cell.has-notes {
   padding: 1px;
