@@ -27,7 +27,7 @@ header {
 
 .share-btn {
   background: none;
-  border: 1.5px solid #333;
+  border: 1.5px solid #243050;
   border-radius: 6px;
   color: #8899bb;
   width: 28px;
@@ -111,8 +111,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 2px;
-  background: #333;
-  border: 3px solid #666;
+  background: #0e1a35;
+  border: 3px solid #4a5a80;
   border-radius: 6px;
   padding: 3px;
   width: 100%;
@@ -171,7 +171,7 @@ h1 {
 }
 
 .cell {
-  background: #16213e;
+  background: #1a2a4a;
   border: none;
   color: #c9d1e0;
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
@@ -213,11 +213,11 @@ h1 {
 }
 
 .cell.border-right {
-  border-right: 2px solid #666;
+  border-right: 2px solid #4a5a80;
 }
 
 .cell.border-bottom {
-  border-bottom: 2px solid #666;
+  border-bottom: 2px solid #4a5a80;
 }
 
 .cell.has-notes {
@@ -268,7 +268,7 @@ h1 {
 .hint-panel {
   position: absolute;
   inset: 0;
-  background: #16213e;
+  background: #1a2a4a;
   border: 1px solid #2a3a60;
   border-radius: 10px;
   padding: 0.75rem 1rem;
@@ -279,8 +279,8 @@ h1 {
 }
 
 .num-btn {
-  background: #16213e;
-  border: 2px solid #333;
+  background: #1a2a4a;
+  border: 2px solid #243050;
   border-radius: 8px;
   color: #eee;
   outline: none;
@@ -309,8 +309,8 @@ h1 {
 }
 
 .num-btn:disabled:hover {
-  background: #16213e;
-  border-color: #333;
+  background: #1a2a4a;
+  border-color: #243050;
 }
 
 .numpad-row {
@@ -460,7 +460,7 @@ h1 {
 
 .hint-dismiss-btn {
   background: none;
-  border: 1px solid #333;
+  border: 1px solid #243050;
   border-radius: 6px;
   color: #8899bb;
   font-size: 0.78rem;
@@ -469,8 +469,8 @@ h1 {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.hint-dismiss-btn:focus-visible { border-color: #555; color: #eee; outline: none; }
-@media (hover: hover) { .hint-dismiss-btn:hover { border-color: #555; color: #eee; } }
+.hint-dismiss-btn:focus-visible { border-color: #4a5a80; color: #eee; outline: none; }
+@media (hover: hover) { .hint-dismiss-btn:hover { border-color: #4a5a80; color: #eee; } }
 
 /* Help button active state */
 .num-btn.help-active {
