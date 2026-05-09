@@ -1,4 +1,4 @@
-export type ThemeId = 'ocean' | 'midnight' | 'dusk' | 'forest' | 'parchment' | 'mist';
+export type ThemeId = 'ocean' | 'midnight' | 'dusk' | 'forest' | 'slate' | 'terra' | 'parchment' | 'mist';
 
 export interface ThemeMeta {
   id: ThemeId;
@@ -56,6 +56,28 @@ export const THEMES: ThemeMeta[] = [
     accent: '#10b981',
     accentSoft: '#34d399',
     text1: '#d0fae4',
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    metaColor: '#3a4858',
+    bgCell: '#4c5e6e',
+    bgCellHi: '#587080',
+    borderBox: '#607888',
+    accent: '#3a80cc',
+    accentSoft: '#58a0e4',
+    text1: '#d0e2f0',
+  },
+  {
+    id: 'terra',
+    name: 'Terra',
+    metaColor: '#5a4030',
+    bgCell: '#785640',
+    bgCellHi: '#88624c',
+    borderBox: '#a07858',
+    accent: '#c06828',
+    accentSoft: '#d88040',
+    text1: '#f8e0c8',
   },
   {
     id: 'parchment',
