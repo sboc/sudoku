@@ -489,13 +489,6 @@ h1 {
 }
 
 
-.autosolve-checkbox {
-  width: 13px;
-  height: 13px;
-  accent-color: var(--c-accent);
-  cursor: pointer;
-  flex-shrink: 0;
-}
 
 .autosolve-disabled {
   opacity: 0.4;

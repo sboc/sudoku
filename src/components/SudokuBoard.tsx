@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useSudoku } from '../hooks/useSudoku';
 import type { GeneratedPuzzle } from '../hooks/usePuzzlePool';
 import { loadSave, persistGame, localRemove } from '../core/persistence';
-import { PencilIcon, FillAllIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon } from './Icons';
+import { PencilIcon, FillAllIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon, AutoIcon } from './Icons';
 import { findNextHint } from '../core/humanSolver';
 import { TechniqueHelpModal } from './TechniqueHelpModal';
 import { DIFFICULTY_COLOR, TECHNIQUE_WEIGHT } from '../core/grader';
@@ -362,16 +362,13 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
               >
                 <HelpIcon /> Hint
               </button>
-              <label className={`num-btn autosolve-label${autoSolve ? ' active' : ''}${autoDisabled ? ' autosolve-disabled' : ''}`}>
-                <input
-                  type="checkbox"
-                  className="autosolve-checkbox"
-                  checked={autoSolve}
-                  onChange={(e) => { toggleAutoSolve(); e.currentTarget.blur(); }}
-                  disabled={autoDisabled}
-                />
-                Auto
-              </label>
+              <button
+                className={`num-btn autosolve-label${autoSolve ? ' active' : ''}${autoDisabled ? ' autosolve-disabled' : ''}`}
+                onClick={(e) => { toggleAutoSolve(); (e.currentTarget as HTMLButtonElement).blur(); }}
+                disabled={autoDisabled}
+              >
+                <AutoIcon checked={autoSolve} /> Auto
+              </button>
             </div>
           </>
         )}

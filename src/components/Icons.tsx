@@ -68,6 +68,14 @@ export const HelpIcon = () => {
   );
 };
 
+export const AutoIcon = ({ checked }: { checked: boolean }) => (
+  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="none"
+    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2.5" y="2.5" width="11" height="11" rx="2"/>
+    {checked && <path d="M5 8.5l2.5 2.5L11 5.5"/>}
+  </svg>
+);
+
 export const GearIcon = () => (
   <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none"
     stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
