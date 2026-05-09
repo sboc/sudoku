@@ -111,8 +111,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
-  gap: 0;
-  background: transparent;
+  gap: 1px;
+  background: var(--c-border-box);
   border: 2px solid var(--c-border-box);
   padding: 0;
   width: 100%;
@@ -129,8 +129,8 @@ h1 {
   inset: 0;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  gap: 0;
-  /* match board border(2px) so cells align exactly */
+  gap: 1px;
+  /* match board border(2px) + 1px gap */
   padding: 2px;
   pointer-events: none;
   overflow: visible;
@@ -172,8 +172,6 @@ h1 {
 
 .cell {
   background: var(--c-bg-cell);
-  border-right: 1px solid var(--c-border-box);
-  border-bottom: 1px solid var(--c-border-box);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
@@ -211,9 +209,9 @@ h1 {
   background: var(--c-bg-cell-digit);
 }
 
-/* Box dividers — thicker and brighter than the 1px cell lines */
-.cell.border-right { border-right: 2px solid var(--c-border-box); }
-.cell.border-bottom { border-bottom: 2px solid var(--c-border-box); }
+/* Box dividers: 1px border + 1px gap = 2px visual; cell lines are just the 1px gap */
+.cell.border-right { border-right: 1px solid var(--c-border-box); }
+.cell.border-bottom { border-bottom: 1px solid var(--c-border-box); }
 
 .cell.has-notes {
   padding: 1px;
