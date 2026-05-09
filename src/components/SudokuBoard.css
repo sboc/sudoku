@@ -331,10 +331,10 @@ h1 {
 
 .num-btn.icon-btn,
 .num-btn.notes-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.4rem 1fr 1.4rem;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
+  text-align: center;
 }
 
 .num-btn.notes-toggle {
@@ -483,9 +483,10 @@ h1 {
 /* Auto-solve checkbox label */
 .autosolve-label {
   cursor: pointer;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.4rem 1fr 1.4rem;
   align-items: center;
-  gap: 0.3rem;
+  text-align: center;
   letter-spacing: 0.03em;
 }
 
@@ -494,7 +495,7 @@ h1 {
   height: 13px;
   accent-color: var(--c-accent);
   cursor: pointer;
-  flex-shrink: 0;
+  justify-self: center;
 }
 
 .autosolve-disabled {
