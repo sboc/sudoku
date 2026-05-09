@@ -3,7 +3,9 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { Hint } from '../core/humanSolver';
 import { findNextHint } from '../core/humanSolver';
 import { TECHNIQUE_WEIGHT } from '../core/grader';
-import { penaltyLabel, HINT_PEEK_COST, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
+import { penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
+
+const AUTOSOLVE_STEP_COST = 15;
 
 interface UseAutoSolveParams {
   userGridRef: MutableRefObject<number[]>;
@@ -57,8 +59,8 @@ export const useAutoSolve = ({
       return;
     }
     const w = TECHNIQUE_WEIGHT[hint.technique];
-    setElapsed(s => s + HINT_PEEK_COST * w);
-    showTimerFlash(penaltyLabel(HINT_PEEK_COST * w));
+    setElapsed(s => s + AUTOSOLVE_STEP_COST * w);
+    showTimerFlash(penaltyLabel(AUTOSOLVE_STEP_COST * w));
     setActiveHint(hint);
     setHintPhase('evidence');
     setHintRevealed(true);

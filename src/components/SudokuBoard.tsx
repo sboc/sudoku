@@ -5,9 +5,9 @@ import { loadSave, persistGame, localRemove } from '../core/persistence';
 import { PencilIcon, FillAllIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon } from './Icons';
 import { findNextHint } from '../core/humanSolver';
 import { TechniqueHelpModal } from './TechniqueHelpModal';
-import { DIFFICULTY_COLOR } from '../core/grader';
+import { DIFFICULTY_COLOR, TECHNIQUE_WEIGHT } from '../core/grader';
 import { TECHNIQUE_LABEL } from '../core/techniqueHelp';
-import { formatTime, formatSolveTime } from '../core/utils';
+import { formatTime, formatSolveTime, penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
 import { useTimer } from '../hooks/useTimer';
 import { useCelebration } from '../hooks/useCelebration';
 import { useHint } from '../hooks/useHint';
@@ -321,23 +321,26 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
               </div>
               {activeHint && (
                 <div className="hint-panel">
-                  <div className="hint-header">
-                    <span className="hint-technique-name">{TECHNIQUE_LABEL[activeHint.technique]}</span>
-                    <button className="hint-explain-btn" onClick={() => setShowTechniqueHelp(true)} aria-label="Explain technique">?</button>
-                  </div>
                   {hintRevealed ? (
                     <>
+                      <div className="hint-header">
+                        <span className="hint-technique-name">{TECHNIQUE_LABEL[activeHint.technique]}</span>
+                        <button className="hint-explain-btn" onClick={() => setShowTechniqueHelp(true)} aria-label="Explain technique">?</button>
+                      </div>
                       <p className="hint-description">{activeHint.description}</p>
                       <div className="hint-footer">
-                        <button className="hint-apply-btn" onClick={handleApplyHint}>Apply</button>
+                        <button className="hint-apply-btn" onClick={handleApplyHint}>Apply ({penaltyLabel(HINT_APPLY_COST)})</button>
                         <button className="hint-dismiss-btn" onClick={dismissHint} aria-label="Dismiss hint">✕</button>
                       </div>
                     </>
                   ) : (
-                    <div className="hint-footer">
-                      <button className="hint-apply-btn" onClick={handleShowWhere}>Show where</button>
-                      <button className="hint-dismiss-btn" onClick={dismissHint} aria-label="Dismiss hint">✕</button>
-                    </div>
+                    <>
+                      <p className="hint-cost-label">Reveal costs {penaltyLabel(HINT_REVEAL_COST * TECHNIQUE_WEIGHT[activeHint.technique])}</p>
+                      <div className="hint-footer">
+                        <button className="hint-apply-btn" onClick={handleShowWhere}>Reveal</button>
+                        <button className="hint-dismiss-btn" onClick={dismissHint} aria-label="Dismiss hint">✕</button>
+                      </div>
+                    </>
                   )}
                 </div>
               )}

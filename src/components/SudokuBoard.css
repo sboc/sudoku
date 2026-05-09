@@ -431,6 +431,13 @@ h1 {
   margin: 0;
 }
 
+.hint-cost-label {
+  font-size: 0.85rem;
+  color: #c9d1e0;
+  margin: 0;
+  text-align: center;
+}
+
 .hint-footer {
   display: flex;
   gap: 0.5rem;

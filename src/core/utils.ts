@@ -1,6 +1,5 @@
-export const HINT_PEEK_COST = 15;
 export const HINT_REVEAL_COST = 60;
-export const HINT_APPLY_COST = 120;
+export const HINT_APPLY_COST = 30;
 
 export const penaltyLabel = (s: number): string => {
   const m = Math.floor(s / 60);

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { Hint } from '../core/humanSolver';
 import { TECHNIQUE_WEIGHT } from '../core/grader';
-import { penaltyLabel, HINT_PEEK_COST, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
+import { penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
 
 interface UseHintParams {
   nextHint: Hint | null;
@@ -52,9 +52,6 @@ export const useHint = ({
   const handleHelp = () => {
     if (activeHint) { dismissHint(); return; }
     if (!nextHint) return;
-    const w = TECHNIQUE_WEIGHT[nextHint.technique];
-    setElapsed(s => s + HINT_PEEK_COST * w);
-    showTimerFlash(penaltyLabel(HINT_PEEK_COST * w));
     setActiveHint(nextHint);
     setHintPhase('evidence');
     setHintRevealed(false);
@@ -72,9 +69,8 @@ export const useHint = ({
 
   const handleApplyHint = () => {
     if (!activeHint) return;
-    const w = TECHNIQUE_WEIGHT[activeHint.technique];
-    setElapsed(s => s + HINT_APPLY_COST * w);
-    showTimerFlash(penaltyLabel(HINT_APPLY_COST * w));
+    setElapsed(s => s + HINT_APPLY_COST);
+    showTimerFlash(penaltyLabel(HINT_APPLY_COST));
     applyHintAction(activeHint);
     dismissHint();
   };
