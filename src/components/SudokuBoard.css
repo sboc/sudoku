@@ -171,6 +171,8 @@ h1 {
 }
 
 .cell {
+  appearance: none;
+  border: none;
   background: var(--c-bg-cell);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
