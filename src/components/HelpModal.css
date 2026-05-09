@@ -53,6 +53,11 @@
   font-weight: 700;
   margin: 0;
   padding-right: 2rem;
+  padding-left: 0;
+}
+
+.help-modal:has(.help-back) h2 {
+  padding-left: 5rem;
 }
 
 .help-modal section {
@@ -160,6 +165,64 @@
   font-size: 0.88rem;
   line-height: 1.55;
   color: #c9d1e0;
+}
+
+.help-back {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: none;
+  border: none;
+  color: #8899bb;
+  font-size: 0.82rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  padding: 0.5rem 0.75rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.help-back:hover {
+  color: #eee;
+}
+
+.tech-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #7ab3f0;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.tech-link:hover {
+  color: #a8d0ff;
+}
+
+.tech-detail-weight {
+  font-size: 0.82rem;
+  color: #8899bb;
+  margin-top: -0.6rem;
+}
+
+.tech-weight-badge {
+  display: inline-block;
+  background: #0e1a35;
+  border: 1px solid #2a3a60;
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  color: #6af;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-left: 0.25rem;
 }
 
 @media (max-width: 480px) {

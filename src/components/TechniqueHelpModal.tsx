@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { TECHNIQUE_EXPLANATIONS, TECHNIQUE_LABEL } from '../core/techniqueHelp';
+import { TECHNIQUE_EXPLANATIONS, TECHNIQUE_EXAMPLES, TECHNIQUE_LABEL } from '../core/techniqueHelp';
 import type { Technique } from '../core/humanSolver';
+import { TechniqueGrid } from './TechniqueGrid';
 import './HelpModal.css';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 
 export const TechniqueHelpModal = ({ technique, onClose }: Props) => {
   const explanation = TECHNIQUE_EXPLANATIONS[technique];
+  const example = TECHNIQUE_EXAMPLES[technique];
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -29,6 +31,18 @@ export const TechniqueHelpModal = ({ technique, onClose }: Props) => {
             <section>
               <p>{explanation.summary}</p>
             </section>
+            {example && (
+              <section>
+                <h3>Example</h3>
+                <TechniqueGrid cells={example.cells} />
+                <div className="tg-legend">
+                  <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--evidence" />Pattern</span>
+                  <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--action" />Elimination / placement</span>
+                  <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--elim" />Eliminated candidate</span>
+                </div>
+                <p className="tg-caption">{example.caption}</p>
+              </section>
+            )}
             <section>
               <h3>How to apply</h3>
               <ol className="technique-steps">

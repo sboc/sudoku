@@ -1,5 +1,14 @@
 import type { Technique } from './humanSolver';
 
+export interface ExampleCell {
+  r: number;
+  c: number;
+  value?: number;
+  cands?: number[];
+  elim?: number[];
+  role: 'evidence' | 'action' | 'context';
+}
+
 export interface TechniqueExplanation {
   summary: string;
   steps: string[];
@@ -158,6 +167,244 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
       'Find a pincer that sees the pivot with candidates {A, C}.',
       'Find another pincer that sees the pivot with candidates {B, C}.',
       'Any cell that sees both pincers can have C eliminated, as it would conflict with whichever pincer ends up holding C.',
+    ],
+  },
+};
+
+export interface TechniqueExample {
+  caption: string;
+  cells: ExampleCell[];
+}
+
+export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
+  naked_single: {
+    caption: 'Row 5 already contains every digit except 7. The centre cell has only one legal candidate — place it.',
+    cells: [
+      { r: 4, c: 0, value: 1, role: 'context' },
+      { r: 4, c: 1, value: 3, role: 'context' },
+      { r: 4, c: 2, value: 9, role: 'context' },
+      { r: 4, c: 3, value: 5, role: 'context' },
+      { r: 4, c: 4, cands: [7], role: 'action' },
+      { r: 4, c: 5, value: 2, role: 'context' },
+      { r: 4, c: 6, value: 6, role: 'context' },
+      { r: 4, c: 7, value: 8, role: 'context' },
+      { r: 4, c: 8, value: 4, role: 'context' },
+    ],
+  },
+
+  hidden_single: {
+    caption: 'Digit 4 appears as a candidate in only one cell of column 6 (blue). Even though that cell has other candidates, 4 must go there.',
+    cells: [
+      { r: 0, c: 5, value: 3, role: 'context' },
+      { r: 1, c: 5, value: 7, role: 'context' },
+      { r: 2, c: 5, value: 1, role: 'context' },
+      { r: 3, c: 5, value: 8, role: 'context' },
+      { r: 4, c: 5, cands: [4, 6], role: 'action' },
+      { r: 5, c: 5, value: 9, role: 'context' },
+      { r: 6, c: 5, value: 2, role: 'context' },
+      { r: 7, c: 5, value: 5, role: 'context' },
+      { r: 8, c: 5, cands: [6], role: 'context' },
+    ],
+  },
+
+  pointing_pair: {
+    caption: 'Digit 4 in the top-left box can only appear in row 2 (blue). Eliminate 4 from that row outside the box (orange).',
+    cells: [
+      { r: 0, c: 0, value: 2, role: 'context' },
+      { r: 0, c: 1, value: 8, role: 'context' },
+      { r: 0, c: 2, value: 6, role: 'context' },
+      { r: 1, c: 0, cands: [4, 3], role: 'evidence' },
+      { r: 1, c: 1, cands: [4, 9], role: 'evidence' },
+      { r: 1, c: 2, value: 5, role: 'context' },
+      { r: 2, c: 0, value: 7, role: 'context' },
+      { r: 2, c: 1, value: 1, role: 'context' },
+      { r: 2, c: 2, value: 9, role: 'context' },
+      { r: 1, c: 3, cands: [4, 6], elim: [4], role: 'action' },
+      { r: 1, c: 5, cands: [4, 7], elim: [4], role: 'action' },
+      { r: 1, c: 7, cands: [4, 2], elim: [4], role: 'action' },
+    ],
+  },
+
+  box_line_reduction: {
+    caption: 'Digit 6 in row 2 only appears within the left box (blue). Eliminate 6 from other cells in that box (orange).',
+    cells: [
+      { r: 1, c: 0, cands: [6, 3], role: 'evidence' },
+      { r: 1, c: 1, cands: [6, 2], role: 'evidence' },
+      { r: 1, c: 2, cands: [6, 8], role: 'evidence' },
+      { r: 1, c: 3, value: 5, role: 'context' },
+      { r: 1, c: 4, value: 9, role: 'context' },
+      { r: 1, c: 5, value: 4, role: 'context' },
+      { r: 1, c: 6, value: 7, role: 'context' },
+      { r: 1, c: 7, value: 8, role: 'context' },
+      { r: 1, c: 8, value: 1, role: 'context' },
+      { r: 0, c: 0, cands: [6, 9], elim: [6], role: 'action' },
+      { r: 0, c: 1, cands: [6, 4], elim: [6], role: 'action' },
+      { r: 2, c: 2, cands: [6, 1], elim: [6], role: 'action' },
+    ],
+  },
+
+  naked_pair: {
+    caption: 'Two cells share exactly {3, 8} (blue). Those digits are claimed — eliminate 3 and 8 from every other cell in the row (orange).',
+    cells: [
+      { r: 0, c: 0, cands: [3, 5], elim: [3], role: 'action' },
+      { r: 0, c: 1, cands: [8, 7], elim: [8], role: 'action' },
+      { r: 0, c: 2, cands: [3, 8], role: 'evidence' },
+      { r: 0, c: 3, value: 1, role: 'context' },
+      { r: 0, c: 4, value: 6, role: 'context' },
+      { r: 0, c: 5, cands: [3, 8], role: 'evidence' },
+      { r: 0, c: 6, cands: [8, 4], elim: [8], role: 'action' },
+      { r: 0, c: 7, value: 2, role: 'context' },
+      { r: 0, c: 8, value: 9, role: 'context' },
+    ],
+  },
+
+  hidden_pair: {
+    caption: 'Digits 2 and 9 only appear in two cells of this row (blue). Remove all other candidates from those cells (red strikethroughs).',
+    cells: [
+      { r: 3, c: 0, value: 4, role: 'context' },
+      { r: 3, c: 1, cands: [2, 5, 9], elim: [5], role: 'evidence' },
+      { r: 3, c: 2, value: 8, role: 'context' },
+      { r: 3, c: 3, value: 6, role: 'context' },
+      { r: 3, c: 4, cands: [5, 7], role: 'context' },
+      { r: 3, c: 5, value: 3, role: 'context' },
+      { r: 3, c: 6, cands: [2, 7, 9], elim: [7], role: 'evidence' },
+      { r: 3, c: 7, value: 1, role: 'context' },
+      { r: 3, c: 8, value: 5, role: 'context' },
+    ],
+  },
+
+  naked_triple: {
+    caption: 'Three cells collectively hold only {1, 5, 9} (blue). Eliminate those three digits from all other cells in the row (orange).',
+    cells: [
+      { r: 6, c: 0, cands: [1, 5], role: 'evidence' },
+      { r: 6, c: 1, cands: [1, 4, 5, 9], elim: [1, 5, 9], role: 'action' },
+      { r: 6, c: 2, value: 7, role: 'context' },
+      { r: 6, c: 3, cands: [1, 9], role: 'evidence' },
+      { r: 6, c: 4, cands: [5, 6, 9], elim: [5, 9], role: 'action' },
+      { r: 6, c: 5, value: 2, role: 'context' },
+      { r: 6, c: 6, value: 8, role: 'context' },
+      { r: 6, c: 7, cands: [5, 9], role: 'evidence' },
+      { r: 6, c: 8, cands: [3, 5, 9], elim: [5, 9], role: 'action' },
+    ],
+  },
+
+  hidden_triple: {
+    caption: 'Digits 2, 6, and 8 only appear in three cells of this column (blue). Remove all other candidates from those cells.',
+    cells: [
+      { r: 0, c: 4, value: 5, role: 'context' },
+      { r: 1, c: 4, cands: [2, 3, 6, 8], elim: [3], role: 'evidence' },
+      { r: 2, c: 4, value: 7, role: 'context' },
+      { r: 3, c: 4, value: 9, role: 'context' },
+      { r: 4, c: 4, cands: [2, 4, 6, 8], elim: [4], role: 'evidence' },
+      { r: 5, c: 4, value: 1, role: 'context' },
+      { r: 6, c: 4, value: 3, role: 'context' },
+      { r: 7, c: 4, cands: [2, 6, 8, 9], elim: [9], role: 'evidence' },
+      { r: 8, c: 4, value: 4, role: 'context' },
+    ],
+  },
+
+  naked_quad: {
+    caption: 'Four cells in this box share only {1, 4, 6, 9} (blue). Eliminate those digits from the remaining cell (orange).',
+    cells: [
+      { r: 0, c: 6, cands: [1, 4], role: 'evidence' },
+      { r: 0, c: 7, cands: [4, 6], role: 'evidence' },
+      { r: 0, c: 8, cands: [1, 9], role: 'evidence' },
+      { r: 1, c: 6, value: 7, role: 'context' },
+      { r: 1, c: 7, cands: [1, 3, 4, 6, 9], elim: [1, 4, 6, 9], role: 'action' },
+      { r: 1, c: 8, value: 2, role: 'context' },
+      { r: 2, c: 6, cands: [1, 6, 9], role: 'evidence' },
+      { r: 2, c: 7, value: 8, role: 'context' },
+      { r: 2, c: 8, value: 5, role: 'context' },
+    ],
+  },
+
+  hidden_quad: {
+    caption: 'Digits 1, 3, 5, and 7 only appear in four cells of this row (blue). Remove all other candidates from those cells.',
+    cells: [
+      { r: 8, c: 0, value: 9, role: 'context' },
+      { r: 8, c: 1, cands: [1, 3, 6, 7], elim: [6], role: 'evidence' },
+      { r: 8, c: 2, value: 4, role: 'context' },
+      { r: 8, c: 3, cands: [1, 5, 7, 8], elim: [8], role: 'evidence' },
+      { r: 8, c: 4, value: 6, role: 'context' },
+      { r: 8, c: 5, cands: [3, 5, 7, 2], elim: [2], role: 'evidence' },
+      { r: 8, c: 6, value: 8, role: 'context' },
+      { r: 8, c: 7, cands: [1, 3, 5, 4], elim: [4], role: 'evidence' },
+      { r: 8, c: 8, value: 2, role: 'context' },
+    ],
+  },
+
+  x_wing: {
+    caption: 'Digit 6 appears in exactly two cells in each of rows 2 and 6, both in columns 3 and 8 (blue). Eliminate 6 from those columns everywhere else (orange).',
+    cells: [
+      { r: 1, c: 2, cands: [6], role: 'evidence' },
+      { r: 1, c: 7, cands: [6], role: 'evidence' },
+      { r: 5, c: 2, cands: [6], role: 'evidence' },
+      { r: 5, c: 7, cands: [6], role: 'evidence' },
+      { r: 0, c: 2, cands: [6, 3], elim: [6], role: 'action' },
+      { r: 3, c: 2, cands: [6, 8], elim: [6], role: 'action' },
+      { r: 7, c: 2, cands: [6, 4], elim: [6], role: 'action' },
+      { r: 2, c: 7, cands: [6, 9], elim: [6], role: 'action' },
+      { r: 6, c: 7, cands: [6, 1], elim: [6], role: 'action' },
+      { r: 8, c: 7, cands: [6, 5], elim: [6], role: 'action' },
+    ],
+  },
+
+  swordfish: {
+    caption: 'Digit 9 across rows 1, 5, and 8 is confined to columns 2, 5, and 9 (blue). Eliminate 9 from those columns in all other rows (orange).',
+    cells: [
+      { r: 0, c: 1, cands: [9], role: 'evidence' },
+      { r: 0, c: 4, cands: [9], role: 'evidence' },
+      { r: 4, c: 1, cands: [9], role: 'evidence' },
+      { r: 4, c: 8, cands: [9], role: 'evidence' },
+      { r: 7, c: 4, cands: [9], role: 'evidence' },
+      { r: 7, c: 8, cands: [9], role: 'evidence' },
+      { r: 2, c: 1, cands: [9, 3], elim: [9], role: 'action' },
+      { r: 5, c: 4, cands: [9, 6], elim: [9], role: 'action' },
+      { r: 3, c: 8, cands: [9, 2], elim: [9], role: 'action' },
+      { r: 6, c: 8, cands: [9, 7], elim: [9], role: 'action' },
+    ],
+  },
+
+  unique_rectangle: {
+    caption: 'Three corners of the rectangle have only {2, 7}. If the fourth also had only {2, 7}, two solutions would exist. Eliminate {2, 7} from it (orange), leaving only 5.',
+    cells: [
+      { r: 0, c: 1, cands: [2, 7], role: 'evidence' },
+      { r: 0, c: 6, cands: [2, 7], role: 'evidence' },
+      { r: 4, c: 1, cands: [2, 7], role: 'evidence' },
+      { r: 4, c: 6, cands: [2, 5, 7], elim: [2, 7], role: 'action' },
+    ],
+  },
+
+  y_wing: {
+    caption: 'Pivot {3,7} (blue, centre) connects to pincers {3,5} and {5,7}. Any cell seeing both pincers cannot be 5 (orange).',
+    cells: [
+      { r: 4, c: 0, cands: [3, 5], role: 'evidence' },
+      { r: 4, c: 4, cands: [3, 7], role: 'evidence' },
+      { r: 7, c: 4, cands: [5, 7], role: 'evidence' },
+      { r: 7, c: 0, cands: [5, 2], elim: [5], role: 'action' },
+      { r: 7, c: 1, cands: [5, 8], elim: [5], role: 'action' },
+    ],
+  },
+
+  w_wing: {
+    caption: 'Two {4,9} cells (blue corners) are connected via a strong link on 4 through column 6. Any cell seeing both cannot be 9 (orange).',
+    cells: [
+      { r: 2, c: 2, cands: [4, 9], role: 'evidence' },
+      { r: 7, c: 7, cands: [4, 9], role: 'evidence' },
+      { r: 2, c: 5, cands: [4, 1], role: 'evidence' },
+      { r: 7, c: 5, cands: [4, 3], role: 'evidence' },
+      { r: 2, c: 7, cands: [9, 6], elim: [9], role: 'action' },
+      { r: 7, c: 2, cands: [9, 8], elim: [9], role: 'action' },
+    ],
+  },
+
+  xyz_wing: {
+    caption: 'Pivot {1,3,7} (blue, centre-left) connects to pincers {1,7} and {3,7}. All three hold 7, so any cell seeing all three cannot be 7 (orange).',
+    cells: [
+      { r: 3, c: 3, cands: [1, 3, 7], role: 'evidence' },
+      { r: 3, c: 7, cands: [1, 7], role: 'evidence' },
+      { r: 6, c: 3, cands: [3, 7], role: 'evidence' },
+      { r: 6, c: 7, cands: [7, 5], elim: [7], role: 'action' },
     ],
   },
 };

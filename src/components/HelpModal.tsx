@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TECHNIQUE_WEIGHT, DIFFICULTY_BANDS } from '../core/grader';
 import type { Technique } from '../core/humanSolver';
-import { TECHNIQUE_LABEL } from '../core/techniqueHelp';
+import { TECHNIQUE_LABEL, TECHNIQUE_EXPLANATIONS, TECHNIQUE_EXAMPLES } from '../core/techniqueHelp';
+import { TechniqueGrid } from './TechniqueGrid';
 import './HelpModal.css';
 
 const TECHNIQUES: { key: Technique; desc: string }[] = [
@@ -28,75 +29,136 @@ interface Props {
 }
 
 export const HelpModal = ({ onClose }: Props) => {
+  const [selected, setSelected] = useState<Technique | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    closeRef.current?.focus();
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
+    (selected ? backRef : closeRef).current?.focus();
+  }, [selected]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        if (selected) setSelected(null);
+        else onClose();
+      }
+    };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [onClose]);
+  }, [onClose, selected]);
+
+  const explanation = selected ? TECHNIQUE_EXPLANATIONS[selected] : null;
+  const example = selected ? TECHNIQUE_EXAMPLES[selected] : null;
 
   return (
-    <div className="help-overlay" onClick={onClose}>
+    <div className="help-overlay" onClick={selected ? () => setSelected(null) : onClose}>
       <div className="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" onClick={e => e.stopPropagation()}>
-        <button ref={closeRef} className="help-close" onClick={onClose} aria-label="Close">✕</button>
 
-        <h2 id="help-modal-title">How puzzles work</h2>
+        {selected ? (
+          <>
+            <button ref={backRef} className="help-back" onClick={() => setSelected(null)} aria-label="Back to techniques">← Back</button>
+            <button className="help-close" onClick={onClose} aria-label="Close">✕</button>
 
-        <section>
-          <h3>Generation</h3>
-          <p>
-            A complete grid is built using randomised backtracking. Cells are then removed one by one,
-            and each removal is only kept if the puzzle still has exactly one solution (checked with an
-            exact-cover solver). This guarantees every puzzle is uniquely solvable.
-          </p>
-        </section>
+            <h2 id="help-modal-title">{TECHNIQUE_LABEL[selected]}</h2>
+            <div className="tech-detail-weight">
+              Weight <span className="tech-weight-badge">{TECHNIQUE_WEIGHT[selected]}</span>
+            </div>
 
-        <section>
-          <h3>Grading</h3>
-          <p>
-            A human-style solver attempts the puzzle using logic techniques in order of complexity.
-            The difficulty score is the sum of the weights of every technique needed to reach a solution.
-          </p>
-          <div className="band-row">
-            {DIFFICULTY_BANDS.map(b => (
-              <div key={b.label} className="band-chip" style={{ borderColor: b.color }}>
-                <span className="band-label" style={{ color: b.color }}>{b.label}</span>
-                <span className="band-range">{b.range}</span>
+            {explanation && (
+              <>
+                <section>
+                  <p>{explanation.summary}</p>
+                </section>
+                {example && (
+                  <section>
+                    <h3>Example</h3>
+                    <TechniqueGrid cells={example.cells} />
+                    <div className="tg-legend">
+                      <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--evidence" />Pattern</span>
+                      <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--action" />Elimination / placement</span>
+                      <span className="tg-legend-item"><span className="tg-legend-swatch tg-legend-swatch--elim" />Eliminated candidate</span>
+                    </div>
+                    <p className="tg-caption">{example.caption}</p>
+                  </section>
+                )}
+                <section>
+                  <h3>How to apply</h3>
+                  <ol className="technique-steps">
+                    {explanation.steps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </section>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <button ref={closeRef} className="help-close" onClick={onClose} aria-label="Close">✕</button>
+
+            <h2 id="help-modal-title">How puzzles work</h2>
+
+            <section>
+              <h3>Generation</h3>
+              <p>
+                A complete grid is built using randomised backtracking. Cells are then removed one by one,
+                and each removal is only kept if the puzzle still has exactly one solution (checked with an
+                exact-cover solver). This guarantees every puzzle is uniquely solvable.
+              </p>
+            </section>
+
+            <section>
+              <h3>Grading</h3>
+              <p>
+                A human-style solver attempts the puzzle using logic techniques in order of complexity.
+                The difficulty score is the sum of the weights of every technique needed to reach a solution.
+              </p>
+              <div className="band-row">
+                {DIFFICULTY_BANDS.map(b => (
+                  <div key={b.label} className="band-chip" style={{ borderColor: b.color }}>
+                    <span className="band-label" style={{ color: b.color }}>{b.label}</span>
+                    <span className="band-range">{b.range}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
 
-        <section>
-          <h3>Why Master &amp; Legend show "Preparing…"</h3>
-          <p>
-            Puzzles are generated randomly and graded after the fact. There is no way to aim for a
-            specific difficulty directly. Most randomly generated puzzles land in the Easy to Hard range,
-            so Master and Legend puzzles are rare finds. The app keeps generating in the background
-            and queues one puzzle per high difficulty, but it can take a while before one appears.
-            Tap the button once it turns green.
-          </p>
-        </section>
+            <section>
+              <h3>Why Master &amp; Legend show "Preparing…"</h3>
+              <p>
+                Puzzles are generated randomly and graded after the fact. There is no way to aim for a
+                specific difficulty directly. Most randomly generated puzzles land in the Easy to Hard range,
+                so Master and Legend puzzles are rare finds. The app keeps generating in the background
+                and queues one puzzle per high difficulty, but it can take a while before one appears.
+                Tap the button once it turns green.
+              </p>
+            </section>
 
-        <section>
-          <h3>Techniques</h3>
-          <table className="tech-table">
-            <thead>
-              <tr><th>Technique</th><th>Weight</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              {TECHNIQUES.map(t => (
-                <tr key={t.key}>
-                  <td className="tech-name">{TECHNIQUE_LABEL[t.key]}</td>
-                  <td className="tech-weight">{TECHNIQUE_WEIGHT[t.key]}</td>
-                  <td className="tech-desc">{t.desc}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+            <section>
+              <h3>Techniques</h3>
+              <table className="tech-table">
+                <thead>
+                  <tr><th>Technique</th><th>Weight</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                  {TECHNIQUES.map(t => (
+                    <tr key={t.key}>
+                      <td className="tech-name">
+                        <button className="tech-link" onClick={() => setSelected(t.key)}>
+                          {TECHNIQUE_LABEL[t.key]}
+                        </button>
+                      </td>
+                      <td className="tech-weight">{TECHNIQUE_WEIGHT[t.key]}</td>
+                      <td className="tech-desc">{t.desc}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          </>
+        )}
       </div>
     </div>
   );
