@@ -172,8 +172,6 @@ h1 {
 
 .cell {
   background: var(--c-bg-cell);
-  border-right: 1px solid var(--c-border-box);
-  border-bottom: 1px solid var(--c-border-box);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
@@ -210,11 +208,6 @@ h1 {
 .cell.same-digit {
   background: var(--c-bg-cell-digit);
 }
-
-/* Remove excess borders at outer edges */
-.cell:nth-child(9n) { border-right: none; }
-/* :nth-child(n+73) never matches (cells live in 9-child row wrappers), use DOM path instead */
-.board > div:last-child > .cell { border-bottom: none; }
 
 /* Box dividers — accent color, clearly visible against cell background */
 .cell.border-right { border-right: 2px solid var(--c-accent); }
