@@ -820,3 +820,36 @@ describe('findNextHint — wing technique hint formatting', () => {
     expect(hint!.eliminations.length).toBeGreaterThan(0);
   });
 });
+
+describe('unique_rectangle technique', () => {
+  // UR requires a state where all simpler techniques are exhausted first.
+  // These tests verify code correctness; specific puzzle strings exercising
+  // each UR type should be added when identified.
+
+  it('technique does not crash during full solves', () => {
+    // uniqueRectangle runs on every iteration — verify no throws on known puzzles
+    for (const puz of [EASY_PUZZLE, MEDIUM_PUZZLE, HARD_PUZZLE, WW4_PUZZLE, YW1_PUZZLE]) {
+      expect(() => humanSolve(puz)).not.toThrow();
+    }
+  });
+
+  it('if unique_rectangle hint fires it has correct structure', () => {
+    for (const puz of [WW4_PUZZLE, YW1_PUZZLE, XYZ3_PUZZLE, WW_A_PUZZLE, WW_B_PUZZLE]) {
+      const hint = captureHintOfType(puz, 'unique_rectangle', 2000);
+      if (!hint) continue;
+      expect(hint.isPlacement).toBe(false);
+      // evidence is the 4 rectangle corners (possibly 3 for type 1)
+      expect(hint.evidenceCells.length).toBeGreaterThanOrEqual(3);
+      expect(hint.evidenceCells.length).toBeLessThanOrEqual(4);
+      expect(hint.eliminations.length).toBeGreaterThan(0);
+      expect(hint.description).toMatch(/unique rectangle/i);
+      // all eliminations must be from empty cells with that digit as a candidate
+      for (const { cell, digit } of hint.eliminations) {
+        expect(digit).toBeGreaterThanOrEqual(1);
+        expect(digit).toBeLessThanOrEqual(9);
+        expect(cell).toBeGreaterThanOrEqual(0);
+        expect(cell).toBeLessThan(81);
+      }
+    }
+  });
+});

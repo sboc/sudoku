@@ -17,6 +17,7 @@ const TECHNIQUES: { key: Technique; desc: string }[] = [
   { key: 'hidden_quad', desc: 'Four digits confined to four cells in a unit, allowing elimination of other candidates from those cells.' },
   { key: 'x_wing', desc: 'A digit appears in only two cells across two rows, forming a rectangle that eliminates the digit in two columns.' },
   { key: 'swordfish', desc: 'A three-row extension of X-Wing: a digit in 2-3 cells across three rows spans exactly three columns, eliminating it from the rest of those columns.' },
+  { key: 'unique_rectangle', desc: 'Four empty cells forming a rectangle across two boxes share two candidates. Extra candidates in roof cells must be used to prevent two solutions, enabling eliminations.' },
   { key: 'y_wing', desc: 'Three cells with two candidates each form a chain that forces eliminations.' },
   { key: 'w_wing', desc: 'Two bivalue cells with the same candidates are connected by a strong link, eliminating one candidate from cells that see both.' },
   { key: 'xyz_wing', desc: 'Like Y-Wing but the pivot has three candidates. Eliminates one digit from cells that see all three cells.' },

@@ -18,6 +18,7 @@ export const TECHNIQUE_LABEL: Record<Technique, string> = {
   box_line_reduction: 'Box-Line Reduction',
   x_wing: 'X-Wing',
   swordfish: 'Swordfish',
+  unique_rectangle: 'Unique Rectangle',
   y_wing: 'Y-Wing',
   xyz_wing: 'XYZ-Wing',
   w_wing: 'W-Wing',
@@ -120,6 +121,16 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
       'The candidate cells in all three rows must together span exactly three columns.',
       'Eliminate the digit from all other cells in those three columns.',
       '(The same pattern works with columns and rows swapped.)',
+    ],
+  },
+  unique_rectangle: {
+    summary: 'Four empty cells forming a rectangle across exactly two boxes all contain the same two candidates. If no extra candidates existed, the puzzle would have two solutions (the two digits could swap). The extra candidates in roof cells must therefore be used — allowing eliminations that preserve uniqueness.',
+    steps: [
+      'Find four empty cells forming a rectangle (2 rows × 2 columns) that spans exactly two boxes.',
+      'Confirm all four cells share two common candidates {A, B} — these are the UR digits.',
+      'Type 1 — three cells have only {A,B}: the fourth cell must use one of its extra candidates, so eliminate A and B from it.',
+      'Type 2 — two floor cells have only {A,B}, two roof cells each have exactly one extra digit C: one roof must be C to break the pattern; eliminate C from cells seeing both roof cells.',
+      'Type 4 — two floor cells have only {A,B}, and one UR digit is confined to the two roof cells in their shared unit: eliminate the other UR digit from both roof cells.',
     ],
   },
   xyz_wing: {

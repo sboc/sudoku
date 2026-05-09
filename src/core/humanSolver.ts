@@ -11,6 +11,7 @@ export type Technique =
   | 'box_line_reduction'
   | 'x_wing'
   | 'swordfish'
+  | 'unique_rectangle'
   | 'y_wing'
   | 'xyz_wing'
   | 'w_wing';
@@ -21,6 +22,7 @@ interface SolveStep {
   cells?: number[];
   digit?: number;
   eliminated?: number[];
+  urType?: 1 | 2 | 4;
 }
 
 interface HumanSolveResult {
@@ -565,6 +567,91 @@ const wWing = (grid: number[], cands: Candidates): SolveStep | null => {
   return null;
 };
 
+// Unique Rectangle: a rectangle of 4 empty cells spanning exactly 2 boxes whose 4 corners all
+// contain UR candidates {A,B}. If they could all use only A/B the puzzle would have 2 solutions,
+// so the pattern forces eliminations to preserve uniqueness.
+const uniqueRectangle = (grid: number[], cands: Candidates): SolveStep | null => {
+  const boxOf = (cell: number) =>
+    Math.floor(Math.floor(cell / 9) / 3) * 3 + Math.floor((cell % 9) / 3);
+
+  for (let r1 = 0; r1 < 9; r1++) {
+    for (let r2 = r1 + 1; r2 < 9; r2++) {
+      for (let c1 = 0; c1 < 9; c1++) {
+        for (let c2 = c1 + 1; c2 < 9; c2++) {
+          const corners = [r1 * 9 + c1, r1 * 9 + c2, r2 * 9 + c1, r2 * 9 + c2];
+          if (corners.some(c => grid[c] !== 0 || cands[c].size < 2)) continue;
+          if (new Set(corners.map(boxOf)).size !== 2) continue;
+
+          // digits present in all 4 corners
+          const common: number[] = [];
+          for (const d of cands[corners[0]]) {
+            if (corners.every(c => cands[c].has(d))) common.push(d);
+          }
+          if (common.length < 2) continue;
+
+          for (let i = 0; i < common.length - 1; i++) {
+            for (let j = i + 1; j < common.length; j++) {
+              const a = common[i], b = common[j];
+              // floor = corners with exactly {a,b}; roof = corners with extras
+              const floor = corners.filter(c => cands[c].size === 2);
+              const roof  = corners.filter(c => cands[c].size > 2);
+
+              // Type 1: 3 floor cells, 1 roof cell → eliminate a and b from the roof cell
+              if (floor.length === 3 && roof.length === 1) {
+                const rc = roof[0];
+                let changed = false;
+                if (cands[rc].has(a)) { cands[rc].delete(a); changed = true; }
+                if (cands[rc].has(b)) { cands[rc].delete(b); changed = true; }
+                if (changed) return { technique: 'unique_rectangle', cells: corners, urType: 1 };
+              }
+
+              if (floor.length === 2 && roof.length === 2) {
+                const [rf1, rf2] = roof;
+
+                // Type 2: each roof has exactly 1 extra, same digit C → lock C in shared unit
+                const xtra1 = [...cands[rf1]].filter(d => d !== a && d !== b);
+                const xtra2 = [...cands[rf2]].filter(d => d !== a && d !== b);
+                if (xtra1.length === 1 && xtra2.length === 1 && xtra1[0] === xtra2[0]) {
+                  const C = xtra1[0];
+                  const rf1Peers = PEER_SETS[rf1];
+                  let changed = false;
+                  for (const c of peers(rf2)) {
+                    if (c === rf1 || !rf1Peers.has(c)) continue;
+                    if (cands[c].has(C)) { cands[c].delete(C); changed = true; }
+                  }
+                  if (changed) return { technique: 'unique_rectangle', cells: corners, digit: C, urType: 2 };
+                }
+
+                // Type 4: in a unit shared by both roof cells, one UR digit is confined there
+                // → eliminate the other UR digit from both roof cells
+                const rR1 = Math.floor(rf1 / 9), rR2 = Math.floor(rf2 / 9);
+                const rC1 = rf1 % 9,              rC2 = rf2 % 9;
+                const sharedUnits: number[][] = [];
+                if (rR1 === rR2) sharedUnits.push(ALL_ROWS[rR1]);
+                if (rC1 === rC2) sharedUnits.push(ALL_COLS[rC1]);
+                if (boxOf(rf1) === boxOf(rf2)) sharedUnits.push(ALL_BOXES[boxOf(rf1)]);
+
+                for (const unit of sharedUnits) {
+                  for (const [locked, elim] of [[a, b], [b, a]] as [number, number][]) {
+                    const inUnit = unit.filter(c => grid[c] === 0 && cands[c].has(locked));
+                    if (inUnit.length === 2 && inUnit.includes(rf1) && inUnit.includes(rf2)) {
+                      let changed = false;
+                      if (cands[rf1].has(elim)) { cands[rf1].delete(elim); changed = true; }
+                      if (cands[rf2].has(elim)) { cands[rf2].delete(elim); changed = true; }
+                      if (changed) return { technique: 'unique_rectangle', cells: corners, digit: locked, urType: 4 };
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
 const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
   nakedSingle,
   hiddenSingle,
@@ -578,6 +665,7 @@ const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
   hiddenQuad,
   xWing,
   swordfish,
+  uniqueRectangle,
   yWing,
   xyzWing,
   wWing,
@@ -863,6 +951,49 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
           digit,
           eliminations: allEliminations,
         };
+        break;
+      }
+      case 'unique_rectangle': {
+        const corners = step.cells!;
+        const urType = step.urType!;
+        const floorCell = corners.find(c => baseCands[c].size === 2)!;
+        const [a, b] = [...baseCands[floorCell]];
+        const roofCells = corners.filter(c => baseCands[c].size > 2);
+
+        if (urType === 1) {
+          const rc = roofCells[0];
+          hint = {
+            technique: step.technique,
+            description: `Unique Rectangle (Type 1): three corners are locked to {${a},${b}}. Placing ${a} or ${b} in ${cellRef(rc)} would allow two solutions — eliminate them from ${cellRef(rc)}.`,
+            evidenceCells: corners.filter(c => c !== rc),
+            actionCells: eliminatedCells,
+            isPlacement: false,
+            eliminations: allEliminations,
+          };
+        } else if (urType === 2) {
+          const C = step.digit!;
+          hint = {
+            technique: step.technique,
+            description: `Unique Rectangle (Type 2): floor cells locked to {${a},${b}}, both roof cells add candidate ${C}. One roof must be ${C} to break the deadly pattern — eliminate ${C} from their common peers.`,
+            evidenceCells: corners,
+            actionCells: eliminatedCells,
+            isPlacement: false,
+            digit: C,
+            eliminations: allEliminations,
+          };
+        } else {
+          const locked = step.digit!;
+          const elim = locked === a ? b : a;
+          hint = {
+            technique: step.technique,
+            description: `Unique Rectangle (Type 4): ${locked} is confined to the roof cells in their shared unit. If ${elim} appeared in a roof cell it could swap with ${locked}, giving two solutions — eliminate ${elim} from ${roofCells.map(cellRef).join(' and ')}.`,
+            evidenceCells: corners,
+            actionCells: eliminatedCells,
+            isPlacement: false,
+            digit: elim,
+            eliminations: allEliminations,
+          };
+        }
         break;
       }
       case 'y_wing': {
