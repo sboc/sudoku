@@ -110,10 +110,10 @@ h1 {
 .board {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
   gap: 0;
   background: transparent;
   border: 2px solid var(--c-border-box);
-  border-radius: 3px;
   padding: 0;
   width: 100%;
   aspect-ratio: 1;
@@ -183,7 +183,6 @@ h1 {
   align-items: center;
   justify-content: center;
   transition: background 0.1s;
-  border-radius: 3px;
   padding: 0;
   line-height: 1;
   aspect-ratio: 1;
@@ -331,10 +330,10 @@ h1 {
 
 .num-btn.icon-btn,
 .num-btn.notes-toggle {
-  display: grid;
-  grid-template-columns: 1.4rem 1fr 1.4rem;
+  display: flex;
   align-items: center;
-  text-align: center;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 .num-btn.notes-toggle {
@@ -483,10 +482,10 @@ h1 {
 /* Auto-solve checkbox label */
 .autosolve-label {
   cursor: pointer;
-  display: grid;
-  grid-template-columns: 1.4rem 1fr 1.4rem;
+  display: flex;
   align-items: center;
-  text-align: center;
+  justify-content: center;
+  gap: 0.3rem;
   letter-spacing: 0.03em;
 }
 
@@ -495,7 +494,7 @@ h1 {
   height: 13px;
   accent-color: var(--c-accent);
   cursor: pointer;
-  justify-self: center;
+  flex-shrink: 0;
 }
 
 .autosolve-disabled {
