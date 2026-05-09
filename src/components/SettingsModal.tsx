@@ -36,6 +36,10 @@ export const SettingsModal = ({ theme, onChangeTheme, onClose }: Props) => {
                 className={`theme-card${theme === t.id ? ' theme-card--active' : ''}`}
                 onClick={() => onChangeTheme(t.id)}
                 aria-pressed={theme === t.id}
+                style={{
+                  background: t.bgCell,
+                  borderColor: theme === t.id ? t.accent : t.borderBox,
+                }}
               >
                 <div className="theme-preview">
                   <div className="theme-preview-grid" style={{ background: t.bgCell, borderColor: t.borderBox }}>

@@ -81,14 +81,11 @@
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
-  transition: border-color 0.15s, background 0.15s;
+  transition: filter 0.15s;
   position: relative;
 }
 @media (hover: hover) {
-  .theme-card:hover { background: var(--c-bg-cell-hi); }
-}
-.theme-card--active {
-  border-color: var(--c-accent);
+  .theme-card:hover { filter: brightness(1.12); }
 }
 
 .theme-preview {
