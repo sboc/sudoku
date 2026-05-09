@@ -336,14 +336,6 @@ h1 {
   gap: 0.35rem;
 }
 
-/* Spacer mirrors the 13px SVG icon so the label lands at the visual centre */
-.num-btn.icon-btn::after,
-.num-btn.notes-toggle::after {
-  content: '';
-  display: block;
-  width: 13px;
-  flex-shrink: 0;
-}
 
 .num-btn.notes-toggle {
   font-size: 0.82rem;
@@ -498,12 +490,6 @@ h1 {
   letter-spacing: 0.03em;
 }
 
-.autosolve-label::after {
-  content: '';
-  display: block;
-  width: 13px;
-  flex-shrink: 0;
-}
 
 .autosolve-checkbox {
   width: 13px;
