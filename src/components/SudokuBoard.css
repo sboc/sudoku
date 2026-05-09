@@ -173,6 +173,8 @@ h1 {
 .cell {
   appearance: none;
   border: none;
+  border-right: 1px solid var(--c-border-ui);
+  border-bottom: 1px solid var(--c-border-ui);
   background: var(--c-bg-cell);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
@@ -210,6 +212,10 @@ h1 {
 .cell.same-digit {
   background: var(--c-bg-cell-digit);
 }
+
+/* Remove separator at outer edges */
+.cell:nth-child(9n) { border-right: none; }
+.board > div:last-child > .cell { border-bottom: none; }
 
 /* Box dividers — accent color, clearly visible against cell background */
 .cell.border-right { border-right: 2px solid var(--c-accent); }
