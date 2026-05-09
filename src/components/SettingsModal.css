@@ -41,7 +41,9 @@
   border-radius: 4px;
   transition: color 0.15s;
 }
-.settings-close:hover { color: var(--c-text-1); }
+@media (hover: hover) {
+  .settings-close:hover { color: var(--c-text-1); }
+}
 
 .settings-modal h2 {
   font-size: 1.2rem;

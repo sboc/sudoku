@@ -44,8 +44,8 @@
   transition: color 0.15s;
 }
 
-.help-close:hover {
-  color: var(--c-text-1);
+@media (hover: hover) {
+  .help-close:hover { color: var(--c-text-1); }
 }
 
 .help-modal h2 {
@@ -185,8 +185,8 @@
   transition: color 0.15s;
 }
 
-.help-back:hover {
-  color: var(--c-text-1);
+@media (hover: hover) {
+  .help-back:hover { color: var(--c-text-1); }
 }
 
 .tech-link {
@@ -203,8 +203,8 @@
   transition: color 0.15s;
 }
 
-.tech-link:hover {
-  color: var(--c-text-1);
+@media (hover: hover) {
+  .tech-link:hover { color: var(--c-text-1); }
 }
 
 .tech-detail-weight {
