@@ -27,10 +27,16 @@ export const TECHNIQUE_LABEL: Record<Technique, string> = {
   box_line_reduction: 'Box-Line Reduction',
   x_wing: 'X-Wing',
   swordfish: 'Swordfish',
+  jellyfish: 'Jellyfish',
   unique_rectangle: 'Unique Rectangle',
   y_wing: 'Y-Wing',
   xyz_wing: 'XYZ-Wing',
   w_wing: 'W-Wing',
+  skyscraper: 'Skyscraper',
+  two_string_kite: '2-String Kite',
+  empty_rectangle: 'Empty Rectangle',
+  simple_coloring: 'Simple Coloring',
+  xy_chain: 'XY-Chain',
 };
 
 export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
@@ -142,13 +148,49 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
       'Type 4 — two floor cells have only {A,B}, and one UR digit is confined to the two roof cells in their shared unit: eliminate the other UR digit from both roof cells.',
     ],
   },
-  xyz_wing: {
-    summary: 'Like Y-Wing but the pivot has three candidates {X,Y,Z} instead of two. The pivot and both pincers all hold Z, so Z is eliminated from any cell that sees all three, giving a tighter elimination zone than Y-Wing.',
+  jellyfish: {
+    summary: 'A four-row (or four-column) extension of Swordfish. A digit appears in only 2-4 cells in each of four rows, and those cells together span exactly four columns. The digit can be eliminated from all other cells in those four columns.',
     steps: [
-      'Find a pivot cell with exactly three candidates {X, Y, Z}.',
-      'Find a pincer that sees the pivot with candidates {X, Z}.',
-      'Find another pincer that sees the pivot with candidates {Y, Z}.',
-      'One of the three cells must hold Z. Eliminate Z from any cell that sees the pivot and both pincers.',
+      'Find a digit that appears in exactly 2–4 cells across each of four rows.',
+      'The candidate cells across all four rows must together span exactly four columns.',
+      'Eliminate the digit from all other cells in those four columns.',
+      '(The same pattern works with columns and rows swapped.)',
+    ],
+  },
+  skyscraper: {
+    summary: 'Two rows (or columns) each have exactly two candidates for a digit, sharing one column (the trunk). The other two cells are the tips. Either one tip or the other must hold the digit, so cells seeing both tips can be eliminated.',
+    steps: [
+      'Find a digit with exactly two candidates in each of two rows, sharing exactly one column (the trunk).',
+      'Identify the two tip cells — one in each row, in the non-shared column.',
+      'Either the first row\'s tip or the second row\'s tip must hold the digit.',
+      'Eliminate the digit from any cell that sees both tips.',
+    ],
+  },
+  two_string_kite: {
+    summary: 'A row-string (digit in exactly two row cells) and a column-string (digit in exactly two column cells) share a box corner. The two outer ends act like a conjugate pair — eliminate the digit from cells seeing both ends.',
+    steps: [
+      'Find a digit with exactly two candidates in a row and exactly two in a column.',
+      'One cell from the row and one from the column must be in the same box (the shared corner).',
+      'The remaining two cells (one from each string) are the tips.',
+      'Eliminate the digit from any cell that sees both tips.',
+    ],
+  },
+  empty_rectangle: {
+    summary: 'In a box, a digit\'s candidates are confined to a single row and a single column forming a cross. Combined with an external strong link that touches the cross row (or column), this forces an elimination at the intersection of the other strong-link end and the cross column (or row).',
+    steps: [
+      'Find a box where a digit\'s candidates lie entirely on one row AND one column within the box (an "L" or "+" shape).',
+      'Find a strong link (conjugate pair) in an external column that includes the cross row.',
+      'The other end of the strong link plus the cross column define a single elimination target.',
+      'Eliminate the digit from that target cell.',
+    ],
+  },
+  simple_coloring: {
+    summary: 'Two-color the strong-link graph for a digit (BFS alternating colors). If two same-color cells see each other, that color is impossible and all cells of that color are eliminated. If a cell outside the chain sees both colors, it can be eliminated.',
+    steps: [
+      'For a digit, build a graph of conjugate pairs (strong links — units where the digit appears in exactly two cells).',
+      'Two-color the connected components: alternate colors along each chain.',
+      'Type 1 — if two cells of the same color share a unit, that color is a contradiction: eliminate the digit from all same-color cells.',
+      'Type 2 — if a cell outside the chain sees one cell of each color, it can\'t be the digit (one color must be correct): eliminate it.',
     ],
   },
   w_wing: {
@@ -167,6 +209,15 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
       'Find a pincer that sees the pivot with candidates {A, C}.',
       'Find another pincer that sees the pivot with candidates {B, C}.',
       'Any cell that sees both pincers can have C eliminated, as it would conflict with whichever pincer ends up holding C.',
+    ],
+  },
+  xy_chain: {
+    summary: 'A chain of bivalue cells where each consecutive pair shares one candidate. The first and last cell share a target digit T. Either the start or the end must be T, so cells seeing both chain ends can have T eliminated.',
+    steps: [
+      'Find a chain of bivalue cells where adjacent cells share exactly one candidate.',
+      'The first cell has candidates {T, X}, each link passes the "exit" digit to the next cell, and the last cell ends with candidate T.',
+      'Either the first cell is T or the last cell is T (or the chain forces one of them).',
+      'Eliminate T from any cell that sees both the first and last cell of the chain.',
     ],
   },
 };
@@ -405,6 +456,80 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
       { r: 3, c: 7, cands: [1, 7], role: 'evidence' },
       { r: 6, c: 3, cands: [3, 7], role: 'evidence' },
       { r: 6, c: 7, cands: [7, 5], elim: [7], role: 'action' },
+    ],
+  },
+
+  jellyfish: {
+    caption: 'Digit 3 across rows 1, 3, 6, and 8 is confined to columns 2, 4, 7, and 9 (blue). Eliminate 3 from those columns in all other rows (orange).',
+    cells: [
+      { r: 0, c: 1, cands: [3], role: 'evidence' },
+      { r: 0, c: 3, cands: [3], role: 'evidence' },
+      { r: 2, c: 3, cands: [3], role: 'evidence' },
+      { r: 2, c: 6, cands: [3], role: 'evidence' },
+      { r: 5, c: 1, cands: [3], role: 'evidence' },
+      { r: 5, c: 8, cands: [3], role: 'evidence' },
+      { r: 7, c: 6, cands: [3], role: 'evidence' },
+      { r: 7, c: 8, cands: [3], role: 'evidence' },
+      { r: 3, c: 1, cands: [3, 5], elim: [3], role: 'action' },
+      { r: 4, c: 3, cands: [3, 8], elim: [3], role: 'action' },
+      { r: 1, c: 6, cands: [3, 2], elim: [3], role: 'action' },
+      { r: 6, c: 8, cands: [3, 7], elim: [3], role: 'action' },
+    ],
+  },
+
+  skyscraper: {
+    caption: 'Digit 5 in rows 1 and 3 share column 5 as trunk (blue). Tips R1C8 and R3C9 land in the same box — cells in that box seeing both tips cannot be 5 (orange).',
+    cells: [
+      { r: 0, c: 4, cands: [5], role: 'evidence' },
+      { r: 2, c: 4, cands: [5], role: 'evidence' },
+      { r: 0, c: 7, cands: [5], role: 'evidence' },
+      { r: 2, c: 8, cands: [5], role: 'evidence' },
+      { r: 1, c: 7, cands: [5, 2], elim: [5], role: 'action' },
+      { r: 1, c: 8, cands: [5, 3], elim: [5], role: 'action' },
+    ],
+  },
+
+  two_string_kite: {
+    caption: 'Digit 7: row-string R3C2–R3C8 and column-string R1C2–R7C2 share box corner R3C2. Tips R3C8 and R7C2 force an elimination at R7C8 (orange).',
+    cells: [
+      { r: 2, c: 1, cands: [7], role: 'evidence' },
+      { r: 0, c: 1, cands: [7], role: 'evidence' },
+      { r: 2, c: 7, cands: [7], role: 'evidence' },
+      { r: 6, c: 1, cands: [7], role: 'evidence' },
+      { r: 6, c: 7, cands: [7, 3], elim: [7], role: 'action' },
+    ],
+  },
+
+  empty_rectangle: {
+    caption: 'Digit 4 in the centre box forms a cross on row 5 and column 5. Strong link R2C8–R5C8 forces elimination of 4 from R2C5 (orange).',
+    cells: [
+      { r: 3, c: 4, cands: [4], role: 'evidence' },
+      { r: 4, c: 3, cands: [4], role: 'evidence' },
+      { r: 4, c: 4, cands: [4], role: 'evidence' },
+      { r: 1, c: 7, cands: [4], role: 'evidence' },
+      { r: 4, c: 7, cands: [4], role: 'evidence' },
+      { r: 1, c: 4, cands: [4, 9], elim: [4], role: 'action' },
+    ],
+  },
+
+  simple_coloring: {
+    caption: 'Digit 6: four-cell chain alternates colors (blue/orange). R4C2 sits in column 2 between a blue cell (R1C2) and an orange cell (R7C2) — it sees both colors, so eliminate 6 from R4C2.',
+    cells: [
+      { r: 0, c: 1, cands: [6], role: 'evidence' },
+      { r: 0, c: 5, cands: [6], role: 'evidence' },
+      { r: 6, c: 1, cands: [6], role: 'evidence' },
+      { r: 6, c: 5, cands: [6], role: 'evidence' },
+      { r: 3, c: 1, cands: [6, 4], elim: [6], role: 'action' },
+    ],
+  },
+
+  xy_chain: {
+    caption: 'XY-Chain on 9: {9,4}→{4,5}→{5,9}. Start R1C1 and end R4C8 both hold 9. R1C8 sees start (row 1) and end (col 8) — eliminate 9 from R1C8 (orange).',
+    cells: [
+      { r: 0, c: 0, cands: [9, 4], role: 'evidence' },
+      { r: 3, c: 0, cands: [4, 5], role: 'evidence' },
+      { r: 3, c: 7, cands: [5, 9], role: 'evidence' },
+      { r: 0, c: 7, cands: [9, 1], elim: [9], role: 'action' },
     ],
   },
 };

@@ -15,10 +15,16 @@ export const TECHNIQUE_WEIGHT: Record<Technique, number> = {
   box_line_reduction: 3,
   x_wing: 7,
   swordfish: 8,
+  jellyfish: 9,
   unique_rectangle: 7,
   y_wing: 8,
   xyz_wing: 9,
   w_wing: 8,
+  skyscraper: 6,
+  two_string_kite: 6,
+  empty_rectangle: 7,
+  simple_coloring: 8,
+  xy_chain: 9,
 };
 
 export const DIFFICULTY_COLOR: Record<string, string> = {

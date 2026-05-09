@@ -11,10 +11,16 @@ export type Technique =
   | 'box_line_reduction'
   | 'x_wing'
   | 'swordfish'
+  | 'jellyfish'
   | 'unique_rectangle'
   | 'y_wing'
   | 'xyz_wing'
-  | 'w_wing';
+  | 'w_wing'
+  | 'skyscraper'
+  | 'two_string_kite'
+  | 'empty_rectangle'
+  | 'simple_coloring'
+  | 'xy_chain';
 
 interface SolveStep {
   technique: Technique;
@@ -652,6 +658,366 @@ const uniqueRectangle = (grid: number[], cands: Candidates): SolveStep | null =>
   return null;
 };
 
+const jellyfish = (grid: number[], cands: Candidates): SolveStep | null => {
+  for (let d = 1; d <= 9; d++) {
+    // row-based
+    const rowData: { row: number; cols: number[] }[] = [];
+    for (let r = 0; r < 9; r++) {
+      const cols = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => c % 9);
+      if (cols.length >= 2 && cols.length <= 4) rowData.push({ row: r, cols });
+    }
+    for (let i = 0; i < rowData.length; i++) {
+      for (let j = i + 1; j < rowData.length; j++) {
+        for (let k = j + 1; k < rowData.length; k++) {
+          for (let l = k + 1; l < rowData.length; l++) {
+            const colSet = new Set<number>(rowData[i].cols);
+            for (const c of rowData[j].cols) colSet.add(c);
+            for (const c of rowData[k].cols) colSet.add(c);
+            for (const c of rowData[l].cols) colSet.add(c);
+            if (colSet.size !== 4) continue;
+            const cols = [...colSet];
+            const rows = [rowData[i].row, rowData[j].row, rowData[k].row, rowData[l].row];
+            let changed = false;
+            for (const col of cols) {
+              for (const c of ALL_COLS[col]) {
+                if (rows.includes(Math.floor(c / 9))) continue;
+                if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+              }
+            }
+            if (changed) return {
+              technique: 'jellyfish',
+              digit: d,
+              cells: rows.flatMap(r => cols.map(col => r * 9 + col)),
+            };
+          }
+        }
+      }
+    }
+    // col-based
+    const colData: { col: number; rows: number[] }[] = [];
+    for (let col = 0; col < 9; col++) {
+      const rows = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => Math.floor(c / 9));
+      if (rows.length >= 2 && rows.length <= 4) colData.push({ col, rows });
+    }
+    for (let i = 0; i < colData.length; i++) {
+      for (let j = i + 1; j < colData.length; j++) {
+        for (let k = j + 1; k < colData.length; k++) {
+          for (let l = k + 1; l < colData.length; l++) {
+            const rowSet = new Set<number>(colData[i].rows);
+            for (const r of colData[j].rows) rowSet.add(r);
+            for (const r of colData[k].rows) rowSet.add(r);
+            for (const r of colData[l].rows) rowSet.add(r);
+            if (rowSet.size !== 4) continue;
+            const rows = [...rowSet];
+            const cols = [colData[i].col, colData[j].col, colData[k].col, colData[l].col];
+            let changed = false;
+            for (const r of rows) {
+              for (const c of ALL_ROWS[r]) {
+                if (cols.includes(c % 9)) continue;
+                if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+              }
+            }
+            if (changed) return {
+              technique: 'jellyfish',
+              digit: d,
+              cells: rows.flatMap(r => cols.map(col => r * 9 + col)),
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
+const skyscraper = (grid: number[], cands: Candidates): SolveStep | null => {
+  for (let d = 1; d <= 9; d++) {
+    // Row-based: two rows with exactly 2 candidates sharing one column
+    const rowData: { row: number; cols: number[] }[] = [];
+    for (let r = 0; r < 9; r++) {
+      const cols = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => c % 9);
+      if (cols.length === 2) rowData.push({ row: r, cols });
+    }
+    for (let i = 0; i < rowData.length; i++) {
+      for (let j = i + 1; j < rowData.length; j++) {
+        const ri = rowData[i], rj = rowData[j];
+        const shared = ri.cols.filter(c => rj.cols.includes(c));
+        if (shared.length !== 1) continue;
+        const trunk = shared[0];
+        const tip1Cell = ri.row * 9 + ri.cols.find(c => c !== trunk)!;
+        const tip2Cell = rj.row * 9 + rj.cols.find(c => c !== trunk)!;
+        const tip1Peers = PEER_SETS[tip1Cell];
+        let changed = false;
+        for (const c of peers(tip2Cell)) {
+          if (c === tip1Cell || !tip1Peers.has(c)) continue;
+          if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+        }
+        if (changed) return {
+          technique: 'skyscraper',
+          digit: d,
+          cells: [ri.row * 9 + trunk, rj.row * 9 + trunk, tip1Cell, tip2Cell],
+        };
+      }
+    }
+    // Col-based
+    const colData: { col: number; rows: number[] }[] = [];
+    for (let col = 0; col < 9; col++) {
+      const rows = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => Math.floor(c / 9));
+      if (rows.length === 2) colData.push({ col, rows });
+    }
+    for (let i = 0; i < colData.length; i++) {
+      for (let j = i + 1; j < colData.length; j++) {
+        const ci = colData[i], cj = colData[j];
+        const shared = ci.rows.filter(r => cj.rows.includes(r));
+        if (shared.length !== 1) continue;
+        const trunk = shared[0];
+        const tip1Cell = (ci.rows.find(r => r !== trunk)!) * 9 + ci.col;
+        const tip2Cell = (cj.rows.find(r => r !== trunk)!) * 9 + cj.col;
+        const tip1Peers = PEER_SETS[tip1Cell];
+        let changed = false;
+        for (const c of peers(tip2Cell)) {
+          if (c === tip1Cell || !tip1Peers.has(c)) continue;
+          if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+        }
+        if (changed) return {
+          technique: 'skyscraper',
+          digit: d,
+          cells: [trunk * 9 + ci.col, trunk * 9 + cj.col, tip1Cell, tip2Cell],
+        };
+      }
+    }
+  }
+  return null;
+};
+
+const twoStringKite = (grid: number[], cands: Candidates): SolveStep | null => {
+  const boxOf = (cell: number) =>
+    Math.floor(Math.floor(cell / 9) / 3) * 3 + Math.floor((cell % 9) / 3);
+
+  for (let d = 1; d <= 9; d++) {
+    for (let r = 0; r < 9; r++) {
+      const rowCellsD = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d));
+      if (rowCellsD.length !== 2) continue;
+      for (let col = 0; col < 9; col++) {
+        const colCellsD = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d));
+        if (colCellsD.length !== 2) continue;
+        for (const rc of rowCellsD) {
+          for (const cc of colCellsD) {
+            if (rc === cc) continue;
+            if (boxOf(rc) !== boxOf(cc)) continue;
+            const tip1 = rowCellsD.find(c => c !== rc)!;
+            const tip2 = colCellsD.find(c => c !== cc)!;
+            if (tip1 === tip2) continue;
+            const tip1Peers = PEER_SETS[tip1];
+            let changed = false;
+            for (const c of peers(tip2)) {
+              if (c === tip1 || !tip1Peers.has(c)) continue;
+              if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+            }
+            if (changed) return {
+              technique: 'two_string_kite',
+              digit: d,
+              cells: [rc, cc, tip1, tip2],
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
+const emptyRectangle = (grid: number[], cands: Candidates): SolveStep | null => {
+  for (let d = 1; d <= 9; d++) {
+    for (let box = 0; box < 9; box++) {
+      const bCells = ALL_BOXES[box].filter(c => grid[c] === 0 && cands[c].has(d));
+      if (bCells.length < 2) continue;
+
+      const boxRowStart = Math.floor(box / 3) * 3;
+      const boxColStart = (box % 3) * 3;
+      const bRows = [...new Set(bCells.map(c => Math.floor(c / 9)))];
+      const bCols = [...new Set(bCells.map(c => c % 9))];
+
+      for (const r_B of bRows) {
+        for (const c_B of bCols) {
+          if (!bCells.every(c => Math.floor(c / 9) === r_B || c % 9 === c_B)) continue;
+          if (!bCells.some(c => Math.floor(c / 9) === r_B && c % 9 !== c_B)) continue;
+          if (!bCells.some(c => c % 9 === c_B && Math.floor(c / 9) !== r_B)) continue;
+
+          // Strong link in column c2 (outside box col band) with one end at (r_B, c2)
+          for (let c2 = 0; c2 < 9; c2++) {
+            if (c2 >= boxColStart && c2 < boxColStart + 3) continue;
+            const cl = ALL_COLS[c2].filter(c => grid[c] === 0 && cands[c].has(d));
+            if (cl.length !== 2) continue;
+            const r0 = Math.floor(cl[0] / 9), r1 = Math.floor(cl[1] / 9);
+            const r_x = r0 === r_B ? r1 : r1 === r_B ? r0 : -1;
+            if (r_x === -1) continue;
+            if (r_x >= boxRowStart && r_x < boxRowStart + 3) continue;
+            const target = r_x * 9 + c_B;
+            if (grid[target] !== 0 || !cands[target].has(d)) continue;
+            cands[target].delete(d);
+            return {
+              technique: 'empty_rectangle',
+              digit: d,
+              cells: [r_B * 9 + c2, r_x * 9 + c2, ...bCells],
+            };
+          }
+
+          // Strong link in row r2 (outside box row band) with one end at (r2, c_B)
+          for (let r2 = 0; r2 < 9; r2++) {
+            if (r2 >= boxRowStart && r2 < boxRowStart + 3) continue;
+            const rl = ALL_ROWS[r2].filter(c => grid[c] === 0 && cands[c].has(d));
+            if (rl.length !== 2) continue;
+            const ca = rl[0] % 9, cb = rl[1] % 9;
+            const c_x = ca === c_B ? cb : cb === c_B ? ca : -1;
+            if (c_x === -1) continue;
+            if (c_x >= boxColStart && c_x < boxColStart + 3) continue;
+            const target = r_B * 9 + c_x;
+            if (grid[target] !== 0 || !cands[target].has(d)) continue;
+            cands[target].delete(d);
+            return {
+              technique: 'empty_rectangle',
+              digit: d,
+              cells: [r2 * 9 + c_B, r2 * 9 + c_x, ...bCells],
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
+const simpleColoring = (grid: number[], cands: Candidates): SolveStep | null => {
+  for (let d = 1; d <= 9; d++) {
+    const adj = new Map<number, number[]>();
+    const addEdge = (a: number, b: number) => {
+      if (!adj.has(a)) adj.set(a, []);
+      if (!adj.has(b)) adj.set(b, []);
+      adj.get(a)!.push(b);
+      adj.get(b)!.push(a);
+    };
+    for (const unit of ALL_UNITS) {
+      const cells = unit.filter(c => grid[c] === 0 && cands[c].has(d));
+      if (cells.length === 2) addEdge(cells[0], cells[1]);
+    }
+    if (adj.size === 0) continue;
+
+    const visited = new Set<number>();
+    for (const start of adj.keys()) {
+      if (visited.has(start)) continue;
+      const compColor = new Map<number, 0 | 1>();
+      const queue: number[] = [start];
+      compColor.set(start, 0);
+      visited.add(start);
+      while (queue.length > 0) {
+        const curr = queue.shift()!;
+        const currColor = compColor.get(curr)!;
+        for (const nb of adj.get(curr)!) {
+          if (compColor.has(nb)) continue;
+          compColor.set(nb, (1 - currColor) as 0 | 1);
+          visited.add(nb);
+          queue.push(nb);
+        }
+      }
+      const color0 = [...compColor.entries()].filter(([, c]) => c === 0).map(([cell]) => cell);
+      const color1 = [...compColor.entries()].filter(([, c]) => c === 1).map(([cell]) => cell);
+      if (color1.length === 0) continue;
+
+      // Type 1: two same-color cells see each other — that color is wrong
+      for (const colorCells of [color0, color1]) {
+        let conflict = false;
+        for (let i = 0; i < colorCells.length && !conflict; i++) {
+          for (let j = i + 1; j < colorCells.length && !conflict; j++) {
+            if (PEER_SETS[colorCells[i]].has(colorCells[j])) conflict = true;
+          }
+        }
+        if (conflict) {
+          let changed = false;
+          for (const c of colorCells) {
+            if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+          }
+          if (changed) return {
+            technique: 'simple_coloring',
+            digit: d,
+            cells: [...color0, ...color1],
+          };
+        }
+      }
+
+      // Type 2: cell outside the chain sees both colors
+      const color0Set = new Set(color0);
+      const color1Set = new Set(color1);
+      let changed = false;
+      for (let c = 0; c < 81; c++) {
+        if (grid[c] !== 0 || !cands[c].has(d)) continue;
+        if (color0Set.has(c) || color1Set.has(c)) continue;
+        const peerSet = PEER_SETS[c];
+        if (color0.some(cc => peerSet.has(cc)) && color1.some(cc => peerSet.has(cc))) {
+          cands[c].delete(d);
+          changed = true;
+        }
+      }
+      if (changed) return {
+        technique: 'simple_coloring',
+        digit: d,
+        cells: [...color0, ...color1],
+      };
+    }
+  }
+  return null;
+};
+
+const xyChain = (grid: number[], cands: Candidates): SolveStep | null => {
+  const bivalue: number[] = [];
+  for (let c = 0; c < 81; c++) {
+    if (grid[c] === 0 && cands[c].size === 2) bivalue.push(c);
+  }
+  if (bivalue.length < 2) return null;
+
+  for (const start of bivalue) {
+    const [a, b] = cands[start];
+    for (const [targetDigit, firstExit] of [[a, b], [b, a]] as [number, number][]) {
+      const visited = new Set<number>([start]);
+      const path: number[] = [start];
+
+      const dfs = (cell: number, exitDigit: number): boolean => {
+        if (path.length > 12) return false;
+        for (const next of bivalue) {
+          if (visited.has(next) || !PEER_SETS[cell].has(next)) continue;
+          if (!cands[next].has(exitDigit)) continue;
+          const [x, y] = cands[next];
+          const nextExit = x === exitDigit ? y : x;
+          path.push(next);
+          visited.add(next);
+          if (nextExit === targetDigit) {
+            const startPeers = PEER_SETS[start];
+            let changed = false;
+            for (const c of peers(next)) {
+              if (c === start || !startPeers.has(c)) continue;
+              if (cands[c].has(targetDigit)) { cands[c].delete(targetDigit); changed = true; }
+            }
+            if (changed) return true;
+          }
+          if (dfs(next, nextExit)) return true;
+          path.pop();
+          visited.delete(next);
+        }
+        return false;
+      };
+
+      if (dfs(start, firstExit)) {
+        return {
+          technique: 'xy_chain',
+          digit: targetDigit,
+          cells: [...path],
+        };
+      }
+    }
+  }
+  return null;
+};
+
 const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
   nakedSingle,
   hiddenSingle,
@@ -665,10 +1031,16 @@ const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
   hiddenQuad,
   xWing,
   swordfish,
+  jellyfish,
   uniqueRectangle,
   yWing,
   xyzWing,
   wWing,
+  skyscraper,
+  twoStringKite,
+  emptyRectangle,
+  simpleColoring,
+  xyChain,
 ];
 
 export interface Hint {
@@ -1033,6 +1405,96 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
           technique: step.technique,
           description: `W-Wing: ${cellRef(p)} and ${cellRef(q)} both have candidates {${a},${digit}}. A strong link on ${a} via ${cellRef(x)} and ${cellRef(y)} means ${digit} can be eliminated from cells that see both.`,
           evidenceCells: [p, q, x, y],
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'jellyfish': {
+        const digit = step.digit!;
+        const cornerCells = step.cells!;
+        hint = {
+          technique: step.technique,
+          description: `Jellyfish on ${digit}: four rows (or columns) each have ${digit} in only 2-4 cells spanning the same four columns (or rows). Eliminate ${digit} from the rest of those lines.`,
+          evidenceCells: cornerCells,
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'skyscraper': {
+        const digit = step.digit!;
+        const cells = step.cells!;
+        const [t1, t2] = cells;
+        const sameCol = t1 % 9 === t2 % 9;
+        const axis = sameCol ? `column ${t1 % 9 + 1}` : `row ${Math.floor(t1 / 9) + 1}`;
+        hint = {
+          technique: step.technique,
+          description: `Skyscraper on ${digit}: two ${sameCol ? 'rows' : 'columns'} each have exactly two positions for ${digit} sharing ${axis}. Cells seeing both outer ends can't be ${digit}.`,
+          evidenceCells: cells,
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'two_string_kite': {
+        const digit = step.digit!;
+        const cells = step.cells!;
+        const [rc, cc, tip1, tip2] = cells;
+        hint = {
+          technique: step.technique,
+          description: `2-String Kite on ${digit}: a row-string through ${cellRef(rc)} and a column-string through ${cellRef(cc)} share a box. Eliminate ${digit} from cells seeing both ${cellRef(tip1)} and ${cellRef(tip2)}.`,
+          evidenceCells: cells,
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'empty_rectangle': {
+        const digit = step.digit!;
+        const cells = step.cells!;
+        const [sl1, sl2] = cells;
+        hint = {
+          technique: step.technique,
+          description: `Empty Rectangle on ${digit}: candidates in a box form a cross pattern. The strong link ${cellRef(sl1)}–${cellRef(sl2)} forces an elimination.`,
+          evidenceCells: cells,
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'simple_coloring': {
+        const digit = step.digit!;
+        hint = {
+          technique: step.technique,
+          description: `Simple Coloring on ${digit}: alternating two colors across a strong-link chain reveals that ${digit} can be eliminated.`,
+          evidenceCells: step.cells!,
+          actionCells: eliminatedCells,
+          isPlacement: false,
+          digit,
+          eliminations: allEliminations,
+        };
+        break;
+      }
+      case 'xy_chain': {
+        const digit = step.digit!;
+        const chainCells = step.cells!;
+        const chainStart = chainCells[0];
+        const chainEnd = chainCells[chainCells.length - 1];
+        hint = {
+          technique: step.technique,
+          description: `XY-Chain on ${digit}: a chain of bivalue cells from ${cellRef(chainStart)} to ${cellRef(chainEnd)} forces one end to be ${digit}. Eliminate ${digit} from cells seeing both ends.`,
+          evidenceCells: chainCells,
           actionCells: eliminatedCells,
           isPlacement: false,
           digit,

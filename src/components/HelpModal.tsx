@@ -18,10 +18,16 @@ const TECHNIQUES: { key: Technique; desc: string }[] = [
   { key: 'hidden_quad', desc: 'Four digits confined to four cells in a unit, allowing elimination of other candidates from those cells.' },
   { key: 'x_wing', desc: 'A digit appears in only two cells across two rows, forming a rectangle that eliminates the digit in two columns.' },
   { key: 'swordfish', desc: 'A three-row extension of X-Wing: a digit in 2-3 cells across three rows spans exactly three columns, eliminating it from the rest of those columns.' },
+  { key: 'jellyfish', desc: 'A four-row extension of Swordfish: a digit in 2-4 cells across four rows spans exactly four columns, eliminating it from the rest of those columns.' },
+  { key: 'skyscraper', desc: 'Two rows each have exactly two candidates for a digit sharing one column. Cells seeing both outer ends can be eliminated.' },
+  { key: 'two_string_kite', desc: 'A row-string and column-string for a digit share a box corner. Cells seeing both outer tips can be eliminated.' },
+  { key: 'empty_rectangle', desc: 'A digit in a box forms a cross pattern. Combined with an external strong link, forces a single elimination.' },
   { key: 'unique_rectangle', desc: 'Four empty cells forming a rectangle across two boxes share two candidates. Extra candidates in roof cells must be used to prevent two solutions, enabling eliminations.' },
   { key: 'y_wing', desc: 'Three cells with two candidates each form a chain that forces eliminations.' },
   { key: 'w_wing', desc: 'Two bivalue cells with the same candidates are connected by a strong link, eliminating one candidate from cells that see both.' },
   { key: 'xyz_wing', desc: 'Like Y-Wing but the pivot has three candidates. Eliminates one digit from cells that see all three cells.' },
+  { key: 'simple_coloring', desc: 'Two-color a strong-link chain for a digit. Same-color conflicts or cells seeing both colors reveal eliminations.' },
+  { key: 'xy_chain', desc: 'A chain of bivalue cells where the first and last share a target digit. Cells seeing both ends can have that digit eliminated.' },
 ];
 
 interface Props {
