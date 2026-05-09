@@ -1,10 +1,9 @@
-export type ThemeId = 'ocean' | 'midnight' | 'dusk' | 'forest';
+export type ThemeId = 'ocean' | 'midnight' | 'dusk' | 'forest' | 'parchment' | 'mist';
 
 export interface ThemeMeta {
   id: ThemeId;
   name: string;
-  metaColor: string; // for <meta name="theme-color">
-  // swatch colors for the settings modal preview
+  metaColor: string;
   bgCell: string;
   bgCellHi: string;
   borderBox: string;
@@ -57,6 +56,28 @@ export const THEMES: ThemeMeta[] = [
     accent: '#10b981',
     accentSoft: '#34d399',
     text1: '#d0fae4',
+  },
+  {
+    id: 'parchment',
+    name: 'Parchment',
+    metaColor: '#f5f0e8',
+    bgCell: '#faf6ee',
+    bgCellHi: '#e8e0d0',
+    borderBox: '#a89878',
+    accent: '#b05000',
+    accentSoft: '#c86010',
+    text1: '#2a200e',
+  },
+  {
+    id: 'mist',
+    name: 'Mist',
+    metaColor: '#eef2f6',
+    bgCell: '#f4f7fa',
+    bgCellHi: '#dde5ef',
+    borderBox: '#8aaac8',
+    accent: '#1a6abf',
+    accentSoft: '#2880d8',
+    text1: '#0e2040',
   },
 ];
 

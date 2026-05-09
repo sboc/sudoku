@@ -67,6 +67,40 @@ html[data-theme="forest"] {
   --c-accent-soft: #34d399;
 }
 
+html[data-theme="parchment"] {
+  --c-bg-page: #f5f0e8;
+  --c-bg-surface: #faf6ee;
+  --c-bg-cell: #faf6ee;
+  --c-bg-cell-hi: #e8e0d0;
+  --c-bg-cell-digit: #ddd0ba;
+  --c-bg-select: #b05000;
+  --c-gap: #c8b89a;
+  --c-border-box: #a89878;
+  --c-border-ui: #d0c0a8;
+  --c-text-1: #2a200e;
+  --c-text-2: #7a6040;
+  --c-text-3: #b0a088;
+  --c-accent: #b05000;
+  --c-accent-soft: #c86010;
+}
+
+html[data-theme="mist"] {
+  --c-bg-page: #eef2f6;
+  --c-bg-surface: #f4f7fa;
+  --c-bg-cell: #f4f7fa;
+  --c-bg-cell-hi: #dde5ef;
+  --c-bg-cell-digit: #c8d8ec;
+  --c-bg-select: #1a6abf;
+  --c-gap: #b0c4d8;
+  --c-border-box: #8aaac8;
+  --c-border-ui: #c8d8e8;
+  --c-text-1: #0e2040;
+  --c-text-2: #406080;
+  --c-text-3: #8aaccb;
+  --c-accent: #1a6abf;
+  --c-accent-soft: #2880d8;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 button { -webkit-tap-highlight-color: transparent; }
 body {

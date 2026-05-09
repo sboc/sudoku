@@ -110,11 +110,11 @@ h1 {
 .board {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  gap: 2px;
-  background: var(--c-gap);
-  border: 3px solid var(--c-border-box);
-  border-radius: 6px;
-  padding: 3px;
+  gap: 0;
+  background: transparent;
+  border: 2px solid var(--c-border-box);
+  border-radius: 3px;
+  padding: 0;
   width: 100%;
   aspect-ratio: 1;
 }
@@ -129,9 +129,9 @@ h1 {
   inset: 0;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  gap: 2px;
-  /* match board border(3px) + padding(3px) = 6px offset so cells align exactly */
-  padding: 6px;
+  gap: 0;
+  /* match board border(2px) so cells align exactly */
+  padding: 2px;
   pointer-events: none;
   overflow: visible;
   z-index: 10;
@@ -172,7 +172,8 @@ h1 {
 
 .cell {
   background: var(--c-bg-cell);
-  border: none;
+  border-right: 1px solid var(--c-border-ui);
+  border-bottom: 1px solid var(--c-border-ui);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
@@ -212,13 +213,13 @@ h1 {
   background: var(--c-bg-cell-digit);
 }
 
-.cell.border-right {
-  border-right: 2px solid var(--c-border-box);
-}
+/* Remove excess borders at grid edges */
+.cell:nth-child(9n) { border-right: none; }
+.cell:nth-child(n+73) { border-bottom: none; }
 
-.cell.border-bottom {
-  border-bottom: 2px solid var(--c-border-box);
-}
+/* Box dividers — thicker and brighter than the 1px cell lines */
+.cell.border-right { border-right: 2px solid var(--c-border-box); }
+.cell.border-bottom { border-bottom: 2px solid var(--c-border-box); }
 
 .cell.has-notes {
   padding: 1px;
