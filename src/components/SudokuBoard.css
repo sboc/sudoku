@@ -113,7 +113,7 @@ h1 {
   grid-template-rows: repeat(9, 1fr);
   gap: 0;
   background: transparent;
-  border: 2px solid var(--c-accent);
+  border: 3px solid var(--c-accent);
   padding: 0;
   width: 100%;
   aspect-ratio: 1;
@@ -130,8 +130,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 0;
-  /* match board border (2px) so cells align exactly */
-  padding: 2px;
+  /* match board border (3px) so cells align exactly */
+  padding: 3px;
   pointer-events: none;
   overflow: visible;
   z-index: 10;
@@ -172,8 +172,8 @@ h1 {
 
 .cell {
   background: var(--c-bg-cell);
-  border-right: 1px solid var(--c-border-ui);
-  border-bottom: 1px solid var(--c-border-ui);
+  border-right: 1px solid var(--c-border-box);
+  border-bottom: 1px solid var(--c-border-box);
   color: var(--c-text-1);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 600;
