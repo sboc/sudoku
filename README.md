@@ -7,7 +7,7 @@ A React + TypeScript Sudoku game with a human-style solver, graded difficulty, a
 - Six difficulty levels: Easy, Medium, Hard, Expert, Master, Legend
 - Puzzles guaranteed to have a unique solution (exact-cover check via Dancing Links)
 - Difficulty graded by running a human-style solver and summing technique weights
-- Hint system: 15 solving techniques from Naked Single through W-Wing; peeking a hint is free and shows the reveal cost upfront, revealing highlights the board and charges time, applying executes the move for a flat +30s
+- Hint system: 22 solving techniques from Naked Single through XY-Chain; peeking a hint is free and shows the reveal cost upfront, revealing highlights the board and charges time, applying executes the move for a flat +30s
 - Notes mode, auto-fill all notes, animated auto-solve
 - Penalty system: wrong guesses add time; 10 wrong attempts ends the game
 - Game state persisted in `localStorage`; resume unfinished games on return; share via URL hash (`#game/<81-digit-string>`) with solve time in share text (Web Share API on mobile, clipboard fallback)
@@ -60,27 +60,34 @@ Internally maintains `DLXNode` / `ColumnNode` doubly-linked lists that are surgi
 
 #### `humanSolver.ts` - human-style solver and hint engine
 
-The most substantial module (~920 lines). Simulates how a human solves Sudoku by applying techniques in order of increasing difficulty rather than brute-forcing.
+The most substantial module (~1500 lines). Simulates how a human solves Sudoku by applying techniques in order of increasing difficulty rather than brute-forcing.
 
-**Technique ladder** (15 techniques, in application order):
+**Technique ladder** (22 techniques, in application order):
 
 | Technique | What it does |
 |---|---|
 | `naked_single` | Cell with only one candidate |
 | `hidden_single` | Digit with only one candidate cell in a unit |
 | `naked_pair` | Two cells in a unit sharing exactly two candidates - eliminate from rest of unit |
-| `naked_triple` | Same as pair but three cells/candidates |
-| `hidden_pair` | Two digits confined to two cells in a unit - eliminate other candidates from those cells |
-| `hidden_triple` | Same as pair but three digits/cells |
-| `naked_quad` | Four cells / four candidates |
-| `hidden_quad` | Four digits / four cells |
 | `pointing_pair` | Candidates in a box confined to one row/col - eliminate from that row/col outside box |
 | `box_line_reduction` | Candidates in a row/col confined to one box - eliminate from rest of box |
+| `hidden_pair` | Two digits confined to two cells in a unit - eliminate other candidates from those cells |
+| `naked_triple` | Same as naked pair but three cells/candidates |
+| `hidden_triple` | Same as hidden pair but three digits/cells |
+| `naked_quad` | Four cells / four candidates |
+| `skyscraper` | Two rows sharing one column for a digit - cells seeing both outer tips are eliminated |
+| `two_string_kite` | Row-string and column-string sharing a box corner - cells seeing both tips are eliminated |
+| `hidden_quad` | Four digits / four cells |
 | `x_wing` | Two rows with a digit in only two columns - eliminate from those columns in other rows |
+| `unique_rectangle` | Rectangle of four cells across two boxes sharing two candidates - extra candidates in roof cells enable eliminations |
+| `empty_rectangle` | Digit in a box confined to a cross pattern - combined with an external strong link forces one elimination |
 | `swordfish` | Three-row / three-column generalisation of X-Wing |
 | `y_wing` | Three-cell chain: pivot + two pincers with shared candidate |
-| `xyz_wing` | Y-Wing extended: pivot holds all three candidates |
 | `w_wing` | Two cells with identical two candidates connected via a strong link |
+| `simple_coloring` | Two-color conjugate-pair chains - same-color conflicts or cells seeing both colors are eliminated |
+| `jellyfish` | Four-row / four-column generalisation of Swordfish |
+| `xyz_wing` | Y-Wing extended: pivot holds all three candidates |
+| `xy_chain` | Chain of bivalue cells - cells seeing both ends can have the shared terminal digit eliminated |
 
 Exported functions:
 - `humanSolve(puzzle)` → `HumanSolveResult` - runs the full solve, returning all steps taken, the set of techniques used, and the final grid state. Used by the grader.
@@ -95,9 +102,9 @@ Maps a solved puzzle's technique set to a difficulty band by summing `TECHNIQUE_
 | Easy | ≤ 4 | naked_single = 1, hidden_single = 2 |
 | Medium | 5–10 | naked_pair = 3, pointing_pair = 3 |
 | Hard | 11–17 | hidden_pair = 4, naked_triple = 5 |
-| Expert | 18–24 | hidden_triple = 6, naked_quad = 6 |
-| Master | 25–32 | x_wing = 7, hidden_quad = 7 |
-| Legend | > 32 | swordfish = 8, y_wing = 8, w_wing = 8, xyz_wing = 9 |
+| Expert | 18–24 | hidden_triple = 6, naked_quad = 6, skyscraper = 6, two_string_kite = 6 |
+| Master | 25–32 | hidden_quad = 7, x_wing = 7, unique_rectangle = 7, empty_rectangle = 7 |
+| Legend | > 32 | swordfish = 8, y_wing = 8, w_wing = 8, simple_coloring = 8, jellyfish = 9, xyz_wing = 9, xy_chain = 9 |
 
 `gradePuzzle(techniques, solved)` → `Grade { difficulty, score, techniques[] }`.
 
@@ -192,7 +199,7 @@ Difficulty selection screen. Shows six difficulty cards (colour-coded by `DIFFIC
 
 #### `HelpModal.tsx` + `HelpModal.css`
 
-How-to-play modal with two tabs: game rules and a technique reference table listing all 15 techniques with difficulty weights.
+How-to-play modal with two tabs: game rules and a technique reference table listing all 22 techniques with difficulty weights.
 
 #### `TechniqueHelpModal.tsx`
 
@@ -220,7 +227,7 @@ Each `core/` module has a co-located `*.test.ts` file:
 | `dlx.test.ts` | Exact-cover correctness, uniqueness detection |
 | `generator.test.ts` | Puzzle validity, uniqueness, clue count |
 | `grader.test.ts` | Score calculation, difficulty band assignment |
-| `humanSolver.test.ts` | All 15 technique detection cases (~700 lines) |
+| `humanSolver.test.ts` | All 22 technique detection cases (~1250 lines) |
 | `persistence.test.ts` | Serialisation round-trips, schema validation |
 | `utils.test.ts` | Time/penalty formatters, `formatSolveTime` |
 
