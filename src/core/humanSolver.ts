@@ -97,182 +97,55 @@ const hiddenSingle = (grid: number[], cands: Candidates): SolveStep | null => {
   return null;
 };
 
-const nakedPair = (grid: number[], cands: Candidates): SolveStep | null => {
+const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+const nakedSubset = (k: number, technique: Technique, grid: number[], cands: Candidates): SolveStep | null => {
+  for (const unit of ALL_UNITS) {
+    const allEmpties = unit.filter(c => grid[c] === 0);
+    const empties = allEmpties.filter(c => cands[c].size >= 2 && cands[c].size <= k);
+    for (const combo of combinations(empties, k)) {
+      const combined = new Set<number>();
+      for (const c of combo) for (const d of cands[c]) combined.add(d);
+      if (combined.size !== k) continue;
+      let changed = false;
+      for (const c of allEmpties) {
+        if (combo.includes(c)) continue;
+        for (const d of combined) {
+          if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
+        }
+      }
+      if (changed) return { technique, cells: combo };
+    }
+  }
+  return null;
+};
+
+const hiddenSubset = (k: number, technique: Technique, grid: number[], cands: Candidates): SolveStep | null => {
   for (const unit of ALL_UNITS) {
     const empties = unit.filter(c => grid[c] === 0);
-    for (let i = 0; i < empties.length; i++) {
-      if (cands[empties[i]].size !== 2) continue;
-      for (let j = i + 1; j < empties.length; j++) {
-        if (cands[empties[j]].size !== 2) continue;
-        const a = cands[empties[i]];
-        const b = cands[empties[j]];
-        const [d1, d2] = a;
-        if (b.has(d1) && b.has(d2)) {
-          let changed = false;
-          for (const c of empties) {
-            if (c === empties[i] || c === empties[j]) continue;
-            for (const d of a) {
-              if (cands[c].has(d)) {
-                cands[c].delete(d);
-                changed = true;
-              }
-            }
-          }
-          if (changed) {
-            return { technique: 'naked_pair', cells: [empties[i], empties[j]] };
-          }
+    for (const digitCombo of combinations(DIGITS, k)) {
+      const digitSet = new Set(digitCombo);
+      const cells = empties.filter(c => digitCombo.some(d => cands[c].has(d)));
+      if (cells.length !== k) continue;
+      if (!digitCombo.every(d => cells.some(c => cands[c].has(d)))) continue;
+      let changed = false;
+      for (const c of cells) {
+        for (const d of cands[c]) {
+          if (!digitSet.has(d)) { cands[c].delete(d); changed = true; }
         }
       }
+      if (changed) return { technique, cells };
     }
   }
   return null;
 };
 
-const nakedTriple = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (const unit of ALL_UNITS) {
-    const unitEmpties = unit.filter(c => grid[c] === 0);
-    const empties = unitEmpties.filter(c => cands[c].size >= 2 && cands[c].size <= 3);
-    for (let i = 0; i < empties.length; i++) {
-      for (let j = i + 1; j < empties.length; j++) {
-        for (let k = j + 1; k < empties.length; k++) {
-          const combined = new Set<number>(cands[empties[i]]);
-          for (const d of cands[empties[j]]) combined.add(d);
-          for (const d of cands[empties[k]]) combined.add(d);
-          if (combined.size === 3) {
-            let changed = false;
-            for (const c of unitEmpties) {
-              if (c === empties[i] || c === empties[j] || c === empties[k]) continue;
-              for (const d of combined) {
-                if (cands[c].has(d)) {
-                  cands[c].delete(d);
-                  changed = true;
-                }
-              }
-            }
-            if (changed) {
-              return { technique: 'naked_triple', cells: [empties[i], empties[j], empties[k]] };
-            }
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
-const hiddenPair = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (const unit of ALL_UNITS) {
-    const empties = unit.filter(c => grid[c] === 0);
-    for (let d1 = 1; d1 <= 8; d1++) {
-      for (let d2 = d1 + 1; d2 <= 9; d2++) {
-        const p1 = empties.filter(c => cands[c].has(d1));
-        const p2 = empties.filter(c => cands[c].has(d2));
-        if (p1.length === 2 && p2.length === 2 && p1[0] === p2[0] && p1[1] === p2[1]) {
-          let changed = false;
-          for (const c of p1) {
-            for (const d of cands[c]) {
-              if (d !== d1 && d !== d2) {
-                cands[c].delete(d);
-                changed = true;
-              }
-            }
-          }
-          if (changed) {
-            return { technique: 'hidden_pair', cells: p1 };
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
-const hiddenTriple = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (const unit of ALL_UNITS) {
-    const empties = unit.filter(c => grid[c] === 0);
-    for (let d1 = 1; d1 <= 7; d1++) {
-      for (let d2 = d1 + 1; d2 <= 8; d2++) {
-        for (let d3 = d2 + 1; d3 <= 9; d3++) {
-          const cells = empties.filter(c => cands[c].has(d1) || cands[c].has(d2) || cands[c].has(d3));
-          if (cells.length === 3) {
-            const hasD1 = cells.some(c => cands[c].has(d1));
-            const hasD2 = cells.some(c => cands[c].has(d2));
-            const hasD3 = cells.some(c => cands[c].has(d3));
-            if (!hasD1 || !hasD2 || !hasD3) continue;
-            let changed = false;
-            for (const c of cells) {
-              for (const d of cands[c]) {
-                if (d !== d1 && d !== d2 && d !== d3) {
-                  cands[c].delete(d);
-                  changed = true;
-                }
-              }
-            }
-            if (changed) {
-              return { technique: 'hidden_triple', cells };
-            }
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
-const nakedQuad = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (const unit of ALL_UNITS) {
-    const unitEmpties = unit.filter(c => grid[c] === 0);
-    const empties = unitEmpties.filter(c => cands[c].size >= 2 && cands[c].size <= 4);
-    for (let i = 0; i < empties.length; i++) {
-      for (let j = i + 1; j < empties.length; j++) {
-        for (let k = j + 1; k < empties.length; k++) {
-          for (let l = k + 1; l < empties.length; l++) {
-            const combined = new Set<number>(cands[empties[i]]);
-            for (const d of cands[empties[j]]) combined.add(d);
-            for (const d of cands[empties[k]]) combined.add(d);
-            for (const d of cands[empties[l]]) combined.add(d);
-            if (combined.size === 4) {
-              let changed = false;
-              for (const c of unitEmpties) {
-                if (c === empties[i] || c === empties[j] || c === empties[k] || c === empties[l]) continue;
-                for (const d of combined) {
-                  if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-                }
-              }
-              if (changed) return { technique: 'naked_quad', cells: [empties[i], empties[j], empties[k], empties[l]] };
-            }
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
-const hiddenQuad = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (const unit of ALL_UNITS) {
-    const empties = unit.filter(c => grid[c] === 0);
-    for (let d1 = 1; d1 <= 6; d1++) {
-      for (let d2 = d1 + 1; d2 <= 7; d2++) {
-        for (let d3 = d2 + 1; d3 <= 8; d3++) {
-          for (let d4 = d3 + 1; d4 <= 9; d4++) {
-            const cells = empties.filter(c => cands[c].has(d1) || cands[c].has(d2) || cands[c].has(d3) || cands[c].has(d4));
-            if (cells.length !== 4) continue;
-            if (![d1, d2, d3, d4].every(d => cells.some(c => cands[c].has(d)))) continue;
-            let changed = false;
-            for (const c of cells) {
-              for (const d of cands[c]) {
-                if (d !== d1 && d !== d2 && d !== d3 && d !== d4) { cands[c].delete(d); changed = true; }
-              }
-            }
-            if (changed) return { technique: 'hidden_quad', cells };
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
+const nakedPair    = (g: number[], c: Candidates) => nakedSubset(2, 'naked_pair',    g, c);
+const nakedTriple  = (g: number[], c: Candidates) => nakedSubset(3, 'naked_triple',  g, c);
+const nakedQuad    = (g: number[], c: Candidates) => nakedSubset(4, 'naked_quad',    g, c);
+const hiddenPair   = (g: number[], c: Candidates) => hiddenSubset(2, 'hidden_pair',   g, c);
+const hiddenTriple = (g: number[], c: Candidates) => hiddenSubset(3, 'hidden_triple', g, c);
+const hiddenQuad   = (g: number[], c: Candidates) => hiddenSubset(4, 'hidden_quad',   g, c);
 
 const pointingPair = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let box = 0; box < 9; box++) {
