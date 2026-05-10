@@ -58,9 +58,19 @@ Internally maintains `DLXNode` / `ColumnNode` doubly-linked lists that are surgi
   3. Removes clues one at a time; after each removal calls `hasUniqueSolution` and restores the clue if uniqueness would be violated.
 - `solvePuzzle(puzzle)` - thin wrapper around `dlxSolve` that returns the first solution, used by `App.tsx` when reconstructing a puzzle from a URL hash.
 
+#### `grid.ts` - grid geometry
+
+Precomputed lookup tables shared by `humanSolver.ts`, `useSudoku.ts`, and `SudokuBoard.tsx`:
+
+- `rowCells(r)`, `colCells(c)`, `boxCells(box)` - return the 9 cell indices for a given row, column, or box.
+- `ALL_ROWS`, `ALL_COLS`, `ALL_BOXES` - precomputed arrays of all 9 rows/columns/boxes.
+- `ALL_UNITS` - flat array of all 27 units (rows + columns + boxes), used when iterating over every constraint unit.
+- `PEERS[cell]` - for each of the 81 cells, the 20 cells that share a row, column, or box with it.
+- `PEER_SETS[cell]` - same as `PEERS` but as `ReadonlySet<number>` for O(1) membership tests.
+
 #### `humanSolver.ts` - human-style solver and hint engine
 
-The most substantial module (~1500 lines). Simulates how a human solves Sudoku by applying techniques in order of increasing difficulty rather than brute-forcing.
+The most substantial module (~1220 lines). Simulates how a human solves Sudoku by applying techniques in order of increasing difficulty rather than brute-forcing.
 
 **Technique ladder** (22 techniques, in application order):
 
