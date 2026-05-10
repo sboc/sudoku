@@ -58,10 +58,8 @@ const initCandidates = (grid: number[]): Candidates => {
   return cands;
 };
 
-const peers = (cell: number) => PEERS[cell];
-
 const eliminate = (cands: Candidates, cell: number, d: number) => {
-  for (const p of peers(cell)) {
+  for (const p of PEERS[cell]) {
     cands[p].delete(d);
   }
   cands[cell].clear();
@@ -95,6 +93,16 @@ const hiddenSingle = (grid: number[], cands: Candidates): SolveStep | null => {
     }
   }
   return null;
+};
+
+const combinations = <T>(arr: T[], k: number): T[][] => {
+  if (k === 0) return [[]];
+  if (arr.length < k) return [];
+  const [first, ...rest] = arr;
+  return [
+    ...combinations(rest, k - 1).map(c => [first, ...c]),
+    ...combinations(rest, k),
+  ];
 };
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -197,16 +205,6 @@ const boxLineReduction = (grid: number[], cands: Candidates): SolveStep | null =
   return null;
 };
 
-const combinations = <T>(arr: T[], k: number): T[][] => {
-  if (k === 0) return [[]];
-  if (arr.length < k) return [];
-  const [first, ...rest] = arr;
-  return [
-    ...combinations(rest, k - 1).map(c => [first, ...c]),
-    ...combinations(rest, k),
-  ];
-};
-
 const fish = (size: number, technique: Technique, grid: number[], cands: Candidates): SolveStep | null => {
   for (let d = 1; d <= 9; d++) {
     // row-based: rows where d appears in 2..size cells
@@ -262,7 +260,7 @@ const yWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let pivot = 0; pivot < 81; pivot++) {
     if (grid[pivot] !== 0 || cands[pivot].size !== 2) continue;
     const [a, b] = cands[pivot];
-    const pivotPeers = peers(pivot).filter(c => grid[c] === 0 && cands[c].size === 2);
+    const pivotPeers = PEERS[pivot].filter(c => grid[c] === 0 && cands[c].size === 2);
 
     for (const p1 of pivotPeers) {
       if (!cands[p1].has(a)) continue;
@@ -277,7 +275,7 @@ const yWing = (grid: number[], cands: Candidates): SolveStep | null => {
         const extra2 = p2a !== b ? p2a : p2b;
         if (extra1 !== extra2) continue;
         let changed = false;
-        for (const c of peers(p2)) {
+        for (const c of PEERS[p2]) {
           if (!p1peers.has(c)) continue;
           if (c === pivot) continue;
           if (cands[c].has(extra1)) { cands[c].delete(extra1); changed = true; }
@@ -296,7 +294,7 @@ const xyzWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let pivot = 0; pivot < 81; pivot++) {
     if (grid[pivot] !== 0 || cands[pivot].size !== 3) continue;
     const pivotCands = cands[pivot];
-    const pivotPeers = peers(pivot).filter(c => grid[c] === 0 && cands[c].size === 2);
+    const pivotPeers = PEERS[pivot].filter(c => grid[c] === 0 && cands[c].size === 2);
     const pivotPeerSet = PEER_SETS[pivot];
 
     for (const p1 of pivotPeers) {
@@ -310,7 +308,7 @@ const xyzWing = (grid: number[], cands: Candidates): SolveStep | null => {
         // Both are 2-element subsets of the 3-element pivotCands, so they share exactly 1 digit
         const z = cands[p2].has(pa) ? pa : pb;
         let changed = false;
-        for (const c of peers(p2)) {
+        for (const c of PEERS[p2]) {
           if (!p1peers.has(c) || !pivotPeerSet.has(c)) continue;
           if (cands[c].has(z)) { cands[c].delete(z); changed = true; }
         }
@@ -352,7 +350,7 @@ const wWing = (grid: number[], cands: Candidates): SolveStep | null => {
           if (!((xSeesP && ySeesQ) || (xSeesQ && ySeesP))) continue;
 
           let changed = false;
-          for (const c of peers(q)) {
+          for (const c of PEERS[q]) {
             if (!pPeers.has(c)) continue;
             if (cands[c].has(elim)) { cands[c].delete(elim); changed = true; }
           }
@@ -412,7 +410,7 @@ const uniqueRectangle = (grid: number[], cands: Candidates): SolveStep | null =>
                   const C = xtra1[0];
                   const rf1Peers = PEER_SETS[rf1];
                   let changed = false;
-                  for (const c of peers(rf2)) {
+                  for (const c of PEERS[rf2]) {
                     if (c === rf1 || !rf1Peers.has(c)) continue;
                     if (cands[c].has(C)) { cands[c].delete(C); changed = true; }
                   }
@@ -469,7 +467,7 @@ const skyscraper = (grid: number[], cands: Candidates): SolveStep | null => {
         const tip2Cell = rj.row * 9 + rj.cols.find(c => c !== trunk)!;
         const tip1Peers = PEER_SETS[tip1Cell];
         let changed = false;
-        for (const c of peers(tip2Cell)) {
+        for (const c of PEERS[tip2Cell]) {
           if (c === tip1Cell || !tip1Peers.has(c)) continue;
           if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
         }
@@ -496,7 +494,7 @@ const skyscraper = (grid: number[], cands: Candidates): SolveStep | null => {
         const tip2Cell = (cj.rows.find(r => r !== trunk)!) * 9 + cj.col;
         const tip1Peers = PEER_SETS[tip1Cell];
         let changed = false;
-        for (const c of peers(tip2Cell)) {
+        for (const c of PEERS[tip2Cell]) {
           if (c === tip1Cell || !tip1Peers.has(c)) continue;
           if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
         }
@@ -531,7 +529,7 @@ const twoStringKite = (grid: number[], cands: Candidates): SolveStep | null => {
             /* v8 ignore next */ if (tip1 === tip2) continue;
             const tip1Peers = PEER_SETS[tip1];
             let changed = false;
-            for (const c of peers(tip2)) {
+            for (const c of PEERS[tip2]) {
               if (c === tip1 || !tip1Peers.has(c)) continue;
               if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
             }
@@ -714,7 +712,7 @@ const xyChain = (grid: number[], cands: Candidates): SolveStep | null => {
           if (nextExit === targetDigit) {
             const startPeers = PEER_SETS[start];
             let changed = false;
-            for (const c of peers(next)) {
+            for (const c of PEERS[next]) {
               if (c === start || !startPeers.has(c)) continue;
               if (cands[c].has(targetDigit)) { cands[c].delete(targetDigit); changed = true; }
             }
@@ -830,7 +828,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
       case 'naked_single': {
         const cell = step.cell!;
         const digit = step.digit!;
-        const evidenceCells = peers(cell).filter(c => baseGrid[c] !== 0);
+        const evidenceCells = PEERS[cell].filter(c => baseGrid[c] !== 0);
         hint = {
           technique: step.technique,
           description: `${cellRef(cell)} has only one possible digit: ${digit}.`,
