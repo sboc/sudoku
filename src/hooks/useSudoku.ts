@@ -1,22 +1,11 @@
 import { useState, useCallback } from 'react';
 import type { GeneratedPuzzle } from './usePuzzlePool';
 import type { SavedSudokuState } from '../core/persistence';
+import { PEERS } from '../core/grid';
 
 const eliminateFromPeerNotes = (notes: Set<number>[], cell: number, digit: number): Set<number>[] => {
-  const row = Math.floor(cell / 9);
-  const col = cell % 9;
-  const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
   const result = [...notes];
-  const peerSet = new Set<number>();
-  for (let i = 0; i < 9; i++) {
-    peerSet.add(row * 9 + i);
-    peerSet.add(i * 9 + col);
-    const br = Math.floor(box / 3) * 3 + Math.floor(i / 3);
-    const bc = (box % 3) * 3 + (i % 3);
-    peerSet.add(br * 9 + bc);
-  }
-  peerSet.delete(cell);
-  for (const p of peerSet) {
+  for (const p of PEERS[cell]) {
     if (result[p].has(digit)) {
       result[p] = new Set(result[p]);
       result[p].delete(digit);
@@ -93,17 +82,7 @@ export const useSudoku = (initial: GeneratedPuzzle, saved?: SavedSudokuState) =>
     setState(s => {
       const notes = s.notes.map((cellNotes, i) => {
         if (s.userGrid[i] !== 0) return cellNotes;
-        const row = Math.floor(i / 9);
-        const col = i % 9;
-        const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
-        const used = new Set<number>();
-        for (let k = 0; k < 9; k++) {
-          used.add(s.userGrid[row * 9 + k]);
-          used.add(s.userGrid[k * 9 + col]);
-          const br = Math.floor(box / 3) * 3 + Math.floor(k / 3);
-          const bc = (box % 3) * 3 + (k % 3);
-          used.add(s.userGrid[br * 9 + bc]);
-        }
+        const used = new Set(PEERS[i].map(p => s.userGrid[p]).filter(v => v !== 0));
         const candidates = new Set<number>();
         for (let d = 1; d <= 9; d++) if (!used.has(d)) candidates.add(d);
         return candidates;

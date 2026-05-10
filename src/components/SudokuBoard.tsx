@@ -8,6 +8,7 @@ import { TechniqueHelpModal } from './TechniqueHelpModal';
 import { DIFFICULTY_COLOR, TECHNIQUE_WEIGHT } from '../core/grader';
 import { TECHNIQUE_LABEL } from '../core/techniqueHelp';
 import { formatTime, formatSolveTime, penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
+import { PEERS } from '../core/grid';
 import { useTimer } from '../hooks/useTimer';
 import { useCelebration } from '../hooks/useCelebration';
 import { useHint } from '../hooks/useHint';
@@ -151,16 +152,9 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
 
   const puzzleBlockedDigits = useMemo(() => {
     if (selected === null || userGrid[selected] !== 0) return new Set<number>();
-    const row = Math.floor(selected / 9);
-    const col = selected % 9;
-    const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const blocked = new Set<number>();
-    for (let k = 0; k < 9; k++) {
-      if (userGrid[row * 9 + k]) blocked.add(userGrid[row * 9 + k]);
-      if (userGrid[k * 9 + col]) blocked.add(userGrid[k * 9 + col]);
-      const br = Math.floor(box / 3) * 3 + Math.floor(k / 3);
-      const bc = (box % 3) * 3 + (k % 3);
-      if (userGrid[br * 9 + bc]) blocked.add(userGrid[br * 9 + bc]);
+    for (const p of PEERS[selected]) {
+      if (userGrid[p]) blocked.add(userGrid[p]);
     }
     return blocked;
   }, [selected, userGrid]);
