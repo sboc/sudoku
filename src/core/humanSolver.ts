@@ -305,8 +305,12 @@ const xyzWing = (grid: number[], cands: Candidates): SolveStep | null => {
         if (p2 === p1) continue;
         const [qa, qb] = cands[p2];
         if (!pivotCands.has(qa) || !pivotCands.has(qb)) continue;
-        // Both are 2-element subsets of the 3-element pivotCands, so they share exactly 1 digit
-        const z = cands[p2].has(pa) ? pa : pb;
+        const hasPa = cands[p2].has(pa);
+        const hasPb = cands[p2].has(pb);
+        // Pincers must share exactly 1 digit; if both match p1's candidates the union doesn't cover
+        // the 3rd pivot digit and the XYZ-wing reasoning fails
+        if (hasPa && hasPb) continue;
+        const z = hasPa ? pa : pb;
         let changed = false;
         for (const c of PEERS[p2]) {
           if (!p1peers.has(c) || !pivotPeerSet.has(c)) continue;

@@ -790,12 +790,23 @@ describe('findNextHint — wing technique hint formatting', () => {
   });
 
   it('xyz_wing: 3 evidence cells, digit set, description mentions XYZ-Wing', () => {
-    const hint = captureHintOfType(HQ_PUZZLE, 'xyz_wing');
+    // Synthetic state: pivot=36 (row4,col0,box3) {1,2,3}; P1=39 (row4,col3,box4) {1,2};
+    // P2=27 (row3,col0,box3) {1,3}. Shared digit z=1. Cells 37 and 38 (row4,box3) see all
+    // three and get digit 1 eliminated. All other cells have notes={1-9} (empty → grid-derived).
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>());
+    notes[36] = new Set([1, 2, 3]); // pivot
+    notes[39] = new Set([1, 2]);    // pincer 1
+    notes[27] = new Set([1, 3]);    // pincer 2
+    const hint = findNextHint(grid, notes);
     expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('xyz_wing');
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(3);
-    expect(hint!.digit).toBeDefined();
+    expect(hint!.evidenceCells).toContain(36);
+    expect(hint!.digit).toBe(1);
     expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.eliminations.every(e => e.digit === 1)).toBe(true);
     expect(hint!.description).toMatch(/xyz-wing/i);
   });
 
