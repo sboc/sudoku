@@ -59,7 +59,7 @@ export const THEMES: ThemeMeta[] = [
   },
   {
     id: 'slate',
-    name: 'Slate',
+    name: 'Graphite',
     metaColor: '#141618',
     bgCell: '#22262e',
     bgCellHi: '#2e3540',
@@ -70,7 +70,7 @@ export const THEMES: ThemeMeta[] = [
   },
   {
     id: 'terra',
-    name: 'Terra',
+    name: 'Adobe',
     metaColor: '#f4ede4',
     bgCell: '#faf5ee',
     bgCellHi: '#edd9c4',
@@ -92,7 +92,7 @@ export const THEMES: ThemeMeta[] = [
   },
   {
     id: 'mist',
-    name: 'Mist',
+    name: 'Frost',
     metaColor: '#e8eef5',
     bgCell: '#f4f8fd',
     bgCellHi: '#d5e3ef',
