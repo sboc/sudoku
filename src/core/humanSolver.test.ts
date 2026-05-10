@@ -633,7 +633,7 @@ const captureHintOfType = (puzzle: number[], targetTechnique: string, maxSteps =
 
 describe('findNextHint — naked subset hint formatting', () => {
   it('naked_pair: 2 evidence cells, eliminations present, digit set', () => {
-    const hint = captureHintOfType(GR1_PUZZLE, 'naked_pair');
+    const hint = captureHintOfType(HQ_PUZZLE, 'naked_pair');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(2);
@@ -643,7 +643,7 @@ describe('findNextHint — naked subset hint formatting', () => {
   });
 
   it('naked_triple: 3 evidence cells, digit set, elimination hint', () => {
-    const hint = captureHintOfType(NT1_PUZZLE, 'naked_triple');
+    const hint = captureHintOfType(HQ_PUZZLE, 'naked_triple');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(3);
@@ -665,7 +665,7 @@ describe('findNextHint — naked subset hint formatting', () => {
 
 describe('findNextHint — hidden subset hint formatting', () => {
   it('hidden_pair: 2 cells, action cells equal evidence cells', () => {
-    const hint = captureHintOfType(GR1_PUZZLE, 'hidden_pair');
+    const hint = captureHintOfType(WW_A_PUZZLE, 'hidden_pair');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(2);
@@ -674,7 +674,7 @@ describe('findNextHint — hidden subset hint formatting', () => {
   });
 
   it('hidden_triple: 3 cells, action cells equal evidence cells', () => {
-    const hint = captureHintOfType(WW_A_PUZZLE, 'hidden_triple');
+    const hint = captureHintOfType(HQ_PUZZLE, 'hidden_triple');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(3);
@@ -790,7 +790,7 @@ describe('findNextHint — wing technique hint formatting', () => {
   });
 
   it('xyz_wing: 3 evidence cells, digit set, description mentions XYZ-Wing', () => {
-    const hint = captureHintOfType(XYZ3_PUZZLE, 'xyz_wing');
+    const hint = captureHintOfType(HQ_PUZZLE, 'xyz_wing');
     expect(hint).not.toBeNull();
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.evidenceCells).toHaveLength(3);
@@ -810,9 +810,9 @@ describe('findNextHint — wing technique hint formatting', () => {
   });
 
   it('w_wing (wa !== digit branch): second puzzle exercises the other candidate-order arm', () => {
-    // WW_B_PUZZLE's w_wing fires with baseCands[p] = [5, 9] and digit = 9,
-    // so wa (5) !== digit (9) — takes the wa branch in the description formatter.
-    const hint = captureHintOfType(WW_B_PUZZLE, 'w_wing');
+    // XYZ3_PUZZLE's w_wing fires with baseCands[p] = {6,7} and digit = 7,
+    // so wa (6) !== digit (7) — takes the wa branch in the description formatter.
+    const hint = captureHintOfType(XYZ3_PUZZLE, 'w_wing');
     expect(hint).not.toBeNull();
     expect(hint!.technique).toBe('w_wing');
     expect(hint!.evidenceCells).toHaveLength(4);

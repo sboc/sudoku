@@ -193,6 +193,15 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
       'Type 2 — if a cell outside the chain sees one cell of each color, it can\'t be the digit (one color must be correct): eliminate it.',
     ],
   },
+  xyz_wing: {
+    summary: 'A pivot cell with three candidates {A,B,C} connects to two bivalue pincers that are each a subset of those three. The shared candidate of both pincers can be eliminated from any cell that sees all three cells (pivot and both pincers).',
+    steps: [
+      'Find a pivot cell with exactly three candidates {A, B, C}.',
+      'Find two bivalue pincers that each see the pivot, whose candidates are subsets of {A, B, C}.',
+      'Identify the candidate shared by both pincers — call it Z.',
+      'Eliminate Z from any cell that sees the pivot and both pincers simultaneously.',
+    ],
+  },
   w_wing: {
     summary: 'Two bivalue cells with the same two candidates {A,B} are connected by a strong link on A (A appears in exactly two cells in some unit, one seeing each bivalue cell). Any cell that sees both bivalue cells cannot be B.',
     steps: [

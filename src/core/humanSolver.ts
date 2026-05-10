@@ -1019,28 +1019,28 @@ const xyChain = (grid: number[], cands: Candidates): SolveStep | null => {
 };
 
 const TECHNIQUES: Array<(g: number[], c: Candidates) => SolveStep | null> = [
-  nakedSingle,
-  hiddenSingle,
-  nakedPair,
-  hiddenPair,
-  nakedTriple,
-  hiddenTriple,
-  pointingPair,
-  boxLineReduction,
-  nakedQuad,
-  hiddenQuad,
-  xWing,
-  swordfish,
-  jellyfish,
-  uniqueRectangle,
-  yWing,
-  xyzWing,
-  wWing,
-  skyscraper,
-  twoStringKite,
-  emptyRectangle,
-  simpleColoring,
-  xyChain,
+  nakedSingle,      // weight 1
+  hiddenSingle,     // weight 2
+  nakedPair,        // weight 3
+  pointingPair,     // weight 3
+  boxLineReduction, // weight 3
+  hiddenPair,       // weight 4
+  nakedTriple,      // weight 5
+  hiddenTriple,     // weight 6
+  nakedQuad,        // weight 6
+  skyscraper,       // weight 6
+  twoStringKite,    // weight 6
+  hiddenQuad,       // weight 7
+  xWing,            // weight 7
+  uniqueRectangle,  // weight 7
+  emptyRectangle,   // weight 7
+  swordfish,        // weight 8
+  yWing,            // weight 8
+  wWing,            // weight 8
+  simpleColoring,   // weight 8
+  jellyfish,        // weight 9
+  xyzWing,          // weight 9
+  xyChain,          // weight 9
 ];
 
 export interface Hint {
