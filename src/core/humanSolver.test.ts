@@ -853,3 +853,326 @@ describe('unique_rectangle technique', () => {
     }
   });
 });
+
+describe('findNextHint — jellyfish hint formatting', () => {
+  // Synthetic state for row-based jellyfish on digit 1:
+  //   Rows {0,1,3,4}: digit 1 in cols {0,1,3,4} — 4 cols each (qualifies for jellyfish, not swordfish)
+  //   Row 2: digit 1 in cols {0,3} — spans boxes 0 and 1, preventing box-line reduction
+  //   All other cells: {2..9} — no digit 1 outside listed cells
+  // Jellyfish fires on rows {0,1,2,3} (colSet={0,1,3,4}), eliminating digit 1 from
+  // row 4, cols {0,1,3,4} — cells 36,37,39,40. No earlier technique fires because:
+  //   no unit has exactly 1 cell with digit 1 (no hidden single), no box has digit 1
+  //   confined to a single row/col (no pointing pair), rows have ≥4 cols (no x-wing/swordfish).
+  it('jellyfish (row-based): 4 rows spanning 4 cols, eliminates digit 1 from non-participating rows', () => {
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([2, 3, 4, 5, 6, 7, 8, 9]));
+    for (const c of [0, 1, 3, 4, 9, 10, 12, 13, 18, 21, 27, 28, 30, 31, 36, 37, 39, 40]) {
+      notes[c].add(1);
+    }
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('jellyfish');
+    expect(hint!.digit).toBe(1);
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/jellyfish/i);
+    expect(hint!.evidenceCells.length).toBeGreaterThan(0);
+  });
+});
+
+describe('findNextHint — two_string_kite and xy_chain hint formatting', () => {
+  it('two_string_kite: 4 evidence cells, digit set, description mentions 2-String Kite', () => {
+    const hint = captureHintOfType(XWING_COL_PUZZLE, 'two_string_kite');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.evidenceCells).toHaveLength(4);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/2-string kite/i);
+  });
+
+  it('xy_chain: bivalue chain, digit set, description mentions XY-Chain', () => {
+    const hint = captureHintOfType(XWING_COL_PUZZLE, 'xy_chain');
+    expect(hint).not.toBeNull();
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.digit).toBeDefined();
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/xy-chain/i);
+  });
+});
+
+// Finds the first hint matching predicate, using the same proper note-initialization
+// as captureHintOfType. Applies every non-matching hint and continues.
+const captureHintMatching = (
+  puzzle: number[],
+  predicate: (h: NonNullable<ReturnType<typeof findNextHint>>) => boolean,
+  maxSteps = 3000,
+): ReturnType<typeof findNextHint> => {
+  const grid = [...puzzle];
+  const notes = Array.from({ length: 81 }, () => new Set<number>());
+  for (let i = 0; i < 81; i++) initAdvancedCellNotes(notes, grid, i);
+  for (let step = 0; step < maxSteps; step++) {
+    const hint = findNextHint(grid, notes);
+    if (!hint) return null;
+    if (predicate(hint)) return hint;
+    applyAdvancedHint(grid, notes, hint);
+  }
+  return null;
+};
+
+// Additional hard puzzles for UR type 1/2 hunting
+const UR_HUNT_PUZZLES = [
+  WW4_PUZZLE, YW1_PUZZLE, XYZ3_PUZZLE, WW_A_PUZZLE, WW_B_PUZZLE,
+  p('100007090030020008009600500005300900010080002600004000300000010040000007007000300'), // AI Escargot
+  p('000000010400000000020000000000050407008000300001090000300400200050100000000806000'),
+  p('003000060050600000000910000070050300000408000004030070000071000000003090060000800'),
+  p('800000000003600000070090200060005300400803001700020006060000280000419005000080079'),
+  p('000000085000210009960080100500800016000000000890006007009068050300054000470000000'),
+  p('030000080700200001000050020000680000000000000000012000040070000900003007010000030'),
+  p('000007000000800540780000000500000010000060000060000007000000049037002000000300000'),
+  GR1_PUZZLE, NT1_PUZZLE, HQ_PUZZLE, XWING_PUZZLE, XWING_COL_PUZZLE,
+];
+
+describe('findNextHint — jellyfish col-based hint formatting', () => {
+  it('jellyfish (col-based): 4 cols each with digit 1 in exactly rows {0,1,3,4}, eliminates from non-member col', () => {
+    // Cols 0-4 each have digit 1 in rows {0,1,3,4} (4 rows, union=4).
+    // Row-based: rows 0,1,3,4 each have digit 1 in 5 cols → excluded (needs 2-4).
+    // Col-based: fires on combo {col0,col1,col2,col3}, rowSet={0,1,3,4}, eliminates col4 rows 0,1,3,4.
+    // No pointing pair: digit 1 in each box appears in ≥2 rows AND ≥2 cols.
+    // No earlier technique fires: all cells have ≥8 candidates, no single-candidate units.
+    const grid = Array(81).fill(0);
+    const digit1Cells = new Set([
+      0,1,2,3,4,   // row 0
+      9,10,11,12,13, // row 1
+      27,28,29,30,31, // row 3
+      36,37,38,39,40, // row 4
+    ]);
+    const notes = Array.from({ length: 81 }, (_, i) =>
+      digit1Cells.has(i)
+        ? new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9])
+        : new Set<number>([2, 3, 4, 5, 6, 7, 8, 9])
+    );
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('jellyfish');
+    expect(hint!.digit).toBe(1);
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/jellyfish/i);
+  });
+});
+
+describe('findNextHint — skyscraper hint formatting', () => {
+  it('skyscraper: row 0 and row 3 each have digit 5 in exactly 2 cols, sharing col 0 as trunk', () => {
+    // Row 0: digit 5 only in cols 0 and 6.  Row 3: digit 5 only in cols 0 and 7.
+    // All other cells: all 9 candidates.  Row-based skyscraper fires:
+    //   trunk=col0, tip1=r0c6, tip2=r3c7.  Common peers (box2∩col7 and col6∩box5) have digit 5.
+    // No earlier technique fires: no cell has <8 candidates; x-wing excluded (rows share only 1 col).
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    for (const col of [1, 2, 3, 4, 5, 7, 8]) notes[col].delete(5);       // row 0: no 5 except cols 0,6
+    for (const c of [28, 29, 30, 31, 32, 33, 35]) notes[c].delete(5);    // row 3: no 5 except cols 0,7
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('skyscraper');
+    expect(hint!.digit).toBe(5);
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/skyscraper/i);
+    expect(hint!.evidenceCells).toHaveLength(4);
+  });
+});
+
+describe('findNextHint — skyscraper col-based hint formatting', () => {
+  it('skyscraper (col-based): col 0 and col 3 each have d=5 in exactly 2 rows, sharing row 2 as trunk', () => {
+    // Col 0: d=5 only at r2c0=18 and r6c0=54. Col 3: d=5 only at r2c3=21 and r8c3=75.
+    // Trunk=row2, tips=54(r6c0) and 75(r8c3). Common peers: r6c4=58 and r6c5=59 (row6∩box7).
+    // Col-based skyscraper → sameCol=false → covers the "two columns / sharing row" description branch.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    // Col 0: keep d=5 only at r2c0=18 and r6c0=54
+    for (const c of [0, 9, 27, 36, 45, 63, 72]) notes[c].delete(5);
+    // Col 3: keep d=5 only at r2c3=21 and r8c3=75
+    for (const c of [3, 12, 30, 39, 48, 57, 66]) notes[c].delete(5);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('skyscraper');
+    expect(hint!.digit).toBe(5);
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/skyscraper/i);
+    expect(hint!.evidenceCells).toHaveLength(4);
+  });
+});
+
+describe('findNextHint — unique_rectangle Type 1 and Type 2 hint formatting', () => {
+  it('unique_rectangle Type 1 or Type 2 fires during solve of at least one hard puzzle', () => {
+    let type1hint: ReturnType<typeof findNextHint> = null;
+    let type2hint: ReturnType<typeof findNextHint> = null;
+    for (const puz of UR_HUNT_PUZZLES) {
+      if (!type1hint) {
+        type1hint = captureHintMatching(
+          puz,
+          h => h.technique === 'unique_rectangle' && !!h.description.match(/type 1/i),
+          5000,
+        );
+      }
+      if (!type2hint) {
+        type2hint = captureHintMatching(
+          puz,
+          h => h.technique === 'unique_rectangle' && !!h.description.match(/type 2/i),
+          5000,
+        );
+      }
+      if (type1hint && type2hint) break;
+    }
+
+    if (type1hint) {
+      expect(type1hint.isPlacement).toBe(false);
+      expect(type1hint.description).toMatch(/type 1/i);
+      expect(type1hint.eliminations.length).toBeGreaterThan(0);
+      expect(type1hint.evidenceCells.length).toBeGreaterThanOrEqual(3);
+    }
+    if (type2hint) {
+      expect(type2hint.isPlacement).toBe(false);
+      expect(type2hint.description).toMatch(/type 2/i);
+      expect(type2hint.eliminations.length).toBeGreaterThan(0);
+    }
+    // At least one UR type 1 or 2 must fire to achieve function/line coverage
+    expect(type1hint ?? type2hint).not.toBeNull();
+  });
+});
+
+describe('findNextHint — empty_rectangle hint formatting', () => {
+  it('empty_rectangle col-link: box-0 L-shape + col-3 conjugate pair eliminates digit 5', () => {
+    // Box 0 digit-5 cells: (0,0),(0,1),(1,0) — L-shape with r_B=0, c_B=0.
+    // Col 3 digit-5 cells: (0,3),(5,3) only — conjugate pair. One end at row r_B=0.
+    // Target: (5,0) sees the far end (5,3) via row 5 and the ER pivot col via col 0. Eliminated.
+    // All other digits have all 9 candidates per unit → no earlier technique fires.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    // Box 0: keep digit 5 only at (0,0)=0, (0,1)=1, (1,0)=9
+    for (const c of [2, 10, 11, 18, 19, 20]) notes[c].delete(5);
+    // Col 3: keep digit 5 only at (0,3)=3 and (5,3)=48
+    for (const r of [1, 2, 3, 4, 6, 7, 8]) notes[r * 9 + 3].delete(5);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('empty_rectangle');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/empty rectangle/i);
+    expect(hint!.evidenceCells.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('findNextHint — empty_rectangle row-link hint formatting', () => {
+  it('empty_rectangle row-link: box-0 L-shape + row-5 conjugate pair eliminates digit 5', () => {
+    // Box 0 d=5 cells: (0,0),(0,1),(1,0) — L-shape with r_B=0, c_B=0.
+    // Row 5 d=5 cells: (5,0)=45 and (5,7)=52 only — strong link. One end at col c_B=0.
+    // r_x = col 7, outside box-0 col band {0,1,2}. Target = (r_B=0, c_x=7) = cell 7. Eliminated.
+    // Row 5 is the only 2-d5 row; no col has 2 d=5 cells → no skyscraper/2SK fires first.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    // Box 0: keep d=5 only at (0,0)=0, (0,1)=1, (1,0)=9
+    for (const c of [2, 10, 11, 18, 19, 20]) notes[c].delete(5);
+    // Row 5: keep d=5 only at (5,0)=45 and (5,7)=52
+    for (const c of [46, 47, 48, 49, 50, 51, 53]) notes[c].delete(5);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('empty_rectangle');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/empty rectangle/i);
+    expect(hint!.evidenceCells.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('findNextHint — simple_coloring hint formatting', () => {
+  it('simple_coloring Type 2: 6-node chain eliminates digit 1 from cells seeing both colors', () => {
+    // Chain: A=(0,0):0, B=(0,3):1, C=(4,3):0, D=(4,7):1, E=(7,7):0, F=(7,1):1
+    // Links: row0 A-B, col3 B-C, row4 C-D, col7 D-E, row7 E-F
+    // color0={A,C,E}, color1={B,D,F}
+    // Row col-sets {0,3},{3,7},{1,7} have 4-col union: no Swordfish/Jellyfish.
+    // Skyscraper tips share no common digit-1 peers (strong-link removals cover them).
+    // No box links so no TSK; no L-shape boxes so no ER.
+    // Z cells (6,0)/(8,0) see A via col0 + F via box6; (1,1)/(2,1) see A via box0 + F via col1.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+    // Row 0: keep digit 1 only at A=(0,0)=0 and B=(0,3)=3
+    for (const c of [1, 2, 4, 5, 6, 7, 8]) notes[c].delete(1);
+    // Col 3: keep digit 1 only at B=(0,3)=3 and C=(4,3)=39
+    for (const c of [12, 21, 30, 48, 57, 66, 75]) notes[c].delete(1);
+    // Row 4: keep digit 1 only at C=(4,3)=39 and D=(4,7)=43
+    for (const c of [36, 37, 38, 40, 41, 42, 44]) notes[c].delete(1);
+    // Col 7: keep digit 1 only at D=(4,7)=43 and E=(7,7)=70
+    for (const c of [16, 25, 34, 52, 61, 79]) notes[c].delete(1);
+    // Row 7: keep digit 1 only at E=(7,7)=70 and F=(7,1)=64
+    for (const c of [63, 65, 67, 68, 69, 71]) notes[c].delete(1);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('simple_coloring');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.description).toMatch(/simple coloring/i);
+  });
+});
+
+describe('findNextHint — unique_rectangle Type 2 hint formatting', () => {
+  it('unique_rectangle Type 2: floor {1,2} at r0c0/r2c0, roof {1,2,5} at r0c3/r2c3', () => {
+    // Corners: 0(r0c0,box0,floor), 18(r2c0,box0,floor), 3(r0c3,box1,roof), 21(r2c3,box1,roof)
+    // Box0 non-UR cells and col0 cells outside box0 have no digits 1,2, so the naked pair
+    // {0,18}={1,2} has nothing to eliminate and returns null before UR is reached.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
+    notes[0] = new Set([1, 2]);
+    notes[18] = new Set([1, 2]);
+    notes[3] = new Set([1, 2, 5]);
+    notes[21] = new Set([1, 2, 5]);
+    for (const c of [1, 2, 9, 10, 11, 19, 20]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [27, 36, 45, 54, 63, 72]) { notes[c].delete(1); notes[c].delete(2); }
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('unique_rectangle');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.eliminations.every(e => e.digit === 5)).toBe(true);
+    expect(hint!.description).toMatch(/unique rectangle.*type 2/i);
+  });
+});
+
+describe('findNextHint — simple_coloring Type 1 hint formatting', () => {
+  it('simple_coloring Type 1: odd-cycle forces same-color peers in box4', () => {
+    // 7-cycle (odd): A(r0c2)—[row0]—G(r0c8)—[col8]—F(r4c8)—[row4]—E(r4c3)—[box4]—D(r3c5)—[col5]—C(r1c5)—[row1]—B(r1c0)—[box0]—A
+    // BFS from A: color0={A(2),F(44),C(14)}, color1={G(8),B(9),E(39),D(32),22(r2c4 via box1)}.
+    // D(r3c5) and E(r4c3) both color1, both in box4 → Type 1: eliminate d=1 from color1.
+    // Strong-link rows row0={c2,c8}, row1={c0,c5}, row4={c3,c8} share no common col pair
+    // → no skyscraper. No ER: all potential targets (29,21,47) are removed below.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
+    // Row 0: keep d=1 only at A(r0c2=2) and G(r0c8=8)
+    for (const c of [0,1,3,4,5,6,7]) notes[c].delete(1);
+    // Box 0: keep d=1 only at A(r0c2=2) and B(r1c0=9)
+    for (const c of [10,11,18,19,20]) notes[c].delete(1);
+    // Row 1: keep d=1 only at B(r1c0=9) and C(r1c5=14)
+    for (const c of [12,13,15,16,17]) notes[c].delete(1);
+    // Col 5: keep d=1 only at C(r1c5=14) and D(r3c5=32)
+    for (const c of [23,41,50,59,68,77]) notes[c].delete(1);
+    // Box 4: keep d=1 only at D(r3c5=32) and E(r4c3=39)
+    for (const c of [30,31,40,48,49]) notes[c].delete(1);
+    // Row 4: keep d=1 only at E(r4c3=39) and F(r4c8=44)
+    for (const c of [36,37,38,42,43]) notes[c].delete(1);
+    // Col 8: keep d=1 only at F(r4c8=44) and G(r0c8=8)
+    for (const c of [26,35,53,62,71,80]) notes[c].delete(1);
+    // Prevent Empty Rectangle from firing before Simple Coloring:
+    // box0 L-shape(r1,c2)+col5 → target r3c2=29; box2 L-shape(r2,c8)+row4 → target r2c3=21
+    notes[29].delete(1);
+    notes[21].delete(1);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('simple_coloring');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    expect(hint!.eliminations.every(e => e.digit === 1)).toBe(true);
+    expect(hint!.description).toMatch(/simple coloring/i);
+  });
+});
