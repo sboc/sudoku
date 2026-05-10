@@ -18,17 +18,17 @@ html[data-theme="ocean"] {
 
 html[data-theme="midnight"] {
   --c-bg-page: #000000;
-  --c-bg-surface: #0c0c12;
-  --c-bg-cell: #10101a;
-  --c-bg-cell-hi: #181824;
-  --c-bg-cell-digit: #222235;
+  --c-bg-surface: #0e0e16;
+  --c-bg-cell: #131320;
+  --c-bg-cell-hi: #1e1e32;
+  --c-bg-cell-digit: #282845;
   --c-bg-select: #4338ca;
-  --c-gap: #050508;
-  --c-border-box: #303050;
-  --c-border-ui: #181825;
+  --c-gap: #08080f;
+  --c-border-box: #363660;
+  --c-border-ui: #1a1a2e;
   --c-text-1: #f0f0f8;
-  --c-text-2: #6565a0;
-  --c-text-3: #303060;
+  --c-text-2: #7878c0;
+  --c-text-3: #343468;
   --c-accent: #6366f1;
   --c-accent-soft: #818cf8;
 }
@@ -37,15 +37,15 @@ html[data-theme="dusk"] {
   --c-bg-page: #0d0818;
   --c-bg-surface: #130d28;
   --c-bg-cell: #1a1035;
-  --c-bg-cell-hi: #241550;
-  --c-bg-cell-digit: #2e1868;
+  --c-bg-cell-hi: #2a1858;
+  --c-bg-cell-digit: #361e70;
   --c-bg-select: #7c3aed;
   --c-gap: #080414;
-  --c-border-box: #3e2272;
+  --c-border-box: #4a2880;
   --c-border-ui: #1e0e48;
   --c-text-1: #ede9fe;
-  --c-text-2: #7860c0;
-  --c-text-3: #3a2870;
+  --c-text-2: #9070d8;
+  --c-text-3: #402880;
   --c-accent: #8b5cf6;
   --c-accent-soft: #a78bfa;
 }
@@ -54,51 +54,51 @@ html[data-theme="forest"] {
   --c-bg-page: #051209;
   --c-bg-surface: #091e10;
   --c-bg-cell: #0c2216;
-  --c-bg-cell-hi: #102e1c;
-  --c-bg-cell-digit: #163a24;
+  --c-bg-cell-hi: #153424;
+  --c-bg-cell-digit: #1c4430;
   --c-bg-select: #047a58;
-  --c-gap: #030908;
-  --c-border-box: #1a4830;
+  --c-gap: #040c08;
+  --c-border-box: #1e5538;
   --c-border-ui: #0d2a18;
   --c-text-1: #d0fae4;
-  --c-text-2: #4a9870;
-  --c-text-3: #1e5035;
+  --c-text-2: #52b880;
+  --c-text-3: #235c38;
   --c-accent: #10b981;
   --c-accent-soft: #34d399;
 }
 
 html[data-theme="slate"] {
-  --c-bg-page: #3a4858;
-  --c-bg-surface: #435260;
-  --c-bg-cell: #4c5e6e;
-  --c-bg-cell-hi: #587080;
-  --c-bg-cell-digit: #627c8e;
-  --c-bg-select: #2060a8;
-  --c-gap: #2e3a48;
-  --c-border-box: #607888;
-  --c-border-ui: #485c6c;
-  --c-text-1: #d0e2f0;
-  --c-text-2: #7898b0;
-  --c-text-3: #526070;
-  --c-accent: #3a80cc;
-  --c-accent-soft: #58a0e4;
+  --c-bg-page: #141618;
+  --c-bg-surface: #1c2028;
+  --c-bg-cell: #22262e;
+  --c-bg-cell-hi: #2e3540;
+  --c-bg-cell-digit: #38424f;
+  --c-bg-select: #1e60b0;
+  --c-gap: #0e1014;
+  --c-border-box: #384858;
+  --c-border-ui: #202830;
+  --c-text-1: #d8e4f0;
+  --c-text-2: #6888a8;
+  --c-text-3: #384858;
+  --c-accent: #4090e0;
+  --c-accent-soft: #60aaff;
 }
 
 html[data-theme="terra"] {
-  --c-bg-page: #5a4030;
-  --c-bg-surface: #6a4c38;
-  --c-bg-cell: #785640;
-  --c-bg-cell-hi: #88624c;
-  --c-bg-cell-digit: #987058;
-  --c-bg-select: #c06828;
-  --c-gap: #482e20;
-  --c-border-box: #a07858;
-  --c-border-ui: #886050;
-  --c-text-1: #f8e0c8;
-  --c-text-2: #c09870;
-  --c-text-3: #987058;
-  --c-accent: #c06828;
-  --c-accent-soft: #d88040;
+  --c-bg-page: #f4ede4;
+  --c-bg-surface: #faf5ee;
+  --c-bg-cell: #faf5ee;
+  --c-bg-cell-hi: #edd9c4;
+  --c-bg-cell-digit: #dfcbb0;
+  --c-bg-select: #b03808;
+  --c-gap: #c8a07a;
+  --c-border-box: #a87850;
+  --c-border-ui: #d8c0a0;
+  --c-text-1: #281000;
+  --c-text-2: #804828;
+  --c-text-3: #b07850;
+  --c-accent: #b03808;
+  --c-accent-soft: #c85020;
 }
 
 html[data-theme="parchment"] {
@@ -119,20 +119,20 @@ html[data-theme="parchment"] {
 }
 
 html[data-theme="mist"] {
-  --c-bg-page: #eef2f6;
-  --c-bg-surface: #f4f7fa;
-  --c-bg-cell: #f4f7fa;
-  --c-bg-cell-hi: #dde5ef;
-  --c-bg-cell-digit: #c8d8ec;
-  --c-bg-select: #1a6abf;
-  --c-gap: #b0c4d8;
-  --c-border-box: #8aaac8;
-  --c-border-ui: #c8d8e8;
-  --c-text-1: #0e2040;
-  --c-text-2: #406080;
-  --c-text-3: #8aaccb;
-  --c-accent: #1a6abf;
-  --c-accent-soft: #2880d8;
+  --c-bg-page: #e8eef5;
+  --c-bg-surface: #f0f6fc;
+  --c-bg-cell: #f4f8fd;
+  --c-bg-cell-hi: #d5e3ef;
+  --c-bg-cell-digit: #bfd0e4;
+  --c-bg-select: #1558a8;
+  --c-gap: #90aac4;
+  --c-border-box: #6898c0;
+  --c-border-ui: #c0d4e8;
+  --c-text-1: #0c1e35;
+  --c-text-2: #346080;
+  --c-text-3: #6090b0;
+  --c-accent: #1558a8;
+  --c-accent-soft: #2270c8;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
