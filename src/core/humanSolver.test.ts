@@ -1140,6 +1140,82 @@ describe('findNextHint — unique_rectangle Type 2 hint formatting', () => {
   });
 });
 
+describe('findNextHint — unique_rectangle Type 2 false branches (lines 591-593)', () => {
+  it('UR Type 2: pattern found but no common peer has C=5 → changed stays false', () => {
+    // Corners 0(r0c0,b0,floor) 18(r2c0,b0,floor) 3(r0c3,b1,roof) 21(r2c3,b1,roof).
+    // Same base as the Type 2 true-branch test, but C=5 deleted from ALL common peers
+    // of rf1=3 and rf2=21 → cands[c].has(C) is false for every peer → changed=false.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
+    notes[0] = new Set([1, 2]);
+    notes[18] = new Set([1, 2]);
+    notes[3] = new Set([1, 2, 5]);
+    notes[21] = new Set([1, 2, 5]);
+    for (const c of [1, 2, 9, 10, 11, 19, 20]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [27, 36, 45, 54, 63, 72]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [4, 5, 12, 13, 14, 22, 23, 30, 39, 48, 57, 66, 75]) notes[c].delete(5);
+    const hint = findNextHint(grid, notes);
+    expect(hint?.technique).not.toBe('unique_rectangle');
+  });
+});
+
+describe('findNextHint — unique_rectangle Type 4 locked=b (line 1323 false branch)', () => {
+  it('UR Type 4: digit b=2 confined to roof cells → formatter takes false branch at elim ternary', () => {
+    // Corners 0(r0c0,b0,floor) 18(r2c0,b0,floor) 3(r0c3,b1,roof) 21(r2c3,b1,roof).
+    // floor={1,2}=[a=1,b=2]; roof={1,2,4,5} (xtra.length=2 → UR Type 2 check is skipped).
+    // Digit 2 confined to cells 3,21 in col3 and box1 → UR Type 4 locked=b=2 fires.
+    // X-Wing on digit 2 detects the pattern (cols{0,3} rows{0,2}) but all target cells
+    // already lack digit 2, so it returns null and execution reaches uniqueRectangle.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
+    notes[0] = new Set([1, 2]);
+    notes[18] = new Set([1, 2]);
+    notes[3] = new Set([1, 2, 4, 5]);
+    notes[21] = new Set([1, 2, 4, 5]);
+    for (const c of [1, 2, 9, 10, 11, 19, 20]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [27, 36, 45, 54, 63, 72]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [4, 5, 6, 7, 8, 12, 13, 14, 22, 23, 24, 25, 26]) notes[c].delete(2);
+    for (const c of [30, 39, 48, 57, 66, 75]) notes[c].delete(2);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('unique_rectangle');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    // locked=2=b, so elim = (locked===a ? b : a) = (2===1 ? 2 : 1) = 1 — false branch
+    expect(hint!.eliminations.every(e => e.digit === 1)).toBe(true);
+    expect(hint!.description).toMatch(/unique rectangle.*type 4/i);
+  });
+});
+
+describe('findNextHint — unique_rectangle Type 4 locked=a (line 1323 true branch)', () => {
+  it('UR Type 4: digit a=1 confined to roof cells → formatter takes true branch at elim ternary', () => {
+    // Same rectangle as locked=b test but confine digit 1 (=a) to cells 3,21 in col3/box1.
+    // locked=1=a fires first → elim = (locked===a ? b : a) = 2 — covers true branch.
+    // X-Wing on digit 1 (cols{0,3} rows{0,2}) has no actual eliminations → null.
+    const grid = Array(81).fill(0);
+    const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
+    notes[0] = new Set([1, 2]);
+    notes[18] = new Set([1, 2]);
+    notes[3] = new Set([1, 2, 4, 5]);
+    notes[21] = new Set([1, 2, 4, 5]);
+    for (const c of [1, 2, 9, 10, 11, 19, 20]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [27, 36, 45, 54, 63, 72]) { notes[c].delete(1); notes[c].delete(2); }
+    for (const c of [4, 5, 12, 13, 14, 22, 23]) notes[c].delete(1); // box1 non-roof
+    for (const c of [30, 39, 48, 57, 66, 75]) notes[c].delete(1);   // col3 outside box1
+    // box2 row0/row2 cells still had digit 1, causing box-line reduction to fire first;
+    // delete 1 there so that technique returns null (already-deleted) before reaching UR
+    for (const c of [6, 7, 8, 24, 25, 26]) notes[c].delete(1);
+    const hint = findNextHint(grid, notes);
+    expect(hint).not.toBeNull();
+    expect(hint!.technique).toBe('unique_rectangle');
+    expect(hint!.isPlacement).toBe(false);
+    expect(hint!.eliminations.length).toBeGreaterThan(0);
+    // locked=1=a, so elim = (locked===a ? b : a) = (1===1 ? 2 : 1) = 2 — true branch
+    expect(hint!.eliminations.every(e => e.digit === 2)).toBe(true);
+    expect(hint!.description).toMatch(/unique rectangle.*type 4/i);
+  });
+});
+
 describe('findNextHint — simple_coloring Type 1 hint formatting', () => {
   it('simple_coloring Type 1: odd-cycle forces same-color peers in box4', () => {
     // 7-cycle (odd): A(r0c2)—[row0]—G(r0c8)—[col8]—F(r4c8)—[row4]—E(r4c3)—[box4]—D(r3c5)—[col5]—C(r1c5)—[row1]—B(r1c0)—[box0]—A
