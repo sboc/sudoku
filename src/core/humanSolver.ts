@@ -324,113 +324,66 @@ const boxLineReduction = (grid: number[], cands: Candidates): SolveStep | null =
   return null;
 };
 
-const xWing = (grid: number[], cands: Candidates): SolveStep | null => {
+const combinations = <T>(arr: T[], k: number): T[][] => {
+  if (k === 0) return [[]];
+  if (arr.length < k) return [];
+  const [first, ...rest] = arr;
+  return [
+    ...combinations(rest, k - 1).map(c => [first, ...c]),
+    ...combinations(rest, k),
+  ];
+};
+
+const fish = (size: number, technique: Technique, grid: number[], cands: Candidates): SolveStep | null => {
   for (let d = 1; d <= 9; d++) {
-    // row-based
-    const rowData: { row: number; cols: number[] }[] = [];
+    // row-based: rows where d appears in 2..size cells
+    const rowData: { idx: number; cross: number[] }[] = [];
     for (let r = 0; r < 9; r++) {
       const cols = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => c % 9);
-      if (cols.length === 2) rowData.push({ row: r, cols });
+      if (cols.length >= 2 && cols.length <= size) rowData.push({ idx: r, cross: cols });
     }
-    for (let i = 0; i < rowData.length; i++) {
-      for (let j = i + 1; j < rowData.length; j++) {
-        if (rowData[i].cols[0] === rowData[j].cols[0] && rowData[i].cols[1] === rowData[j].cols[1]) {
-          const [c1, c2] = rowData[i].cols;
-          let changed = false;
-          for (const col of [ALL_COLS[c1], ALL_COLS[c2]]) {
-            for (const c of col) {
-              const r = Math.floor(c / 9);
-              if (r === rowData[i].row || r === rowData[j].row) continue;
-              if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-            }
-          }
-          if (changed) return { technique: 'x_wing', digit: d };
+    for (const combo of combinations(rowData, size)) {
+      const colSet = new Set<number>();
+      for (const { cross } of combo) for (const c of cross) colSet.add(c);
+      if (colSet.size !== size) continue;
+      const rows = combo.map(x => x.idx);
+      const cols = [...colSet];
+      let changed = false;
+      for (const col of cols) {
+        for (const c of ALL_COLS[col]) {
+          if (rows.includes(Math.floor(c / 9))) continue;
+          if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
         }
       }
+      if (changed) return { technique, digit: d, cells: rows.flatMap(r => cols.map(col => r * 9 + col)) };
     }
-    // col-based
-    const colData: { col: number; rows: number[] }[] = [];
+    // col-based: cols where d appears in 2..size cells
+    const colData: { idx: number; cross: number[] }[] = [];
     for (let col = 0; col < 9; col++) {
       const rows = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => Math.floor(c / 9));
-      if (rows.length === 2) colData.push({ col, rows });
+      if (rows.length >= 2 && rows.length <= size) colData.push({ idx: col, cross: rows });
     }
-    for (let i = 0; i < colData.length; i++) {
-      for (let j = i + 1; j < colData.length; j++) {
-        if (colData[i].rows[0] === colData[j].rows[0] && colData[i].rows[1] === colData[j].rows[1]) {
-          const [r1, r2] = colData[i].rows;
-          let changed = false;
-          for (const row of [ALL_ROWS[r1], ALL_ROWS[r2]]) {
-            for (const c of row) {
-              const col = c % 9;
-              if (col === colData[i].col || col === colData[j].col) continue;
-              if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-            }
-          }
-          if (changed) return { technique: 'x_wing', digit: d };
+    for (const combo of combinations(colData, size)) {
+      const rowSet = new Set<number>();
+      for (const { cross } of combo) for (const r of cross) rowSet.add(r);
+      if (rowSet.size !== size) continue;
+      const cols = combo.map(x => x.idx);
+      const rows = [...rowSet];
+      let changed = false;
+      for (const r of rows) {
+        for (const c of ALL_ROWS[r]) {
+          if (cols.includes(c % 9)) continue;
+          if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
         }
       }
+      if (changed) return { technique, digit: d, cells: rows.flatMap(r => cols.map(col => r * 9 + col)) };
     }
   }
   return null;
 };
 
-const swordfish = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (let d = 1; d <= 9; d++) {
-    // row-based
-    const rowData: { row: number; cols: number[] }[] = [];
-    for (let r = 0; r < 9; r++) {
-      const cols = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => c % 9);
-      if (cols.length >= 2 && cols.length <= 3) rowData.push({ row: r, cols });
-    }
-    for (let i = 0; i < rowData.length; i++) {
-      for (let j = i + 1; j < rowData.length; j++) {
-        for (let k = j + 1; k < rowData.length; k++) {
-          const colSet = new Set<number>(rowData[i].cols);
-          for (const c of rowData[j].cols) colSet.add(c);
-          for (const c of rowData[k].cols) colSet.add(c);
-          if (colSet.size !== 3) continue;
-          const cols = [...colSet];
-          const rows = [rowData[i].row, rowData[j].row, rowData[k].row];
-          let changed = false;
-          for (const col of cols) {
-            for (const c of ALL_COLS[col]) {
-              if (rows.includes(Math.floor(c / 9))) continue;
-              if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-            }
-          }
-          if (changed) return { technique: 'swordfish', digit: d, cells: rows.flatMap(r => cols.map(col => r * 9 + col)) };
-        }
-      }
-    }
-    // col-based
-    const colData: { col: number; rows: number[] }[] = [];
-    for (let col = 0; col < 9; col++) {
-      const rows = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => Math.floor(c / 9));
-      if (rows.length >= 2 && rows.length <= 3) colData.push({ col, rows });
-    }
-    for (let i = 0; i < colData.length; i++) {
-      for (let j = i + 1; j < colData.length; j++) {
-        for (let k = j + 1; k < colData.length; k++) {
-          const rowSet = new Set<number>(colData[i].rows);
-          for (const r of colData[j].rows) rowSet.add(r);
-          for (const r of colData[k].rows) rowSet.add(r);
-          if (rowSet.size !== 3) continue;
-          const rows = [...rowSet];
-          const cols = [colData[i].col, colData[j].col, colData[k].col];
-          let changed = false;
-          for (const r of rows) {
-            for (const c of ALL_ROWS[r]) {
-              if (cols.includes(c % 9)) continue;
-              if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-            }
-          }
-          if (changed) return { technique: 'swordfish', digit: d, cells: rows.flatMap(r => cols.map(col => r * 9 + col)) };
-        }
-      }
-    }
-  }
-  return null;
-};
+const xWing    = (g: number[], c: Candidates) => fish(2, 'x_wing',    g, c);
+const swordfish = (g: number[], c: Candidates) => fish(3, 'swordfish', g, c);
 
 const yWing = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let pivot = 0; pivot < 81; pivot++) {
@@ -623,77 +576,7 @@ const uniqueRectangle = (grid: number[], cands: Candidates): SolveStep | null =>
   return null;
 };
 
-const jellyfish = (grid: number[], cands: Candidates): SolveStep | null => {
-  for (let d = 1; d <= 9; d++) {
-    // row-based
-    const rowData: { row: number; cols: number[] }[] = [];
-    for (let r = 0; r < 9; r++) {
-      const cols = ALL_ROWS[r].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => c % 9);
-      if (cols.length >= 2 && cols.length <= 4) rowData.push({ row: r, cols });
-    }
-    for (let i = 0; i < rowData.length; i++) {
-      for (let j = i + 1; j < rowData.length; j++) {
-        for (let k = j + 1; k < rowData.length; k++) {
-          for (let l = k + 1; l < rowData.length; l++) {
-            const colSet = new Set<number>(rowData[i].cols);
-            for (const c of rowData[j].cols) colSet.add(c);
-            for (const c of rowData[k].cols) colSet.add(c);
-            for (const c of rowData[l].cols) colSet.add(c);
-            if (colSet.size !== 4) continue;
-            const cols = [...colSet];
-            const rows = [rowData[i].row, rowData[j].row, rowData[k].row, rowData[l].row];
-            let changed = false;
-            for (const col of cols) {
-              for (const c of ALL_COLS[col]) {
-                if (rows.includes(Math.floor(c / 9))) continue;
-                if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-              }
-            }
-            if (changed) return {
-              technique: 'jellyfish',
-              digit: d,
-              cells: rows.flatMap(r => cols.map(col => r * 9 + col)),
-            };
-          }
-        }
-      }
-    }
-    // col-based
-    const colData: { col: number; rows: number[] }[] = [];
-    for (let col = 0; col < 9; col++) {
-      const rows = ALL_COLS[col].filter(c => grid[c] === 0 && cands[c].has(d)).map(c => Math.floor(c / 9));
-      if (rows.length >= 2 && rows.length <= 4) colData.push({ col, rows });
-    }
-    for (let i = 0; i < colData.length; i++) {
-      for (let j = i + 1; j < colData.length; j++) {
-        for (let k = j + 1; k < colData.length; k++) {
-          for (let l = k + 1; l < colData.length; l++) {
-            const rowSet = new Set<number>(colData[i].rows);
-            for (const r of colData[j].rows) rowSet.add(r);
-            for (const r of colData[k].rows) rowSet.add(r);
-            for (const r of colData[l].rows) rowSet.add(r);
-            if (rowSet.size !== 4) continue;
-            const rows = [...rowSet];
-            const cols = [colData[i].col, colData[j].col, colData[k].col, colData[l].col];
-            let changed = false;
-            for (const r of rows) {
-              for (const c of ALL_ROWS[r]) {
-                if (cols.includes(c % 9)) continue;
-                if (cands[c].has(d)) { cands[c].delete(d); changed = true; }
-              }
-            }
-            if (changed) return {
-              technique: 'jellyfish',
-              digit: d,
-              cells: rows.flatMap(r => cols.map(col => r * 9 + col)),
-            };
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
+const jellyfish = (g: number[], c: Candidates) => fish(4, 'jellyfish', g, c);
 
 const skyscraper = (grid: number[], cands: Candidates): SolveStep | null => {
   for (let d = 1; d <= 9; d++) {
@@ -1223,52 +1106,10 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
       }
       case 'x_wing': {
         const digit = step.digit!;
-        // Re-find the 4 corner cells
-        let cornerCells: number[] = [];
-        // Try row-based
-        const rowData: { row: number; cols: number[] }[] = [];
-        for (let r = 0; r < 9; r++) {
-          const cols = ALL_ROWS[r].filter(c => baseGrid[c] === 0 && baseCands[c].has(digit)).map(c => c % 9);
-          if (cols.length === 2) rowData.push({ row: r, cols });
-        }
-        for (let i = 0; i < rowData.length && cornerCells.length === 0; i++) {
-          for (let j = i + 1; j < rowData.length && cornerCells.length === 0; j++) {
-            if (rowData[i].cols[0] === rowData[j].cols[0] && rowData[i].cols[1] === rowData[j].cols[1]) {
-              const [col1, col2] = rowData[i].cols;
-              cornerCells = [
-                rowData[i].row * 9 + col1,
-                rowData[i].row * 9 + col2,
-                rowData[j].row * 9 + col1,
-                rowData[j].row * 9 + col2,
-              ];
-            }
-          }
-        }
-        // Try col-based if not found
-        if (cornerCells.length === 0) {
-          const colData: { col: number; rows: number[] }[] = [];
-          for (let col = 0; col < 9; col++) {
-            const rows = ALL_COLS[col].filter(c => baseGrid[c] === 0 && baseCands[c].has(digit)).map(c => Math.floor(c / 9));
-            if (rows.length === 2) colData.push({ col, rows });
-          }
-          for (let i = 0; i < colData.length && cornerCells.length === 0; i++) {
-            for (let j = i + 1; j < colData.length && cornerCells.length === 0; j++) {
-              if (colData[i].rows[0] === colData[j].rows[0] && colData[i].rows[1] === colData[j].rows[1]) {
-                const [r1, r2] = colData[i].rows;
-                cornerCells = [
-                  r1 * 9 + colData[i].col,
-                  r1 * 9 + colData[j].col,
-                  r2 * 9 + colData[i].col,
-                  r2 * 9 + colData[j].col,
-                ];
-              }
-            }
-          }
-        }
         hint = {
           technique: step.technique,
           description: `X-Wing on ${digit}: the four corners fix ${digit} in two lines. Eliminate ${digit} from other cells in those lines.`,
-          evidenceCells: cornerCells,
+          evidenceCells: step.cells!,
           actionCells: eliminatedCells,
           isPlacement: false,
           digit,
