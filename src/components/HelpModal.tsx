@@ -149,7 +149,7 @@ export const HelpModal = ({ onClose }: Props) => {
                   <tr><th>Technique</th><th>Weight</th><th>Description</th></tr>
                 </thead>
                 <tbody>
-                  {TECHNIQUES.map(t => (
+                  {[...TECHNIQUES].sort((a, b) => TECHNIQUE_WEIGHT[a.key] - TECHNIQUE_WEIGHT[b.key]).map(t => (
                     <tr key={t.key}>
                       <td className="tech-name">
                         <button className="tech-link" onClick={() => setSelected(t.key)}>
