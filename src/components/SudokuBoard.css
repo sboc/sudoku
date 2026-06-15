@@ -217,7 +217,7 @@ h1 {
 .cell:nth-child(9n) { border-right: none; }
 .board > div:last-child > .cell { border-bottom: none; }
 
-/* Box dividers — accent color, clearly visible against cell background */
+/* Box dividers - accent color, clearly visible against cell background */
 .cell.border-right { border-right: 2px solid var(--c-accent); }
 .cell.border-bottom { border-bottom: 2px solid var(--c-accent); }
 

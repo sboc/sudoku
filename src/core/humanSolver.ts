@@ -647,7 +647,7 @@ const simpleColoring = (grid: number[], cands: Candidates): SolveStep | null => 
       const color1 = [...compColor.entries()].filter(([, c]) => c === 1).map(([cell]) => cell);
       /* v8 ignore next */ if (color1.length === 0) continue;
 
-      // Type 1: two same-color cells see each other — that color is wrong
+      // Type 1: two same-color cells see each other - that color is wrong
       for (const colorCells of [color0, color1]) {
         let conflict = false;
         for (let i = 0; i < colorCells.length && !conflict; i++) {
@@ -1017,7 +1017,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
           const rc = roofCells[0];
           hint = {
             technique: step.technique,
-            description: `Unique Rectangle (Type 1): three corners are locked to {${a},${b}}. Placing ${a} or ${b} in ${cellRef(rc)} would allow two solutions — eliminate them from ${cellRef(rc)}.`,
+            description: `Unique Rectangle (Type 1): three corners are locked to {${a},${b}}. Placing ${a} or ${b} in ${cellRef(rc)} would allow two solutions - eliminate them from ${cellRef(rc)}.`,
             evidenceCells: corners.filter(c => c !== rc),
             actionCells: eliminatedCells,
             isPlacement: false,
@@ -1027,7 +1027,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
           const C = step.digit!;
           hint = {
             technique: step.technique,
-            description: `Unique Rectangle (Type 2): floor cells locked to {${a},${b}}, both roof cells add candidate ${C}. One roof must be ${C} to break the deadly pattern — eliminate ${C} from their common peers.`,
+            description: `Unique Rectangle (Type 2): floor cells locked to {${a},${b}}, both roof cells add candidate ${C}. One roof must be ${C} to break the deadly pattern - eliminate ${C} from their common peers.`,
             evidenceCells: corners,
             actionCells: eliminatedCells,
             isPlacement: false,
@@ -1039,7 +1039,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
           const elim = locked === a ? b : a;
           hint = {
             technique: step.technique,
-            description: `Unique Rectangle (Type 4): ${locked} is confined to the roof cells in their shared unit. If ${elim} appeared in a roof cell it could swap with ${locked}, giving two solutions — eliminate ${elim} from ${roofCells.map(cellRef).join(' and ')}.`,
+            description: `Unique Rectangle (Type 4): ${locked} is confined to the roof cells in their shared unit. If ${elim} appeared in a roof cell it could swap with ${locked}, giving two solutions - eliminate ${elim} from ${roofCells.map(cellRef).join(' and ')}.`,
             evidenceCells: corners,
             actionCells: eliminatedCells,
             isPlacement: false,
@@ -1145,7 +1145,7 @@ export const findNextHint = (userGrid: number[], userNotes: Set<number>[], solut
         const [sl1, sl2] = cells;
         hint = {
           technique: step.technique,
-          description: `Empty Rectangle on ${digit}: candidates in a box form a cross pattern. The strong link ${cellRef(sl1)}–${cellRef(sl2)} forces an elimination.`,
+          description: `Empty Rectangle on ${digit}: candidates in a box form a cross pattern. The strong link ${cellRef(sl1)}-${cellRef(sl2)} forces an elimination.`,
           evidenceCells: cells,
           actionCells: eliminatedCells,
           isPlacement: false,

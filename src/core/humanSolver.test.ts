@@ -18,7 +18,7 @@ const MEDIUM_PUZZLE = p(
   '309000470200709001087002009000840007004010800800097000600400780900301004041000902',
 );
 
-// Hard puzzle — exercises pointing pair, box-line reduction, and naked/hidden subsets
+// Hard puzzle - exercises pointing pair, box-line reduction, and naked/hidden subsets
 const HARD_PUZZLE = p(
   '000700000100000000000430200000000006009000400500080000001060000000007004006000075',
 );
@@ -76,7 +76,7 @@ const collectHints = (puzzle: number[], maxSteps = 200): Array<{ technique: stri
   return hints;
 };
 
-describe('humanSolve — basic', () => {
+describe('humanSolve - basic', () => {
   it('solves an easy puzzle', () => {
     const result = humanSolve(EASY_PUZZLE);
     expect(result.solved).toBe(true);
@@ -127,7 +127,7 @@ describe('humanSolve — basic', () => {
   });
 });
 
-describe('humanSolve — medium puzzle', () => {
+describe('humanSolve - medium puzzle', () => {
   it('solves or makes progress on medium puzzle', () => {
     const result = humanSolve(MEDIUM_PUZZLE);
     expect(result.finalGrid).toHaveLength(81);
@@ -143,7 +143,7 @@ describe('humanSolve — medium puzzle', () => {
   });
 });
 
-describe('humanSolve — hard puzzle', () => {
+describe('humanSolve - hard puzzle', () => {
   it('runs without error on hard puzzle', () => {
     expect(() => humanSolve(HARD_PUZZLE)).not.toThrow();
   });
@@ -156,7 +156,7 @@ describe('humanSolve — hard puzzle', () => {
   });
 });
 
-describe('findNextHint — basic', () => {
+describe('findNextHint - basic', () => {
   it('returns a hint for a solvable puzzle', () => {
     const notes = Array.from({ length: 81 }, () => new Set<number>());
     const hint = findNextHint(EASY_PUZZLE, notes);
@@ -236,7 +236,7 @@ describe('findNextHint — basic', () => {
     const corruptedSolution = [...EASY_SOLUTION];
     corruptedSolution[blockedCell] = blockedDigit === 9 ? 1 : blockedDigit + 1;
 
-    // EASY_PUZZLE has many singles — another valid hint must be reachable
+    // EASY_PUZZLE has many singles - another valid hint must be reachable
     const nextHint = findNextHint(EASY_PUZZLE, notes, corruptedSolution);
     expect(nextHint).not.toBeNull();
     // The returned hint must be valid against the (corrupted) solution
@@ -248,7 +248,7 @@ describe('findNextHint — basic', () => {
   it('validates and returns elimination hint when solution is safe', () => {
     // Walk GR1_PUZZLE (known to require naked_pair) past all singles so the first
     // available hint is an elimination technique. Then call with a zero-filled solution:
-    // digits are 1–9 so solution[cell]=0 never matches, meaning the elimination is safe
+    // digits are 1-9 so solution[cell]=0 never matches, meaning the elimination is safe
     // and isHintValid (line 606) returns true.
     const grid = [...GR1_PUZZLE];
     const notes = Array.from({ length: 81 }, () => new Set<number>());
@@ -256,8 +256,8 @@ describe('findNextHint — basic', () => {
 
     for (let step = 0; step < 500; step++) {
       const h = findNextHint(grid, notes);
-      if (!h) return; // puzzle finished early — skip
-      if (!h.isPlacement) break; // at elimination territory — stop applying
+      if (!h) return; // puzzle finished early - skip
+      if (!h.isPlacement) break; // at elimination territory - stop applying
       applyAdvancedHint(grid, notes, h);
     }
 
@@ -301,7 +301,7 @@ describe('findNextHint — basic', () => {
   });
 });
 
-describe('findNextHint — technique coverage via step-through', () => {
+describe('findNextHint - technique coverage via step-through', () => {
   it('generates hints for all easy puzzle steps', () => {
     const hints = collectHints(EASY_PUZZLE);
     expect(hints.length).toBeGreaterThan(0);
@@ -344,7 +344,7 @@ describe('findNextHint — technique coverage via step-through', () => {
   });
 });
 
-describe('findNextHint — hint descriptions', () => {
+describe('findNextHint - hint descriptions', () => {
   it('naked_single description mentions digit', () => {
     const notes = Array.from({ length: 81 }, () => new Set<number>());
     // Walk through easy puzzle hints until we see a naked_single
@@ -395,7 +395,7 @@ describe('intermediate technique code paths via findNextHint', () => {
   // Step through hints collecting all technique types seen
   const stepThroughHints = (puzzle: number[], maxSteps = 300): Set<string> => {
     const grid = [...puzzle];
-    // Start with empty notes — findNextHint uses grid-derived candidates when no notes present
+    // Start with empty notes - findNextHint uses grid-derived candidates when no notes present
     const notes = Array.from({ length: 81 }, () => new Set<number>());
     const seen = new Set<string>();
 
@@ -509,7 +509,7 @@ describe('advanced technique code paths', () => {
   });
 
   it('humanSolve returns steps array even for unsolvable-by-human puzzles', () => {
-    // AI Escargot — too hard for human techniques, but should run without error
+    // AI Escargot - too hard for human techniques, but should run without error
     const escargot = p(
       '800000000003600000070090200060005030004000000030000410000080070600000305000030000',
     );
@@ -631,7 +631,7 @@ const captureHintOfType = (puzzle: number[], targetTechnique: string, maxSteps =
   return null;
 };
 
-describe('findNextHint — naked subset hint formatting', () => {
+describe('findNextHint - naked subset hint formatting', () => {
   it('naked_pair: 2 evidence cells, eliminations present, digit set', () => {
     const hint = captureHintOfType(HQ_PUZZLE, 'naked_pair');
     expect(hint).not.toBeNull();
@@ -663,7 +663,7 @@ describe('findNextHint — naked subset hint formatting', () => {
   });
 });
 
-describe('findNextHint — hidden subset hint formatting', () => {
+describe('findNextHint - hidden subset hint formatting', () => {
   it('hidden_pair: 2 cells, action cells equal evidence cells', () => {
     const hint = captureHintOfType(WW_A_PUZZLE, 'hidden_pair');
     expect(hint).not.toBeNull();
@@ -694,7 +694,7 @@ describe('findNextHint — hidden subset hint formatting', () => {
   });
 });
 
-describe('findNextHint — fish technique hint formatting', () => {
+describe('findNextHint - fish technique hint formatting', () => {
   it('x_wing (row-based): 4 corner evidence cells, digit set, description mentions X-Wing', () => {
     const hint = captureHintOfType(XWING_PUZZLE, 'x_wing');
     expect(hint).not.toBeNull();
@@ -753,7 +753,7 @@ describe('findNextHint — fish technique hint formatting', () => {
 
   it('swordfish (row-based elimination): synthetic state exercises the row-based branch', () => {
     // All-zero grid + crafted notes: digit 1 in rows 0, 3, 6 constrained to cols
-    // {1,7}, {4,7}, {1,4} respectively — combined col-set = {1,4,7} (size 3).
+    // {1,7}, {4,7}, {1,4} respectively - combined col-set = {1,4,7} (size 3).
     // Each row's target cols deliberately span different boxes so box-line reduction
     // cannot fire before swordfish. No simpler technique fires first.
     const grid = Array(81).fill(0);
@@ -779,7 +779,7 @@ describe('findNextHint — fish technique hint formatting', () => {
   });
 });
 
-describe('findNextHint — wing technique hint formatting', () => {
+describe('findNextHint - wing technique hint formatting', () => {
   it('y_wing: 3 evidence cells (pivot + pincers), description mentions Y-Wing', () => {
     const hint = captureHintOfType(YW1_PUZZLE, 'y_wing');
     expect(hint).not.toBeNull();
@@ -822,7 +822,7 @@ describe('findNextHint — wing technique hint formatting', () => {
 
   it('w_wing (wa !== digit branch): second puzzle exercises the other candidate-order arm', () => {
     // XYZ3_PUZZLE's w_wing fires with baseCands[p] = {6,7} and digit = 7,
-    // so wa (6) !== digit (7) — takes the wa branch in the description formatter.
+    // so wa (6) !== digit (7) - takes the wa branch in the description formatter.
     const hint = captureHintOfType(XYZ3_PUZZLE, 'w_wing');
     expect(hint).not.toBeNull();
     expect(hint!.technique).toBe('w_wing');
@@ -838,7 +838,7 @@ describe('unique_rectangle technique', () => {
   // each UR type should be added when identified.
 
   it('technique does not crash during full solves', () => {
-    // uniqueRectangle runs on every iteration — verify no throws on known puzzles
+    // uniqueRectangle runs on every iteration - verify no throws on known puzzles
     for (const puz of [EASY_PUZZLE, MEDIUM_PUZZLE, HARD_PUZZLE, WW4_PUZZLE, YW1_PUZZLE]) {
       expect(() => humanSolve(puz)).not.toThrow();
     }
@@ -865,13 +865,13 @@ describe('unique_rectangle technique', () => {
   });
 });
 
-describe('findNextHint — jellyfish hint formatting', () => {
+describe('findNextHint - jellyfish hint formatting', () => {
   // Synthetic state for row-based jellyfish on digit 1:
-  //   Rows {0,1,3,4}: digit 1 in cols {0,1,3,4} — 4 cols each (qualifies for jellyfish, not swordfish)
-  //   Row 2: digit 1 in cols {0,3} — spans boxes 0 and 1, preventing box-line reduction
-  //   All other cells: {2..9} — no digit 1 outside listed cells
+  //   Rows {0,1,3,4}: digit 1 in cols {0,1,3,4} - 4 cols each (qualifies for jellyfish, not swordfish)
+  //   Row 2: digit 1 in cols {0,3} - spans boxes 0 and 1, preventing box-line reduction
+  //   All other cells: {2..9} - no digit 1 outside listed cells
   // Jellyfish fires on rows {0,1,2,3} (colSet={0,1,3,4}), eliminating digit 1 from
-  // row 4, cols {0,1,3,4} — cells 36,37,39,40. No earlier technique fires because:
+  // row 4, cols {0,1,3,4} - cells 36,37,39,40. No earlier technique fires because:
   //   no unit has exactly 1 cell with digit 1 (no hidden single), no box has digit 1
   //   confined to a single row/col (no pointing pair), rows have ≥4 cols (no x-wing/swordfish).
   it('jellyfish (row-based): 4 rows spanning 4 cols, eliminates digit 1 from non-participating rows', () => {
@@ -891,7 +891,7 @@ describe('findNextHint — jellyfish hint formatting', () => {
   });
 });
 
-describe('findNextHint — two_string_kite and xy_chain hint formatting', () => {
+describe('findNextHint - two_string_kite and xy_chain hint formatting', () => {
   it('two_string_kite: 4 evidence cells, digit set, description mentions 2-String Kite', () => {
     const hint = captureHintOfType(XWING_COL_PUZZLE, 'two_string_kite');
     expect(hint).not.toBeNull();
@@ -944,7 +944,7 @@ const UR_HUNT_PUZZLES = [
   GR1_PUZZLE, NT1_PUZZLE, HQ_PUZZLE, XWING_PUZZLE, XWING_COL_PUZZLE,
 ];
 
-describe('findNextHint — jellyfish col-based hint formatting', () => {
+describe('findNextHint - jellyfish col-based hint formatting', () => {
   it('jellyfish (col-based): 4 cols each with digit 1 in exactly rows {0,1,3,4}, eliminates from non-member col', () => {
     // Cols 0-4 each have digit 1 in rows {0,1,3,4} (4 rows, union=4).
     // Row-based: rows 0,1,3,4 each have digit 1 in 5 cols → excluded (needs 2-4).
@@ -973,7 +973,7 @@ describe('findNextHint — jellyfish col-based hint formatting', () => {
   });
 });
 
-describe('findNextHint — skyscraper hint formatting', () => {
+describe('findNextHint - skyscraper hint formatting', () => {
   it('skyscraper: row 0 and row 3 each have digit 5 in exactly 2 cols, sharing col 0 as trunk', () => {
     // Row 0: digit 5 only in cols 0 and 6.  Row 3: digit 5 only in cols 0 and 7.
     // All other cells: all 9 candidates.  Row-based skyscraper fires:
@@ -994,7 +994,7 @@ describe('findNextHint — skyscraper hint formatting', () => {
   });
 });
 
-describe('findNextHint — skyscraper col-based hint formatting', () => {
+describe('findNextHint - skyscraper col-based hint formatting', () => {
   it('skyscraper (col-based): col 0 and col 3 each have d=5 in exactly 2 rows, sharing row 2 as trunk', () => {
     // Col 0: d=5 only at r2c0=18 and r6c0=54. Col 3: d=5 only at r2c3=21 and r8c3=75.
     // Trunk=row2, tips=54(r6c0) and 75(r8c3). Common peers: r6c4=58 and r6c5=59 (row6∩box7).
@@ -1016,7 +1016,7 @@ describe('findNextHint — skyscraper col-based hint formatting', () => {
   });
 });
 
-describe('findNextHint — unique_rectangle Type 1 and Type 2 hint formatting', () => {
+describe('findNextHint - unique_rectangle Type 1 and Type 2 hint formatting', () => {
   it('unique_rectangle Type 1 or Type 2 fires during solve of at least one hard puzzle', () => {
     let type1hint: ReturnType<typeof findNextHint> = null;
     let type2hint: ReturnType<typeof findNextHint> = null;
@@ -1054,10 +1054,10 @@ describe('findNextHint — unique_rectangle Type 1 and Type 2 hint formatting', 
   });
 });
 
-describe('findNextHint — empty_rectangle hint formatting', () => {
+describe('findNextHint - empty_rectangle hint formatting', () => {
   it('empty_rectangle col-link: box-0 L-shape + col-3 conjugate pair eliminates digit 5', () => {
-    // Box 0 digit-5 cells: (0,0),(0,1),(1,0) — L-shape with r_B=0, c_B=0.
-    // Col 3 digit-5 cells: (0,3),(5,3) only — conjugate pair. One end at row r_B=0.
+    // Box 0 digit-5 cells: (0,0),(0,1),(1,0) - L-shape with r_B=0, c_B=0.
+    // Col 3 digit-5 cells: (0,3),(5,3) only - conjugate pair. One end at row r_B=0.
     // Target: (5,0) sees the far end (5,3) via row 5 and the ER pivot col via col 0. Eliminated.
     // All other digits have all 9 candidates per unit → no earlier technique fires.
     const grid = Array(81).fill(0);
@@ -1076,10 +1076,10 @@ describe('findNextHint — empty_rectangle hint formatting', () => {
   });
 });
 
-describe('findNextHint — empty_rectangle row-link hint formatting', () => {
+describe('findNextHint - empty_rectangle row-link hint formatting', () => {
   it('empty_rectangle row-link: box-0 L-shape + row-5 conjugate pair eliminates digit 5', () => {
-    // Box 0 d=5 cells: (0,0),(0,1),(1,0) — L-shape with r_B=0, c_B=0.
-    // Row 5 d=5 cells: (5,0)=45 and (5,7)=52 only — strong link. One end at col c_B=0.
+    // Box 0 d=5 cells: (0,0),(0,1),(1,0) - L-shape with r_B=0, c_B=0.
+    // Row 5 d=5 cells: (5,0)=45 and (5,7)=52 only - strong link. One end at col c_B=0.
     // r_x = col 7, outside box-0 col band {0,1,2}. Target = (r_B=0, c_x=7) = cell 7. Eliminated.
     // Row 5 is the only 2-d5 row; no col has 2 d=5 cells → no skyscraper/2SK fires first.
     const grid = Array(81).fill(0);
@@ -1098,7 +1098,7 @@ describe('findNextHint — empty_rectangle row-link hint formatting', () => {
   });
 });
 
-describe('findNextHint — simple_coloring hint formatting', () => {
+describe('findNextHint - simple_coloring hint formatting', () => {
   it('simple_coloring Type 2: 6-node chain eliminates digit 1 from cells seeing both colors', () => {
     // Chain: A=(0,0):0, B=(0,3):1, C=(4,3):0, D=(4,7):1, E=(7,7):0, F=(7,1):1
     // Links: row0 A-B, col3 B-C, row4 C-D, col7 D-E, row7 E-F
@@ -1128,7 +1128,7 @@ describe('findNextHint — simple_coloring hint formatting', () => {
   });
 });
 
-describe('findNextHint — unique_rectangle Type 2 hint formatting', () => {
+describe('findNextHint - unique_rectangle Type 2 hint formatting', () => {
   it('unique_rectangle Type 2: floor {1,2} at r0c0/r2c0, roof {1,2,5} at r0c3/r2c3', () => {
     // Corners: 0(r0c0,box0,floor), 18(r2c0,box0,floor), 3(r0c3,box1,roof), 21(r2c3,box1,roof)
     // Box0 non-UR cells and col0 cells outside box0 have no digits 1,2, so the naked pair
@@ -1151,7 +1151,7 @@ describe('findNextHint — unique_rectangle Type 2 hint formatting', () => {
   });
 });
 
-describe('findNextHint — unique_rectangle Type 2 false branches (lines 591-593)', () => {
+describe('findNextHint - unique_rectangle Type 2 false branches (lines 591-593)', () => {
   it('UR Type 2: pattern found but no common peer has C=5 → changed stays false', () => {
     // Corners 0(r0c0,b0,floor) 18(r2c0,b0,floor) 3(r0c3,b1,roof) 21(r2c3,b1,roof).
     // Same base as the Type 2 true-branch test, but C=5 deleted from ALL common peers
@@ -1170,7 +1170,7 @@ describe('findNextHint — unique_rectangle Type 2 false branches (lines 591-593
   });
 });
 
-describe('findNextHint — unique_rectangle Type 4 locked=b (line 1323 false branch)', () => {
+describe('findNextHint - unique_rectangle Type 4 locked=b (line 1323 false branch)', () => {
   it('UR Type 4: digit b=2 confined to roof cells → formatter takes false branch at elim ternary', () => {
     // Corners 0(r0c0,b0,floor) 18(r2c0,b0,floor) 3(r0c3,b1,roof) 21(r2c3,b1,roof).
     // floor={1,2}=[a=1,b=2]; roof={1,2,4,5} (xtra.length=2 → UR Type 2 check is skipped).
@@ -1192,16 +1192,16 @@ describe('findNextHint — unique_rectangle Type 4 locked=b (line 1323 false bra
     expect(hint!.technique).toBe('unique_rectangle');
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.eliminations.length).toBeGreaterThan(0);
-    // locked=2=b, so elim = (locked===a ? b : a) = (2===1 ? 2 : 1) = 1 — false branch
+    // locked=2=b, so elim = (locked===a ? b : a) = (2===1 ? 2 : 1) = 1 - false branch
     expect(hint!.eliminations.every(e => e.digit === 1)).toBe(true);
     expect(hint!.description).toMatch(/unique rectangle.*type 4/i);
   });
 });
 
-describe('findNextHint — unique_rectangle Type 4 locked=a (line 1323 true branch)', () => {
+describe('findNextHint - unique_rectangle Type 4 locked=a (line 1323 true branch)', () => {
   it('UR Type 4: digit a=1 confined to roof cells → formatter takes true branch at elim ternary', () => {
     // Same rectangle as locked=b test but confine digit 1 (=a) to cells 3,21 in col3/box1.
-    // locked=1=a fires first → elim = (locked===a ? b : a) = 2 — covers true branch.
+    // locked=1=a fires first → elim = (locked===a ? b : a) = 2 - covers true branch.
     // X-Wing on digit 1 (cols{0,3} rows{0,2}) has no actual eliminations → null.
     const grid = Array(81).fill(0);
     const notes = Array.from({ length: 81 }, () => new Set<number>([1,2,3,4,5,6,7,8,9]));
@@ -1221,15 +1221,15 @@ describe('findNextHint — unique_rectangle Type 4 locked=a (line 1323 true bran
     expect(hint!.technique).toBe('unique_rectangle');
     expect(hint!.isPlacement).toBe(false);
     expect(hint!.eliminations.length).toBeGreaterThan(0);
-    // locked=1=a, so elim = (locked===a ? b : a) = (1===1 ? 2 : 1) = 2 — true branch
+    // locked=1=a, so elim = (locked===a ? b : a) = (1===1 ? 2 : 1) = 2 - true branch
     expect(hint!.eliminations.every(e => e.digit === 2)).toBe(true);
     expect(hint!.description).toMatch(/unique rectangle.*type 4/i);
   });
 });
 
-describe('findNextHint — simple_coloring Type 1 hint formatting', () => {
+describe('findNextHint - simple_coloring Type 1 hint formatting', () => {
   it('simple_coloring Type 1: odd-cycle forces same-color peers in box4', () => {
-    // 7-cycle (odd): A(r0c2)—[row0]—G(r0c8)—[col8]—F(r4c8)—[row4]—E(r4c3)—[box4]—D(r3c5)—[col5]—C(r1c5)—[row1]—B(r1c0)—[box0]—A
+    // 7-cycle (odd): A(r0c2)-[row0]-G(r0c8)-[col8]-F(r4c8)-[row4]-E(r4c3)-[box4]-D(r3c5)-[col5]-C(r1c5)-[row1]-B(r1c0)-[box0]-A
     // BFS from A: color0={A(2),F(44),C(14)}, color1={G(8),B(9),E(39),D(32),22(r2c4 via box1)}.
     // D(r3c5) and E(r4c3) both color1, both in box4 → Type 1: eliminate d=1 from color1.
     // Strong-link rows row0={c2,c8}, row1={c0,c5}, row4={c3,c8} share no common col pair

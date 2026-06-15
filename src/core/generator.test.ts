@@ -43,7 +43,7 @@ describe('solvePuzzle', () => {
   });
 
   it('returns null for empty grid (multiple solutions)', () => {
-    // dlxSolve with max=1 returns a solution, but hasUniqueSolution filters it — solvePuzzle
+    // dlxSolve with max=1 returns a solution, but hasUniqueSolution filters it - solvePuzzle
     // just calls dlxSolve(grid,1) so returns one of many solutions
     const result = solvePuzzle(Array(81).fill(0));
     // empty grid has solutions, so result is not null

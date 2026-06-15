@@ -34,7 +34,7 @@
   <!-- Outer border -->
   <rect x="3" y="3" width="42" height="42" rx="2" fill="none" stroke="#3b5bdb" stroke-width="1.5"/>
 
-  <!-- Numbers — a handful of placed digits, font-size tuned for readability -->
+  <!-- Numbers - a handful of placed digits, font-size tuned for readability -->
   <!-- Given (bright) -->
   <g font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central">
     <!-- row 0 -->

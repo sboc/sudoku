@@ -139,19 +139,19 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
     ],
   },
   unique_rectangle: {
-    summary: 'Four empty cells forming a rectangle across exactly two boxes all contain the same two candidates. If no extra candidates existed, the puzzle would have two solutions (the two digits could swap). The extra candidates in roof cells must therefore be used — allowing eliminations that preserve uniqueness.',
+    summary: 'Four empty cells forming a rectangle across exactly two boxes all contain the same two candidates. If no extra candidates existed, the puzzle would have two solutions (the two digits could swap). The extra candidates in roof cells must therefore be used - allowing eliminations that preserve uniqueness.',
     steps: [
       'Find four empty cells forming a rectangle (2 rows × 2 columns) that spans exactly two boxes.',
-      'Confirm all four cells share two common candidates {A, B} — these are the UR digits.',
-      'Type 1 — three cells have only {A,B}: the fourth cell must use one of its extra candidates, so eliminate A and B from it.',
-      'Type 2 — two floor cells have only {A,B}, two roof cells each have exactly one extra digit C: one roof must be C to break the pattern; eliminate C from cells seeing both roof cells.',
-      'Type 4 — two floor cells have only {A,B}, and one UR digit is confined to the two roof cells in their shared unit: eliminate the other UR digit from both roof cells.',
+      'Confirm all four cells share two common candidates {A, B} - these are the UR digits.',
+      'Type 1 - three cells have only {A,B}: the fourth cell must use one of its extra candidates, so eliminate A and B from it.',
+      'Type 2 - two floor cells have only {A,B}, two roof cells each have exactly one extra digit C: one roof must be C to break the pattern; eliminate C from cells seeing both roof cells.',
+      'Type 4 - two floor cells have only {A,B}, and one UR digit is confined to the two roof cells in their shared unit: eliminate the other UR digit from both roof cells.',
     ],
   },
   jellyfish: {
     summary: 'A four-row (or four-column) extension of Swordfish. A digit appears in only 2-4 cells in each of four rows, and those cells together span exactly four columns. The digit can be eliminated from all other cells in those four columns.',
     steps: [
-      'Find a digit that appears in exactly 2–4 cells across each of four rows.',
+      'Find a digit that appears in exactly 2-4 cells across each of four rows.',
       'The candidate cells across all four rows must together span exactly four columns.',
       'Eliminate the digit from all other cells in those four columns.',
       '(The same pattern works with columns and rows swapped.)',
@@ -161,13 +161,13 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
     summary: 'Two rows (or columns) each have exactly two candidates for a digit, sharing one column (the trunk). The other two cells are the tips. Either one tip or the other must hold the digit, so cells seeing both tips can be eliminated.',
     steps: [
       'Find a digit with exactly two candidates in each of two rows, sharing exactly one column (the trunk).',
-      'Identify the two tip cells — one in each row, in the non-shared column.',
+      'Identify the two tip cells - one in each row, in the non-shared column.',
       'Either the first row\'s tip or the second row\'s tip must hold the digit.',
       'Eliminate the digit from any cell that sees both tips.',
     ],
   },
   two_string_kite: {
-    summary: 'A row-string (digit in exactly two row cells) and a column-string (digit in exactly two column cells) share a box corner. The two outer ends act like a conjugate pair — eliminate the digit from cells seeing both ends.',
+    summary: 'A row-string (digit in exactly two row cells) and a column-string (digit in exactly two column cells) share a box corner. The two outer ends act like a conjugate pair - eliminate the digit from cells seeing both ends.',
     steps: [
       'Find a digit with exactly two candidates in a row and exactly two in a column.',
       'One cell from the row and one from the column must be in the same box (the shared corner).',
@@ -187,10 +187,10 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
   simple_coloring: {
     summary: 'Two-color the strong-link graph for a digit (BFS alternating colors). If two same-color cells see each other, that color is impossible and all cells of that color are eliminated. If a cell outside the chain sees both colors, it can be eliminated.',
     steps: [
-      'For a digit, build a graph of conjugate pairs (strong links — units where the digit appears in exactly two cells).',
+      'For a digit, build a graph of conjugate pairs (strong links - units where the digit appears in exactly two cells).',
       'Two-color the connected components: alternate colors along each chain.',
-      'Type 1 — if two cells of the same color share a unit, that color is a contradiction: eliminate the digit from all same-color cells.',
-      'Type 2 — if a cell outside the chain sees one cell of each color, it can\'t be the digit (one color must be correct): eliminate it.',
+      'Type 1 - if two cells of the same color share a unit, that color is a contradiction: eliminate the digit from all same-color cells.',
+      'Type 2 - if a cell outside the chain sees one cell of each color, it can\'t be the digit (one color must be correct): eliminate it.',
     ],
   },
   xyz_wing: {
@@ -198,7 +198,7 @@ export const TECHNIQUE_EXPLANATIONS: Record<Technique, TechniqueExplanation> = {
     steps: [
       'Find a pivot cell with exactly three candidates {A, B, C}.',
       'Find two bivalue pincers that each see the pivot, whose candidates are subsets of {A, B, C}.',
-      'Identify the candidate shared by both pincers — call it Z.',
+      'Identify the candidate shared by both pincers - call it Z.',
       'Eliminate Z from any cell that sees the pivot and both pincers simultaneously.',
     ],
   },
@@ -238,7 +238,7 @@ export interface TechniqueExample {
 
 export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   naked_single: {
-    caption: 'Row 5 already contains every digit except 7. The centre cell has only one legal candidate — place it.',
+    caption: 'Row 5 already contains every digit except 7. The centre cell has only one legal candidate - place it.',
     cells: [
       { r: 4, c: 0, value: 1, role: 'context' },
       { r: 4, c: 1, value: 3, role: 'context' },
@@ -304,7 +304,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   naked_pair: {
-    caption: 'Two cells share exactly {3, 8} (blue). Those digits are claimed — eliminate 3 and 8 from every other cell in the row (orange).',
+    caption: 'Two cells share exactly {3, 8} (blue). Those digits are claimed - eliminate 3 and 8 from every other cell in the row (orange).',
     cells: [
       { r: 0, c: 0, cands: [3, 5], elim: [3], role: 'action' },
       { r: 0, c: 1, cands: [8, 7], elim: [8], role: 'action' },
@@ -487,7 +487,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   skyscraper: {
-    caption: 'Digit 5 in rows 1 and 3 share column 5 as trunk (blue). Tips R1C8 and R3C9 land in the same box — cells in that box seeing both tips cannot be 5 (orange).',
+    caption: 'Digit 5 in rows 1 and 3 share column 5 as trunk (blue). Tips R1C8 and R3C9 land in the same box - cells in that box seeing both tips cannot be 5 (orange).',
     cells: [
       { r: 0, c: 4, cands: [5], role: 'evidence' },
       { r: 2, c: 4, cands: [5], role: 'evidence' },
@@ -499,7 +499,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   two_string_kite: {
-    caption: 'Digit 7: row-string R3C2–R3C8 and column-string R1C2–R7C2 share box corner R3C2. Tips R3C8 and R7C2 force an elimination at R7C8 (orange).',
+    caption: 'Digit 7: row-string R3C2-R3C8 and column-string R1C2-R7C2 share box corner R3C2. Tips R3C8 and R7C2 force an elimination at R7C8 (orange).',
     cells: [
       { r: 2, c: 1, cands: [7], role: 'evidence' },
       { r: 0, c: 1, cands: [7], role: 'evidence' },
@@ -510,7 +510,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   empty_rectangle: {
-    caption: 'Digit 4 in the centre box forms a cross on row 5 and column 5. Strong link R2C8–R5C8 forces elimination of 4 from R2C5 (orange).',
+    caption: 'Digit 4 in the centre box forms a cross on row 5 and column 5. Strong link R2C8-R5C8 forces elimination of 4 from R2C5 (orange).',
     cells: [
       { r: 3, c: 4, cands: [4], role: 'evidence' },
       { r: 4, c: 3, cands: [4], role: 'evidence' },
@@ -522,7 +522,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   simple_coloring: {
-    caption: 'Digit 6: four-cell chain alternates colors (blue/orange). R4C2 sits in column 2 between a blue cell (R1C2) and an orange cell (R7C2) — it sees both colors, so eliminate 6 from R4C2.',
+    caption: 'Digit 6: four-cell chain alternates colors (blue/orange). R4C2 sits in column 2 between a blue cell (R1C2) and an orange cell (R7C2) - it sees both colors, so eliminate 6 from R4C2.',
     cells: [
       { r: 0, c: 1, cands: [6], role: 'evidence' },
       { r: 0, c: 5, cands: [6], role: 'evidence' },
@@ -533,7 +533,7 @@ export const TECHNIQUE_EXAMPLES: Record<Technique, TechniqueExample> = {
   },
 
   xy_chain: {
-    caption: 'XY-Chain on 9: {9,4}→{4,5}→{5,9}. Start R1C1 and end R4C8 both hold 9. R1C8 sees start (row 1) and end (col 8) — eliminate 9 from R1C8 (orange).',
+    caption: 'XY-Chain on 9: {9,4}→{4,5}→{5,9}. Start R1C1 and end R4C8 both hold 9. R1C8 sees start (row 1) and end (col 8) - eliminate 9 from R1C8 (orange).',
     cells: [
       { r: 0, c: 0, cands: [9, 4], role: 'evidence' },
       { r: 3, c: 0, cands: [4, 5], role: 'evidence' },

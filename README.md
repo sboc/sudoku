@@ -101,7 +101,7 @@ The most substantial module (~1220 lines). Simulates how a human solves Sudoku b
 
 Exported functions:
 - `humanSolve(puzzle)` → `HumanSolveResult` - runs the full solve, returning all steps taken, the set of techniques used, and the final grid state. Used by the grader.
-- `findNextHint(grid, notes, solution?)` → `Hint | null` - finds the single next applicable technique given the current user grid and candidate notes. The hint carries evidence cells, action cells, elimination targets, and human-readable description strings used by `useHint`. When `solution` is provided, each candidate hint is validated against it before being returned — placement hints must match the solution digit, elimination hints must not remove the solution digit from any cell. Invalid hints (caused by corrupted user notes) are skipped and the next technique is tried; `null` is only returned when all techniques are exhausted. Each technique gets a fresh candidate clone so a skipped technique's mutations don't pollute subsequent ones.
+- `findNextHint(grid, notes, solution?)` → `Hint | null` - finds the single next applicable technique given the current user grid and candidate notes. The hint carries evidence cells, action cells, elimination targets, and human-readable description strings used by `useHint`. When `solution` is provided, each candidate hint is validated against it before being returned - placement hints must match the solution digit, elimination hints must not remove the solution digit from any cell. Invalid hints (caused by corrupted user notes) are skipped and the next technique is tried; `null` is only returned when all techniques are exhausted. Each technique gets a fresh candidate clone so a skipped technique's mutations don't pollute subsequent ones.
 
 #### `grader.ts` - difficulty classification
 
@@ -110,10 +110,10 @@ Maps a solved puzzle's technique set to a difficulty band by summing `TECHNIQUE_
 | Band | Score range | Weight examples |
 |---|---|---|
 | Easy | ≤ 4 | naked_single = 1, hidden_single = 2 |
-| Medium | 5–10 | naked_pair = 3, pointing_pair = 3 |
-| Hard | 11–17 | hidden_pair = 4, naked_triple = 5 |
-| Expert | 18–24 | hidden_triple = 6, naked_quad = 6, skyscraper = 6, two_string_kite = 6 |
-| Master | 25–32 | hidden_quad = 7, x_wing = 7, unique_rectangle = 7, empty_rectangle = 7 |
+| Medium | 5-10 | naked_pair = 3, pointing_pair = 3 |
+| Hard | 11-17 | hidden_pair = 4, naked_triple = 5 |
+| Expert | 18-24 | hidden_triple = 6, naked_quad = 6, skyscraper = 6, two_string_kite = 6 |
+| Master | 25-32 | hidden_quad = 7, x_wing = 7, unique_rectangle = 7, empty_rectangle = 7 |
 | Legend | > 32 | swordfish = 8, y_wing = 8, w_wing = 8, simple_coloring = 8, jellyfish = 9, xyz_wing = 9, xy_chain = 9 |
 
 `gradePuzzle(techniques, solved)` → `Grade { difficulty, score, techniques[] }`.
@@ -196,12 +196,12 @@ Triggers a CSS-class-based celebration animation when `solved` transitions to `t
 The main game view (~330 lines). Renders:
 - 9×9 grid with 3×3 box borders
 - Per-cell digit display, candidate notes (3×3 mini-grid), selection highlight, error highlight, hint highlights (evidence cells vs action cells)
-- Control bar: digit buttons 1–9, Erase, Notes toggle, Auto-fill notes, Hint button, Auto-solve button
+- Control bar: digit buttons 1-9, Erase, Notes toggle, Auto-fill notes, Hint button, Auto-solve button
 - Timer display with penalty flash
 - Wrong-guess counter (pip display up to 10)
 - Celebration overlay
 
-Keyboard handling: arrow keys move selection, digits 1–9 enter values or notes, Delete/Backspace erases, Escape dismisses hints/modals.
+Keyboard handling: arrow keys move selection, digits 1-9 enter values or notes, Delete/Backspace erases, Escape dismisses hints/modals.
 
 #### `StartPage.tsx` + `StartPage.css`
 

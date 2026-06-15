@@ -56,7 +56,7 @@ const App = () => {
     () => findUnfinishedGame()
   );
 
-  // Re-scan after activePuzzle clears — runs after unmount cleanup (persistGame), so save is in localStorage
+  // Re-scan after activePuzzle clears - runs after unmount cleanup (persistGame), so save is in localStorage
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!activePuzzle) setUnfinished(findUnfinishedGame());
