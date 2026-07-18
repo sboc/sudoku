@@ -164,6 +164,9 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
     if (el?.disabled) el.blur();
   }, [hintDisabled, autoDisabled, selectedFilled, puzzleBlockedDigits]);
 
+  const isDigitDisabledRef = useRef<(d: number) => boolean>(() => false);
+  isDigitDisabledRef.current = (d) => selectedFilled || puzzleBlockedDigits.has(d);
+
   const handleFillAllNotes = () => {
     fillAllNotes();
     setElapsed(s => s + 30);
@@ -177,7 +180,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
       const locked = !!activeHintRef.current || autoSolveRef.current;
       if (e.key === 'Escape') { if (sel !== null) selectCell(sel); }
       else if (e.key === 'n' || e.key === 'N') { if (!locked) toggleNotesMode(); }
-      else if (e.key >= '1' && e.key <= '9') { if (!locked) enterDigit(Number(e.key)); }
+      else if (e.key >= '1' && e.key <= '9') { const d = Number(e.key); if (!locked && !isDigitDisabledRef.current(d)) enterDigit(d); }
       else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') { if (!locked) clearCell(); }
       else if (e.key === 'ArrowRight') selectCell(sel !== null ? (sel % 9 < 8 ? sel + 1 : sel) : 0);
       else if (e.key === 'ArrowLeft') selectCell(sel !== null ? (sel % 9 > 0 ? sel - 1 : sel) : 0);
