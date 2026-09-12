@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { useSudoku } from '../hooks/useSudoku';
 import type { GeneratedPuzzle } from '../hooks/usePuzzlePool';
 import { loadSave, persistGame, localRemove } from '../core/persistence';
-import { PencilIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon, AutoIcon } from './Icons';
+import { PencilIcon, HelpIcon, ShareIcon, PowerIcon, CheckIcon, CrossIcon } from './Icons';
 import { findNextHint } from '../core/humanSolver';
 import { TechniqueHelpModal } from './TechniqueHelpModal';
 import { DIFFICULTY_COLOR, TECHNIQUE_WEIGHT } from '../core/grader';
@@ -12,7 +12,6 @@ import { PEERS } from '../core/grid';
 import { useTimer } from '../hooks/useTimer';
 import { useCelebration } from '../hooks/useCelebration';
 import { useHint } from '../hooks/useHint';
-import { useAutoSolve } from '../hooks/useAutoSolve';
 import './SudokuBoard.css';
 
 const CelebrationNumber = ({ value, index }: { value: number; index: number }) => {
@@ -57,11 +56,8 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
 
   // Declare refs before hooks that receive them; synced via useLayoutEffect below
   const selectedRef = useRef(selected);
-  const userGridRef = useRef(userGrid);
-  const notesRef = useRef(notes);
   const solvedRef = useRef(solved);
   const failedRef = useRef(failed);
-  const autoSolveRef = useRef(false);
 
   const { elapsed, setElapsed, timerFlash, timerFlashKey, showTimerFlash } = useTimer(
     savedGame?.elapsed ?? 0,
@@ -79,22 +75,12 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
   );
 
   const {
-    activeHint, setActiveHint,
-    setHintPhase,
-    hintRevealed, setHintRevealed,
+    activeHint,
+    hintRevealed,
     dismissHint,
     handleHelp, handleShowWhere, handleApplyHint,
     hintEvidenceSet, hintActionSet,
-    applyHintAction,
-  } = useHint({ nextHint, userGrid, autoSolveRef, setElapsed, showTimerFlash, placeDigitDirect, applyEliminations });
-
-  const { autoSolve, toggleAutoSolve } = useAutoSolve({
-    userGridRef, notesRef, solvedRef, failedRef, autoSolveRef,
-    solution: initialPuzzle.solution,
-    setElapsed, showTimerFlash,
-    setActiveHint, setHintPhase, setHintRevealed,
-    applyHintAction, fillAllNotes,
-  });
+  } = useHint({ nextHint, userGrid, setElapsed, showTimerFlash, placeDigitDirect, applyEliminations });
 
   // Keep refs current after every render (in effect, not during render)
   const activeHintRef = useRef(activeHint);
@@ -102,8 +88,6 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
   const exitedRef = useRef(false);
   useLayoutEffect(() => {
     selectedRef.current = selected;
-    userGridRef.current = userGrid;
-    notesRef.current = notes;
     solvedRef.current = solved;
     failedRef.current = failed;
     activeHintRef.current = activeHint;
@@ -147,8 +131,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
     return () => clearTimeout(id);
   }, [flashingCell]);
 
-  const hintDisabled = !nextHint && !activeHint && !autoSolve;
-  const autoDisabled = !nextHint && !autoSolve;
+  const hintDisabled = !nextHint && !activeHint;
 
   const puzzleBlockedDigits = useMemo(() => {
     if (selected === null || userGrid[selected] !== 0) return new Set<number>();
@@ -162,7 +145,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
   useEffect(() => {
     const el = document.activeElement as HTMLButtonElement | HTMLInputElement | null;
     if (el?.disabled) el.blur();
-  }, [hintDisabled, autoDisabled, selectedFilled, puzzleBlockedDigits]);
+  }, [hintDisabled, selectedFilled, puzzleBlockedDigits]);
 
   const isDigitDisabledRef = useRef<(d: number) => boolean>(() => false);
   isDigitDisabledRef.current = (d) => selectedFilled || puzzleBlockedDigits.has(d);
@@ -177,7 +160,7 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
     const handler = (e: KeyboardEvent) => {
       if (solvedRef.current || failedRef.current) return;
       const sel = selectedRef.current;
-      const locked = !!activeHintRef.current || autoSolveRef.current;
+      const locked = !!activeHintRef.current;
       if (e.key === 'Escape') { if (sel !== null) selectCell(sel); }
       else if (e.key === 'n' || e.key === 'N') { if (!locked) toggleNotesMode(); }
       else if (e.key >= '1' && e.key <= '9') { const d = Number(e.key); if (!locked && !isDigitDisabledRef.current(d)) enterDigit(d); }
@@ -353,18 +336,11 @@ export const SudokuBoard = ({ initialPuzzle, onBack }: Props) => {
                 All Notes
               </button>
               <button
-                className={`num-btn icon-btn${activeHint && !autoSolve ? ' help-active' : ''}`}
+                className={`num-btn icon-btn${activeHint ? ' help-active' : ''}`}
                 onClick={handleHelp}
                 disabled={hintDisabled}
               >
                 <HelpIcon /> Hint
-              </button>
-              <button
-                className={`num-btn autosolve-label${autoSolve ? ' active' : ''}${autoDisabled ? ' autosolve-disabled' : ''}`}
-                onClick={(e) => { toggleAutoSolve(); (e.currentTarget as HTMLButtonElement).blur(); }}
-                disabled={autoDisabled}
-              >
-                <AutoIcon checked={autoSolve} /> Auto
               </button>
             </div>
           </>

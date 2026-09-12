@@ -334,8 +334,7 @@ h1 {
 }
 
 .num-btn.icon-btn,
-.num-btn.notes-toggle,
-.num-btn.autosolve-label {
+.num-btn.notes-toggle {
   display: grid;
   grid-template-columns: 1.4rem 1fr 1.4rem;
   align-items: center;
@@ -348,8 +347,7 @@ h1 {
   letter-spacing: 0.03em;
 }
 
-.num-btn.notes-toggle.active,
-.num-btn.autosolve-label.active {
+.num-btn.notes-toggle.active {
   background: var(--c-bg-cell-hi);
   border-color: var(--c-accent);
   color: var(--c-accent-soft);
@@ -484,19 +482,6 @@ h1 {
   background: var(--c-bg-cell-hi);
   border-color: var(--c-accent);
   color: var(--c-accent-soft);
-}
-
-/* Auto-solve checkbox label */
-.autosolve-label {
-  cursor: pointer;
-  letter-spacing: 0.03em;
-}
-
-
-
-.autosolve-disabled {
-  opacity: 0.4;
-  pointer-events: none;
 }
 
 .failed-banner {

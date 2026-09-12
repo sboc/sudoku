@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { Hint } from '../core/humanSolver';
 import { TECHNIQUE_WEIGHT } from '../core/grader';
 import { penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
@@ -7,7 +7,6 @@ import { penaltyLabel, HINT_REVEAL_COST, HINT_APPLY_COST } from '../core/utils';
 interface UseHintParams {
   nextHint: Hint | null;
   userGrid: number[];
-  autoSolveRef: MutableRefObject<boolean>;
   setElapsed: Dispatch<SetStateAction<number>>;
   showTimerFlash: (msg: string) => void;
   placeDigitDirect: (cell: number, digit: number) => void;
@@ -17,7 +16,6 @@ interface UseHintParams {
 export const useHint = ({
   nextHint,
   userGrid,
-  autoSolveRef,
   setElapsed,
   showTimerFlash,
   placeDigitDirect,
@@ -35,9 +33,19 @@ export const useHint = ({
     setHintPhase('evidence');
   }, []);
 
+  // Dismiss the active hint whenever the grid changes, computed during render
+  // (rather than in an effect) to avoid an extra render pass.
+  const [prevUserGrid, setPrevUserGrid] = useState(userGrid);
+  if (userGrid !== prevUserGrid) {
+    setPrevUserGrid(userGrid);
+    setActiveHint(null);
+    setHintRevealed(false);
+    setHintPhase('evidence');
+  }
+
   useEffect(() => {
-    if (!autoSolveRef.current) dismissHint();
-  }, [userGrid, dismissHint, autoSolveRef]);
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+  }, [userGrid]);
 
   useEffect(() => () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); }, []);
 
