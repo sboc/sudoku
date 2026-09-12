@@ -36,6 +36,8 @@ export const SettingsModal = ({ theme, onChangeTheme, onClose }: Props) => {
                 className={`theme-card${theme === t.id ? ' theme-card--active' : ''}`}
                 onClick={() => onChangeTheme(t.id)}
                 aria-pressed={theme === t.id}
+                aria-label={t.name}
+                title={t.name}
                 style={{
                   background: t.bgCell,
                   borderColor: theme === t.id ? t.accent : t.borderBox,
@@ -54,7 +56,6 @@ export const SettingsModal = ({ theme, onChangeTheme, onClose }: Props) => {
                     <div style={{ background: t.bgCellHi }} />
                   </div>
                 </div>
-                <span className="theme-name" style={{ color: t.text1 }}>{t.name}</span>
                 {theme === t.id && <span className="theme-check" style={{ color: t.accent }}>✓</span>}
               </button>
             ))}

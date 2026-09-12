@@ -68,11 +68,12 @@
 
 .theme-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
 .theme-card {
+  min-width: 0;
   background: var(--c-bg-cell);
   border: 2px solid var(--c-border-ui);
   border-radius: 10px;
@@ -82,7 +83,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
   transition: filter 0.15s;
   position: relative;
 }
@@ -110,13 +110,6 @@
 
 .theme-preview-grid > div {
   border-radius: 2px;
-}
-
-.theme-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .theme-check {

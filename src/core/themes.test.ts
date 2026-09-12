@@ -3,8 +3,8 @@ import { THEMES, DEFAULT_THEME } from './themes';
 import type { ThemeId } from './themes';
 
 describe('themes', () => {
-  it('THEMES array has 8 entries', () => {
-    expect(THEMES).toHaveLength(8);
+  it('THEMES array has 12 entries', () => {
+    expect(THEMES).toHaveLength(12);
   });
 
   it('each theme has required fields', () => {
